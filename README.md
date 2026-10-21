@@ -9,7 +9,7 @@ PolePlanner is a mission-planning tool for landing sites at the lunar south pole
 - **Experience (3D):** the selected plan only: launch, transit, landing and a continuous zoom down to the site.
 - **Site:** a 360° horizon panorama and site characteristics. At the south pole the Sun barely grazes the horizon, so terrain decides whether there is light and a direct link to Earth.
 
-> **Status:** early development (Phase 0). Commands marked **TBD** are not available yet.
+> **Status:** in development. Phases 0–2 done: validated science and all front-end data in `web/public/data/`. Front end in progress.
 > The full specification (in Spanish) is in [`docs/SPEC.md`](docs/SPEC.md).
 
 ## Repository layout

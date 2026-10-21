@@ -32,7 +32,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Trayectorias ILLUSTRATIVE | `.venv/Scripts/python -m pipeline.trajectory [--plot]` (→ `pipeline/out/trajectory/`) | disponible |
 | Características de los sitios | `.venv/Scripts/python -m pipeline.site_features` (`--fetch-gazetteer` para reconsultar el nomenclátor) | disponible |
 | Terreno en LOD | `.venv/Scripts/python -m pipeline.terrain_lod` (→ `pipeline/out/terrain/`) | disponible |
-| Datos SYNTHETIC | `python -m pipeline.synthetic` | por definir (TS.1.a) |
+| Datos SYNTHETIC | — | omitido (A4): el front end usa los datos reales |
 | Correr el pipeline | `.venv/Scripts/python -m pipeline.build_all` (`--assemble` solo reensambla) → `web/public/data/` | disponible |
 | Tests pipeline | `.venv/Scripts/python -m pytest` (config en `pyproject.toml`) | disponible |
 | Instalar front end | `npm --prefix web ci` | disponible |
@@ -93,6 +93,6 @@ Notas del protocolo:
 | Sitios y sus fuentes | `docs/sites.md` (T0.3.a), `pipeline/sites.json` (T0.3.b) |
 | Validación contra JPL Horizons | `docs/validation.md` (T1.1.a, T5.3.a) |
 | Pipeline | `pipeline/` (salida intermedia en `pipeline/out/`, no versionada) |
-| Datos del front end | `web/public/data/` (REAL), `web/public/data_synthetic/` (SYNTHETIC) |
+| Datos del front end | `web/public/data/` (REAL, versionado; regenerar con `build_all`) |
 | Front end | `web/src/` (`store/`, `views/`, `components/`, `lib/`, `styles/`, `scene3d/`, `panels2d/`) |
 | Comando de sesión | `.claude/commands/siguiente.md` |

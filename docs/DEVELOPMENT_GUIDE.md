@@ -342,25 +342,30 @@ Revisar `docs/validation.md` (tabla de errores) y `docs/figures/horizon_*.png`.
 
 ---
 
-## Pista S (paralela): datos SYNTHETIC para el front end
+## Pista S (paralela): datos SYNTHETIC para el front end — OMITIDA (A4)
+
+> **Omitida el 2026-10-21 (decisión A4 del humano).** La Fase 2 terminó antes de empezar el front end, así que los datos reales ya existen en `web/public/data/` (versionados). El front end usa los datos reales; sus pruebas usan las fixtures SYNTHETIC del contrato (`pipeline/tests/fixtures/contract/`). El aviso SYNTHETIC del cargador (T3.1.a) se mantiene por si algún conjunto de datos lo declara.
 
 Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo que genera lleva `data_status: "SYNTHETIC"` en el manifiesto y "SYNTHETIC" en los nombres de los sitios; el front end muestra un aviso permanente (T3.1.a). Nunca se mezcla con `web/public/data/`.
 
 ### TS.1 Generador de datos SYNTHETIC conforme a 7.2
 
-##### [ ] TS.1.a — Sitios, horizontes y series SYNTHETIC
+##### [x] TS.1.a — Sitios, horizontes y series SYNTHETIC (OMITIDA)
+- **Nota:** omitida por decisión del humano (A4, 2026-10-21): los datos reales del pipeline (Fase 2) ya existen y el front end trabaja con ellos.
 - **Qué:** 5 sitios ficticios (`syn_a`…`syn_e`, nombre "SYNTHETIC Site A"…, `source: "SYNTHETIC"`); máscaras procedurales distintas entre sí para que los paneles difieran; series de un año a 30 min con un movimiento del Sol y la Tierra generado por fórmulas simples, documentadas como no físicas; banderas con las reglas de 5.3 y 5.4; semilla fija; manifiesto con `data_status: "SYNTHETIC"`.
 - **Archivos:** `pipeline/synthetic.py`, `web/public/data_synthetic/**`
 - **Depende de:** T0.4.b · **Spec:** 14, 7.2, 11 regla 1 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** `python -m pipeline.synthetic` y luego `python -m pipeline.validate web/public/data_synthetic` terminan en 0; el manifiesto y todos los nombres de sitio contienen "SYNTHETIC"; dos ejecuciones dan archivos idénticos (sha256).
 
-##### [ ] TS.1.b — daily, windows y plans SYNTHETIC
+##### [x] TS.1.b — daily, windows y plans SYNTHETIC (OMITIDA)
+- **Nota:** omitida por decisión del humano (A4, 2026-10-21): los datos reales del pipeline (Fase 2) ya existen y el front end trabaja con ellos.
 - **Qué:** daily, windows y plans calculados desde las series sintéticas con una implementación ingenua propia (no depende de `windows.py`); `transit_days` de relleno marcado.
 - **Archivos:** `pipeline/synthetic.py`, `web/public/data_synthetic/**`
 - **Depende de:** TS.1.a · **Spec:** 5.5, 5.6, 5.8, 7.2 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** `python -m pipeline.validate web/public/data_synthetic` termina en 0; `sun_pct` en [0, 100], `score` en [0, 1]; todos los planes cumplen `launch_utc = arrival_utc − transit_days`.
 
-##### [ ] TS.1.c — Escena, trayectorias, características y terreno SYNTHETIC
+##### [x] TS.1.c — Escena, trayectorias, características y terreno SYNTHETIC (OMITIDA)
+- **Nota:** omitida por decisión del humano (A4, 2026-10-21): los datos reales del pipeline (Fase 2) ya existen y el front end trabaja con ellos.
 - **Qué:** `scene/ephemeris.json` (órbita circular simple de la Luna, Sol que gira una vez por año, cuaterniones), trayectorias ILLUSTRATIVE simples, `site_features` con atributos "not available" o marcados SYNTHETIC, terreno procedural (cráter y cresta) en 2–3 LOD; `web/public/data_synthetic/README.md` (qué es, cómo regenerarlo). Si el total pesa < 5 MB se versiona; si no, se ignora en git y se genera.
 - **Archivos:** `pipeline/synthetic.py`, `web/public/data_synthetic/**`
 - **Depende de:** TS.1.b · **Spec:** 5.9, 5.10, 7.2 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
@@ -479,15 +484,15 @@ Revisar `docs/figures/trajectory_*.png` y `docs/figures/polar_context.png`.
 
 ## Fase 3: Front end 2D y comparación
 
-Sin WebGL en esta fase (regla 7). Se desarrolla sobre `data_synthetic` (adelantable) y se cierra con datos reales (T3.5.a). La comparación 2D nunca se recorta.
+Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos reales de `web/public/data/` (la Pista S se omitió, A4); T3.5.a queda como verificación final (paridad Python ↔ TypeScript y tiempo de carga). La comparación 2D nunca se recorta.
 
 ### T3.1 Proyecto, estado global y carga de datos (spec 7, 8)
 
 ##### [ ] T3.1.a — Carga de datos validada y selector REAL/SYNTHETIC
-- **Qué:** carga del manifiesto primero y de los demás archivos bajo demanda, validación zod y caché; directorio de datos seleccionable (`data` por defecto, `data_synthetic` con `?data=synthetic`); aviso "SYNTHETIC DATA" permanente si `data_status` es SYNTHETIC; estados de carga y error.
+- **Qué:** carga del manifiesto primero y de los demás archivos bajo demanda, validación zod y caché; directorio de datos seleccionable (`data` por defecto; otro con `?data=<carpeta>`, p. ej. las fixtures del contrato en las pruebas); aviso "SYNTHETIC DATA" permanente si `data_status` es SYNTHETIC; estados de carga y error.
 - **Archivos:** `web/src/lib/data.ts`, `web/src/components/SyntheticBanner.tsx`, `web/tests/data.test.ts`
-- **Depende de:** T0.4.c, TS.1.c · **Spec:** 7, 7.2, 10 (T3.1), 11 regla 1 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
-- **Aceptación:** pruebas Vitest con fetch simulado: archivo inválido → error tipado; manifiesto SYNTHETIC → aviso activo; `npm --prefix web run typecheck` sin errores; revisión visual del aviso en dev.
+- **Depende de:** T0.4.c, T2.4.b · **Spec:** 7, 7.2, 10 (T3.1), 11 regla 1 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
+- **Aceptación:** pruebas Vitest con fetch simulado: archivo inválido → error tipado; manifiesto SYNTHETIC (fixtures del contrato) → aviso activo; manifiesto REAL de `web/public/data` → sin aviso; `npm --prefix web run typecheck` sin errores; revisión en dev de que carga los datos reales.
 
 ##### [ ] T3.1.b — Estado global (Zustand)
 - **Qué:** `plans`, `comparePlans` (máx. 5), `selectedPlanId`, `selectedSite`, `selectedWindow`, `constraints`, `missionPhase`, `missionTime`, `compareTime` y sus acciones.
@@ -615,7 +620,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 ##### [ ] T4.1.c — Tierra, Luna, Sol y estrellas desde scene/ephemeris
 - **Qué:** texturas convertidas a tamaños web, luz direccional y sprite del Sol, campo de estrellas; posiciones y orientación interpoladas (slerp) en `missionTime`; colores de los tokens.
 - **Archivos:** `web/src/scene3d/bodies.ts`, `web/src/scene3d/ephemeris.ts`, `web/public/textures/`
-- **Depende de:** T4.1.b, T0.2.f, TS.1.c · **Spec:** 8.2, 9, 5.8 · **Decisiones:** D13 · **Est.:** 3 h · **Adelantable**
+- **Depende de:** T4.1.b, T0.2.f, T2.4.b · **Spec:** 8.2, 9, 5.8 · **Decisiones:** D13 · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba numérica: el ángulo de fase de los datos coincide con el de la escena (dirección de la luz frente a los vectores); revisión visual de la fase.
 
 ##### [ ] T4.1.d — Controles de tiempo de misión

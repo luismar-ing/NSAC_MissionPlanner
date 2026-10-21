@@ -1304,3 +1304,16 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - Terreno: 3 niveles por sitio + contexto polar de 2 km (1.15 MB).
   - Build reproducible byte a byte; 15.97 MB de datos (6.2 MB con gzip), dentro de D13.
 - **Siguiente tarea:** Fase 3. T3.1.a depende de la Pista S (TS.1.c); con los datos reales ya disponibles se propone omitir esa pista (pendiente de confirmación del humano).
+
+## 2026-10-21 · DECISIONES · A4: Pista S omitida (cambio en la guía)
+
+- **Qué:** el humano decidió omitir la Pista S (generador de datos SYNTHETIC) porque los datos reales del pipeline ya existen (Fase 2) y están versionados en `web/public/data/`. También autorizó el push.
+- **Cambios en la guía (paso h):**
+  - TS.1.a–c marcadas `[x] (OMITIDA)` con nota.
+  - T3.1.a y T4.1.c dependen ahora de **T2.4.b** en lugar de TS.1.c.
+  - La introducción de la Fase 3 dice que se desarrolla sobre los datos reales; T3.5.a queda como verificación final (paridad Python ↔ TS y tiempo de carga).
+  - La aceptación de T3.1.a prueba el aviso SYNTHETIC con las fixtures del contrato y la ausencia de aviso con los datos REAL.
+  - `CLAUDE.md`: comando SYNTHETIC «omitido (A4)» y mapa de archivos actualizado. `docs/DECISIONS.md`: fila A4. `README.md`: estado actualizado.
+  - Comprobación de la guía (IDs, dependencias, campos): 0 errores.
+- **Por qué no se desvía de la spec:** la sección 14 propone los datos sintéticos como *mitigación* para no esperar al pipeline; ese riesgo ya no existe. La regla 1 (marcar lo SYNTHETIC) se mantiene en el cargador.
+- **Siguiente tarea:** T3.1.a.
