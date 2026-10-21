@@ -9,7 +9,7 @@ PolePlanner is a mission-planning tool for landing sites at the lunar south pole
 - **Experience (3D):** the selected plan only: launch, transit, landing and a continuous zoom down to the site.
 - **Site:** a 360° horizon panorama and site characteristics. At the south pole the Sun barely grazes the horizon, so terrain decides whether there is light and a direct link to Earth.
 
-> **Status:** early development (Phase 0). Most commands below are not available yet and are marked **TBD**.
+> **Status:** early development (Phase 0). Commands marked **TBD** are not available yet.
 > The full specification (in Spanish) is in [`docs/SPEC.md`](docs/SPEC.md).
 
 ## Repository layout
@@ -37,26 +37,28 @@ PolePlanner is a mission-planning tool for landing sites at the lunar south pole
 
 ## Pipeline
 
+Run every command from the repository root.
+
 Everything is precomputed offline; the browser only filters and draws.
 
 | Step | Command | Status |
 |---|---|---|
 | Create a virtual environment | `python -m venv .venv` | available |
-| Install dependencies | `.venv/Scripts/python -m pip install -r pipeline/requirements.txt` (Windows) or `.venv/bin/python -m pip install -r pipeline/requirements.txt` | TBD |
+| Install dependencies | `.venv/Scripts/python -m pip install -r pipeline/requirements.txt` (Windows) or `.venv/bin/python -m pip install -r pipeline/requirements.txt` | available |
 | Download external data | `python -m pipeline.fetch_data` | TBD |
 | Build all data | `python -m pipeline.build_all` | TBD |
 | Validate data | `python -m pipeline.validate web/public/data` | TBD |
-| Run tests | `python -m pytest pipeline/tests -v` | TBD |
+| Run tests | `.venv/Scripts/python -m pytest` (configured in `pyproject.toml`) | available |
 
 ## Front end
 
 | Step | Command | Status |
 |---|---|---|
-| Install | `npm --prefix web ci` | TBD |
-| Development server | `npm --prefix web run dev` | TBD |
-| Tests | `npm --prefix web test` | TBD |
-| Type check | `npm --prefix web run typecheck` | TBD |
-| Production build | `npm --prefix web run build` | TBD |
+| Install | `npm --prefix web ci` | available |
+| Development server | `npm --prefix web run dev` | available |
+| Tests | `npm --prefix web test` | available |
+| Type check | `npm --prefix web run typecheck` | available |
+| Production build | `npm --prefix web run build` | available |
 
 ## What is real and what is not
 

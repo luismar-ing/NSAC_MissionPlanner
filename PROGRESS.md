@@ -161,3 +161,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** git avisa de conversión LF→CRLF en Windows (`core.autocrlf`); no afecta al funcionamiento.
 - **Siguiente tarea:** T0.1.d.
+
+## 2026-10-21 · T0.1.d · Comandos definitivos y prueba desde un clon limpio
+
+- **Tarea:** T0.1.d — Comandos definitivos y prueba desde un clon limpio ([x]).
+- **Qué se hizo:** la tabla de comandos de `CLAUDE.md` y las tablas de `README.md` marcan como disponibles la instalación y los tests del pipeline y todos los comandos del front end. Siguen "por definir"/TBD los comandos que crean tareas futuras (`fetch_data`, `validate`, `synthetic`, `build_all`). El README indica que todo se ejecuta desde la raíz.
+- **Cómo se verificó:** `git clone` del repositorio (HEAD 6986915) a una carpeta temporal y ejecución desde cero:
+  ```
+  clone: 6986915 T0.1.c: esqueleto del front end con Vite, React, TypeScript y Vitest
+  pip install exit: 0
+  9 passed in 1.70s
+  found 0 vulnerabilities
+  typecheck exit: 0
+        Tests  1 passed (1)
+  ✓ built in 185ms
+  build exit: 0
+  ```
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. T0.1 completa.
+- **Siguiente tarea:** T0.4.a.

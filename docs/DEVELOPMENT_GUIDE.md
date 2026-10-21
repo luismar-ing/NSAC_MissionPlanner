@@ -86,7 +86,7 @@ Las carpetas vacías de 7.1 (con `.gitkeep`), `PROGRESS.md`, `CLAUDE.md` y `.git
 - **Depende de:** T0.1.a · **Spec:** 7, 11 (pila) · **Decisiones:** D2 · **Est.:** 1.5 h
 - **Aceptación:** `npm --prefix web ci`, `npm --prefix web run typecheck`, `npm --prefix web test` y `npm --prefix web run build` terminan con código 0; `npm --prefix web run dev` responde HTTP 200.
 
-##### [ ] T0.1.d — Comandos definitivos y prueba desde un clon limpio
+##### [x] T0.1.d — Comandos definitivos y prueba desde un clon limpio
 - **Qué:** sustituir los "por definir" de instalar, tests, servidor de desarrollo y build en `CLAUDE.md` y `README.md`; clonar el repositorio en una carpeta temporal y ejecutar todo desde cero.
 - **Archivos:** `CLAUDE.md`, `README.md`
 - **Depende de:** T0.1.b, T0.1.c · **Spec:** 10 (T0.1), 11 regla 5 · **Decisiones:** — · **Est.:** 1 h
