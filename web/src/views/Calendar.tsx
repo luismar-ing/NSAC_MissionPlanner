@@ -204,6 +204,8 @@ export function Calendar() {
       ctx.lineWidth = 2;
       ctx.strokeRect(x - 2, y - 2, Math.max(w, 3) + 4, hh + 4);
     }
+    // Spec 8.7: initial load of the 2D shell (< 3 s) ends at the first calendar draw (T3.5.a)
+    if (!performance.getEntriesByName("shell-ready").length) performance.mark("shell-ready");
     // Spec 8.7: time from the last control change until the canvas is redrawn (< 100 ms). Measured
     // synchronously (rAF is paused in background tabs); the next-frame time is added when available.
     if (performance.getEntriesByName("constraint-change").length) {

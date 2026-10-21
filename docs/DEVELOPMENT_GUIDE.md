@@ -586,7 +586,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 
 ### T3.5 (añadida) Integración con datos reales
 
-##### [ ] T3.5.a — Pasar a los datos reales del pipeline
+##### [x] T3.5.a — Pasar a los datos reales del pipeline
 - **Qué:** la app carga `web/public/data/`; paridad de restricciones y score entre Python (T1.4.c) y TypeScript (T3.1.d).
 - **Archivos:** `web/tests/parity.test.ts`, correcciones donde haga falta
 - **Depende de:** T2.4.b, T3.2.c, T3.3.e, T3.4.b, T3.4.c · **Spec:** 7, 8.7, 10 (T3.1) · **Decisiones:** — · **Est.:** 2 h

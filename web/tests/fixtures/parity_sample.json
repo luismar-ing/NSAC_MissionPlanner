@@ -1,0 +1,1406 @@
+{
+ "seed": 20261021,
+ "source": "web/public/data/windows",
+ "cells": [
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-10-25T00:00:00Z",
+   "constraints": {
+    "minSunPct": 1,
+    "maxDarkH": 0.0,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8715,
+   "valid_cells_L": 688
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-09-04T00:00:00Z",
+   "constraints": {
+    "minSunPct": 90.48,
+    "maxDarkH": null,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8218,
+   "valid_cells_L": 934
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-10-28T00:00:00Z",
+   "constraints": {
+    "minSunPct": 12,
+    "maxDarkH": 0.0,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7,
+   "valid_cells_L": 1279
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-04-02T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": 1.5
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.6062,
+   "valid_cells_L": 418
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-05-10T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 4,
+    "minEarthH": 9.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.5166,
+   "valid_cells_L": 151
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-03-20T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 29,
+    "minEarthH": 13.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7373,
+   "valid_cells_L": 174
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-11-25T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 142,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.9133,
+   "valid_cells_L": 1564
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-06-18T00:00:00Z",
+   "constraints": {
+    "minSunPct": 68,
+    "maxDarkH": 56,
+    "minEarthH": 19.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.8334,
+   "valid_cells_L": 759
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-09-27T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 318,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.6249,
+   "valid_cells_L": 1822
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-09-27T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 0.0,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7541,
+   "valid_cells_L": 1279
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-11-07T00:00:00Z",
+   "constraints": {
+    "minSunPct": 21,
+    "maxDarkH": 73,
+    "minEarthH": 0.0
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.994,
+   "valid_cells_L": 1242
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 7,
+   "arrival": "2027-04-03T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 140,
+    "minEarthH": 11.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.3,
+   "valid_cells_L": 718
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 7,
+   "arrival": "2027-10-14T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 146,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 1040
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 14,
+   "arrival": "2027-07-10T00:00:00Z",
+   "constraints": {
+    "minSunPct": 45,
+    "maxDarkH": null,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7478,
+   "valid_cells_L": 1632
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-03-19T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 15,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8526,
+   "valid_cells_L": 1040
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-03-29T00:00:00Z",
+   "constraints": {
+    "minSunPct": 33,
+    "maxDarkH": null,
+    "minEarthH": 17.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.3904,
+   "valid_cells_L": 280
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-01-03T00:00:00Z",
+   "constraints": {
+    "minSunPct": 55,
+    "maxDarkH": 25,
+    "minEarthH": 15.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7,
+   "valid_cells_L": 499
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-05-21T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.7,
+   "valid_cells_L": 1825
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-02-23T00:00:00Z",
+   "constraints": {
+    "minSunPct": 77,
+    "maxDarkH": 268,
+    "minEarthH": 13.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7844,
+   "valid_cells_L": 221
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-06-19T00:00:00Z",
+   "constraints": {
+    "minSunPct": 71.58,
+    "maxDarkH": 95.5,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8011,
+   "valid_cells_L": 187
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-05-12T00:00:00Z",
+   "constraints": {
+    "minSunPct": 55,
+    "maxDarkH": null,
+    "minEarthH": 17.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.4653,
+   "valid_cells_L": 796
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-01-05T00:00:00Z",
+   "constraints": {
+    "minSunPct": 86.9,
+    "maxDarkH": 21,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.8512,
+   "valid_cells_L": 869
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-03-20T00:00:00Z",
+   "constraints": {
+    "minSunPct": 88,
+    "maxDarkH": null,
+    "minEarthH": 10.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7285,
+   "valid_cells_L": 758
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-05-23T00:00:00Z",
+   "constraints": {
+    "minSunPct": 84.72,
+    "maxDarkH": null,
+    "minEarthH": 11.0
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.6909,
+   "valid_cells_L": 762
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-08-15T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 60,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 1279
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-08-09T00:00:00Z",
+   "constraints": {
+    "minSunPct": 9,
+    "maxDarkH": 17,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7,
+   "valid_cells_L": 1397
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-02-07T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 72,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.6417,
+   "valid_cells_L": 557
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-02-26T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 49,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7,
+   "valid_cells_L": 1279
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-10-11T00:00:00Z",
+   "constraints": {
+    "minSunPct": 58,
+    "maxDarkH": null,
+    "minEarthH": 5.5
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 632
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 14,
+   "arrival": "2027-10-20T00:00:00Z",
+   "constraints": {
+    "minSunPct": 93,
+    "maxDarkH": 39,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7685,
+   "valid_cells_L": 871
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 7,
+   "arrival": "2027-07-24T00:00:00Z",
+   "constraints": {
+    "minSunPct": 12,
+    "maxDarkH": 0.0,
+    "minEarthH": 19.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 431
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-09-21T00:00:00Z",
+   "constraints": {
+    "minSunPct": 11,
+    "maxDarkH": 108.5,
+    "minEarthH": 19.0
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.6446,
+   "valid_cells_L": 215
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-09-13T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 23.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 675
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-09-16T00:00:00Z",
+   "constraints": {
+    "minSunPct": 91,
+    "maxDarkH": 52.5,
+    "minEarthH": 6.0
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.8737,
+   "valid_cells_L": 191
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 3,
+   "arrival": "2027-02-20T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 13.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 720
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 3,
+   "arrival": "2027-07-22T00:00:00Z",
+   "constraints": {
+    "minSunPct": 2,
+    "maxDarkH": 0.0,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 667
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-05-13T00:00:00Z",
+   "constraints": {
+    "minSunPct": 65,
+    "maxDarkH": null,
+    "minEarthH": 14.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.6119,
+   "valid_cells_L": 235
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-03-05T00:00:00Z",
+   "constraints": {
+    "minSunPct": 21.28,
+    "maxDarkH": 14,
+    "minEarthH": 22.5
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.5249,
+   "valid_cells_L": 134
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-12-05T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 0.0,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 413
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-03-09T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 31,
+    "minEarthH": 11.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 722
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-04-06T00:00:00Z",
+   "constraints": {
+    "minSunPct": 95,
+    "maxDarkH": 135,
+    "minEarthH": 14.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.5664,
+   "valid_cells_L": 154
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-10-03T00:00:00Z",
+   "constraints": {
+    "minSunPct": 75,
+    "maxDarkH": 36,
+    "minEarthH": 8.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.8767,
+   "valid_cells_L": 559
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-02-10T00:00:00Z",
+   "constraints": {
+    "minSunPct": 64,
+    "maxDarkH": null,
+    "minEarthH": 10.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.9145,
+   "valid_cells_L": 255
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 3,
+   "arrival": "2027-03-31T00:00:00Z",
+   "constraints": {
+    "minSunPct": 12,
+    "maxDarkH": null,
+    "minEarthH": 2.0
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.582,
+   "valid_cells_L": 944
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-06-03T00:00:00Z",
+   "constraints": {
+    "minSunPct": 74.85,
+    "maxDarkH": 213,
+    "minEarthH": 5.5
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.6741,
+   "valid_cells_L": 250
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-09-07T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.9119,
+   "valid_cells_L": 688
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-05-03T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 667
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 3,
+   "arrival": "2027-10-13T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 40,
+    "minEarthH": 10.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 727
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-09-10T00:00:00Z",
+   "constraints": {
+    "minSunPct": 51,
+    "maxDarkH": null,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 565
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-06-19T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 38,
+    "minEarthH": 1.0
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.7791,
+   "valid_cells_L": 757
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-11-14T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 13,
+    "minEarthH": 24.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.8664,
+   "valid_cells_L": 127
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-08-09T00:00:00Z",
+   "constraints": {
+    "minSunPct": 93,
+    "maxDarkH": 0.0,
+    "minEarthH": 12.5
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.9269,
+   "valid_cells_L": 142
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 7,
+   "arrival": "2027-12-31T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 4.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 476
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-11-02T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": 8.5
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.9995,
+   "valid_cells_L": 379
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-05-31T00:00:00Z",
+   "constraints": {
+    "minSunPct": 12.65,
+    "maxDarkH": null,
+    "minEarthH": 2.5
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.3501,
+   "valid_cells_L": 398
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 7,
+   "arrival": "2027-02-04T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": null,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.9429,
+   "valid_cells_L": 1040
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-06-04T00:00:00Z",
+   "constraints": {
+    "minSunPct": 45.24,
+    "maxDarkH": 130,
+    "minEarthH": 9.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.6167,
+   "valid_cells_L": 652
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-03-09T00:00:00Z",
+   "constraints": {
+    "minSunPct": 0.0,
+    "maxDarkH": null,
+    "minEarthH": 21.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.3,
+   "valid_cells_L": 1027
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 7,
+   "arrival": "2027-09-17T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": null,
+    "minEarthH": 21.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 424
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 7,
+   "arrival": "2027-09-04T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": 0.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.8099,
+   "valid_cells_L": 877
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-09-11T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 3.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.9125,
+   "valid_cells_L": 753
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-08-06T00:00:00Z",
+   "constraints": {
+    "minSunPct": 10,
+    "maxDarkH": 314,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.809,
+   "valid_cells_L": 1809
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 3,
+   "arrival": "2027-03-28T00:00:00Z",
+   "constraints": {
+    "minSunPct": 95,
+    "maxDarkH": 38,
+    "minEarthH": 5.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.3041,
+   "valid_cells_L": 758
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-03-10T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 65,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": false,
+   "score": 0.5146,
+   "valid_cells_L": 548
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 7,
+   "arrival": "2027-12-31T00:00:00Z",
+   "constraints": {
+    "minSunPct": 88,
+    "maxDarkH": 49,
+    "minEarthH": 0.5
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 538
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-08-30T00:00:00Z",
+   "constraints": {
+    "minSunPct": 62,
+    "maxDarkH": 62.0,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7197,
+   "valid_cells_L": 1198
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 14,
+   "arrival": "2027-03-08T00:00:00Z",
+   "constraints": {
+    "minSunPct": 29,
+    "maxDarkH": 120.0,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7046,
+   "valid_cells_L": 1490
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-05-07T00:00:00Z",
+   "constraints": {
+    "minSunPct": 3.47,
+    "maxDarkH": 69.5,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.3243,
+   "valid_cells_L": 1639
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-07-15T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 80,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8447,
+   "valid_cells_L": 1280
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 14,
+   "arrival": "2027-08-19T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 194,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.9395,
+   "valid_cells_L": 688
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 7,
+   "arrival": "2027-09-17T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 1040
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-07-07T00:00:00Z",
+   "constraints": {
+    "minSunPct": 73,
+    "maxDarkH": 39,
+    "minEarthH": 20.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7859,
+   "valid_cells_L": 520
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-06-02T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 53,
+    "minEarthH": 10.0
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 892
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 3,
+   "arrival": "2027-05-26T00:00:00Z",
+   "constraints": {
+    "minSunPct": 63,
+    "maxDarkH": 49,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.9729,
+   "valid_cells_L": 1449
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 14,
+   "arrival": "2027-01-26T00:00:00Z",
+   "constraints": {
+    "minSunPct": 40.77,
+    "maxDarkH": null,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.4153,
+   "valid_cells_L": 1659
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-05-22T00:00:00Z",
+   "constraints": {
+    "minSunPct": 31,
+    "maxDarkH": null,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.8479,
+   "valid_cells_L": 1555
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-03-11T00:00:00Z",
+   "constraints": {
+    "minSunPct": 26,
+    "maxDarkH": 41.5,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.5965,
+   "valid_cells_L": 1519
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 7,
+   "arrival": "2027-10-09T00:00:00Z",
+   "constraints": {
+    "minSunPct": 4,
+    "maxDarkH": null,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 1737
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-09-11T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 59,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 1279
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 3,
+   "arrival": "2027-05-19T00:00:00Z",
+   "constraints": {
+    "minSunPct": 88,
+    "maxDarkH": 26,
+    "minEarthH": 7.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7,
+   "valid_cells_L": 766
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 7,
+   "arrival": "2027-11-27T00:00:00Z",
+   "constraints": {
+    "minSunPct": 33,
+    "maxDarkH": 86,
+    "minEarthH": 13.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.9205,
+   "valid_cells_L": 639
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-08-03T00:00:00Z",
+   "constraints": {
+    "minSunPct": 7,
+    "maxDarkH": 189,
+    "minEarthH": 4.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.7208,
+   "valid_cells_L": 321
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 14,
+   "arrival": "2027-01-14T00:00:00Z",
+   "constraints": {
+    "minSunPct": 89.14,
+    "maxDarkH": 36.5,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8982,
+   "valid_cells_L": 979
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-09-18T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": null,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8997,
+   "valid_cells_L": 688
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 7,
+   "arrival": "2027-12-30T00:00:00Z",
+   "constraints": {
+    "minSunPct": 58,
+    "maxDarkH": 55,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.9854,
+   "valid_cells_L": 1416
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 3,
+   "arrival": "2027-11-17T00:00:00Z",
+   "constraints": {
+    "minSunPct": 63,
+    "maxDarkH": 22,
+    "minEarthH": 1.5
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 829
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 3,
+   "arrival": "2027-11-19T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 30,
+    "minEarthH": 24.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 759
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-09-23T00:00:00Z",
+   "constraints": {
+    "minSunPct": 74,
+    "maxDarkH": 164,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.8526,
+   "valid_cells_L": 1339
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-10-15T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 0.0,
+    "minEarthH": 8.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 734
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-06-04T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": 12.0
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.4068,
+   "valid_cells_L": 818
+  },
+  {
+   "site_id": "de_gerlache_rim_2",
+   "window_days": 7,
+   "arrival": "2027-08-11T00:00:00Z",
+   "constraints": {
+    "minSunPct": 26,
+    "maxDarkH": 86,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7982,
+   "valid_cells_L": 1548
+  },
+  {
+   "site_id": "connecting_ridge",
+   "window_days": 14,
+   "arrival": "2027-04-17T00:00:00Z",
+   "constraints": {
+    "minSunPct": 77,
+    "maxDarkH": 16,
+    "minEarthH": 21.5
+   },
+   "at_limit": false,
+   "meets": false,
+   "score": 0.6142,
+   "valid_cells_L": 137
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 7,
+   "arrival": "2027-09-02T00:00:00Z",
+   "constraints": {
+    "minSunPct": 15,
+    "maxDarkH": 31,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.7017,
+   "valid_cells_L": 1273
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-12-01T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": 134,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 1530
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-10-23T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": 0.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.8715,
+   "valid_cells_L": 1825
+  },
+  {
+   "site_id": "haworth",
+   "window_days": 3,
+   "arrival": "2027-01-12T00:00:00Z",
+   "constraints": {
+    "minSunPct": 100.0,
+    "maxDarkH": 53,
+    "minEarthH": 6.5
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 1.0,
+   "valid_cells_L": 738
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-05-08T00:00:00Z",
+   "constraints": {
+    "minSunPct": 44,
+    "maxDarkH": 130,
+    "minEarthH": null
+   },
+   "at_limit": false,
+   "meets": true,
+   "score": 0.8542,
+   "valid_cells_L": 1555
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 7,
+   "arrival": "2027-03-08T00:00:00Z",
+   "constraints": {
+    "minSunPct": 55.95,
+    "maxDarkH": 74.0,
+    "minEarthH": 16.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.6917,
+   "valid_cells_L": 600
+  },
+  {
+   "site_id": "malapert_massif",
+   "window_days": 14,
+   "arrival": "2027-12-26T00:00:00Z",
+   "constraints": {
+    "minSunPct": null,
+    "maxDarkH": null,
+    "minEarthH": 20.0
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7993,
+   "valid_cells_L": 317
+  },
+  {
+   "site_id": "nobile_rim_1",
+   "window_days": 3,
+   "arrival": "2027-07-23T00:00:00Z",
+   "constraints": {
+    "minSunPct": 67.36,
+    "maxDarkH": 25,
+    "minEarthH": null
+   },
+   "at_limit": true,
+   "meets": true,
+   "score": 0.7715,
+   "valid_cells_L": 1427
+  }
+ ]
+}

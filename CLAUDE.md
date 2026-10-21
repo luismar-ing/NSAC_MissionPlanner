@@ -34,12 +34,14 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Terreno en LOD | `.venv/Scripts/python -m pipeline.terrain_lod` (→ `pipeline/out/terrain/`) | disponible |
 | Datos SYNTHETIC | — | omitido (A4): el front end usa los datos reales |
 | Correr el pipeline | `.venv/Scripts/python -m pipeline.build_all` (`--assemble` solo reensambla) → `web/public/data/` | disponible |
+| Muestra de paridad Python ↔ TS | `.venv/Scripts/python -m pipeline.parity` (→ `web/tests/fixtures/parity_sample.json`; regenerar si cambian los datos) | disponible |
 | Tests pipeline | `.venv/Scripts/python -m pytest` (config en `pyproject.toml`) | disponible |
 | Instalar front end | `npm --prefix web ci` | disponible |
 | Servidor de desarrollo | `npm --prefix web run dev` | disponible |
 | Tests front end | `npm --prefix web test` | disponible |
 | Tipos | `npm --prefix web run typecheck` | disponible |
 | Build | `npm --prefix web run build` | disponible |
+| Servir el build | `npm --prefix web run preview` (puerto 4173) | disponible |
 
 Cuando una tarea cree o cambie un comando, actualiza esta tabla (T0.1.d la deja definitiva).
 

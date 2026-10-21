@@ -1692,3 +1692,35 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. T3.4 completa.
 - **Siguiente tarea:** T3.5.a.
+
+## 2026-10-21 · T3.5.a · Pasar a los datos reales del pipeline
+
+- **Tarea:** T3.5.a — Pasar a los datos reales del pipeline ([x]).
+- **Qué se hizo:**
+  - La app ya cargaba `web/public/data/` (REAL, desde T2.4.b; Pista S omitida, A4). Esta subtarea añade la verificación.
+  - `pipeline/parity.py` (`python -m pipeline.parity`): 100 celdas al azar (semilla fija), cada una con un conjunto de restricciones. Cada control puede estar desactivado, en un paso del deslizador o **exactamente en el valor de la celda**, que es donde el Float32 del front end podría discrepar. Guarda `meets_constraints` (T1.4.c), el score y el número de celdas válidas de toda la rejilla de esa L en `web/tests/fixtures/parity_sample.json`. `pipeline/tests/test_parity.py` comprueba que la muestra versionada sigue al día con los datos.
+  - `web/tests/parity.test.ts`: recalcula con `validMask`/`lookup` (T3.1.d) sobre los mismos archivos.
+  - Marca `performance.mark("shell-ready")` en el primer dibujo del calendario, para medir la carga inicial del shell 2D (8.7). Configuración `web-preview` en `.claude/launch.json` para medir sobre el build de producción.
+- **Cómo se verificó:**
+  ```
+  $ .venv/Scripts/python -m pipeline.parity
+  100 celdas -> web/tests/fixtures/parity_sample.json  (cumplen 68, con algún umbral exactamente en el valor de la celda 61)
+  $ npx vitest run tests/parity.test.ts
+  parity: 100 cells, 0 mismatches, 61 at the exact limit
+    (además, el recuento de celdas válidas de la rejilla completa coincide en los 100 conjuntos y |Δscore| < 1e-6)
+  $ .venv/Scripts/python -m pytest -q  → 275 passed
+  $ npm --prefix web test               → Test Files 15 passed · Tests 112 passed
+  $ npm --prefix web run typecheck      → exit 0
+  $ npm --prefix web run build          → index.js 376 kB (gzip 116 kB), css 10.7 kB
+  ```
+  Build de producción servido con `vite preview` (puerto 4173), panel del navegador visible:
+  ```
+  shell-ready (primer dibujo del calendario): 517 ms (primera carga), 436, 405, 356 ms en recargas   → < 3 s
+  DOMContentLoaded 259 ms · 10 recursos · 2 045 kB decodificados (272 kB transferidos)
+  insignia «REAL data · 2c2f11dad7», sin aviso SYNTHETIC, consola vacía
+  ```
+  En el servidor de desarrollo, tras recargar y recorrer el flujo (restricciones → «583 of 1825 7-day plans meet the constraints», anclar 3 planes, seleccionar uno, mover los dos relojes) no hay errores en la consola. Los errores que aparecían antes en el registro eran de versiones viejas de los módulos durante la recarga en caliente (marcas de tiempo `?t=` antiguas).
+- **Decisiones tomadas:** la paridad se mide sobre los archivos que carga la app (no sobre `pipeline/out/`), para que cubra lo que ve el usuario. Límite conocido: los umbrales a menos de ~1e-6 relativo de un valor podrían diferir por el Float32, pero los pasos de los deslizadores (1 %, 1 h, 0.5 h/día) no llegan ahí y los valores exactos de los datos sí coinciden (61 casos).
+- **Desviaciones de la spec / cambios en la guía:** ninguno. La medida de 3 s es en local; sobre la red depende del hosting (T7.1.a). Los JSON pesan 2 MB sin comprimir, y los hostings estáticos los sirven comprimidos.
+- **Problemas abiertos:** ninguno. **Fase 3 completa.**
+- **Siguiente tarea:** hito de la Fase 3; después, Fase 4 (T4.1.a).
