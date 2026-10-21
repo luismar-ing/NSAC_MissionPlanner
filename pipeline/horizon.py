@@ -44,3 +44,49 @@ def compute_mask(window: DemWindow, lat_deg: float, lon_deg: float, z0_m: float,
         elev = np.degrees(np.arctan2(z - z0_m - h_obs_m - drop[None, :], d[None, :]))
         out[start:start + len(az)] = elev.max(axis=1)
     return np.maximum(out, 0.0) if clip_negative else out
+
+
+def site_mask(site: dict, r_max_m: float = config.HORIZON_R_MAX_KM * 1000.0, **kw) -> tuple[np.ndarray, dict]:
+    """Máscara de un sitio de sites.json con el DEM real. Devuelve (elev_deg, tiempos en s)."""
+    import time
+
+    from pipeline.dem import latlon_to_xy
+
+    t0 = time.perf_counter()
+    x, y = latlon_to_xy(site["lat"], site["lon"])
+    window = DemWindow.read(x, y, r_max_m + 1_000.0)
+    t1 = time.perf_counter()
+    z0 = float(window.sample(np.array([x]), np.array([y]))[0])
+    mask = compute_mask(window, site["lat"], site["lon"], z0, r_max_m=r_max_m, **kw)
+    t2 = time.perf_counter()
+    return mask, {"read_s": t1 - t0, "compute_s": t2 - t1, "z0_m": z0, "window_px": window.z.shape}
+
+
+def main(argv=None) -> int:
+    import argparse
+    import json
+    import sys
+    import time
+    from pathlib import Path
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    ap = argparse.ArgumentParser(description="Máscaras de horizonte de los sitios (T1.2.d/e)")
+    ap.add_argument("--site", help="solo este sitio (id de sites.json)")
+    args = ap.parse_args(argv)
+    root = Path(__file__).resolve().parents[1]
+    sites = json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8"))
+    if args.site:
+        sites = [s for s in sites if s["id"] == args.site]
+    t_all = time.perf_counter()
+    for site in sites:
+        mask, t = site_mask(site)
+        print(f"{site['id']:18s} lectura {t['read_s']:5.1f} s  cálculo {t['compute_s']:5.1f} s  "
+              f"ventana {t['window_px'][0]}×{t['window_px'][1]} px  z0 {t['z0_m']:7.1f} m  "
+              f"máscara [{mask.min():+6.2f}, {mask.max():+6.2f}]°  (máx en az {int(np.argmax(mask))}°)")
+    print(f"Total {time.perf_counter() - t_all:.1f} s para {len(sites)} sitio(s)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

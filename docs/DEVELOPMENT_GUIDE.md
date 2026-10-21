@@ -244,7 +244,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.2.a, T1.2.b · **Spec:** 5.2 · **Decisiones:** D12 · **Est.:** 3 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_horizon.py -v`: el DEM sintético da la elevación analítica en los 360 bins con error < 0.05° (tolerancia propuesta; justificar por la discretización).
 
-##### [ ] T1.2.d — Rendimiento de la máscara
+##### [x] T1.2.d — Rendimiento de la máscara
 - **Qué:** vectorizar con numpy; objetivo propuesto: < 2 min por sitio con el DEM real (documentar el valor alcanzado).
 - **Archivos:** `pipeline/horizon.py`
 - **Depende de:** T1.2.c · **Spec:** 8.7, 14 · **Decisiones:** — · **Est.:** 2 h

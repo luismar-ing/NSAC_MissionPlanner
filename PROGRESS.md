@@ -835,3 +835,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** la primera versión de la prueba del borde variable exigía el argmax exacto; el pico del coseno es plano, así que ahora se comprueba la forma.
 - **Siguiente tarea:** T1.2.d (rendimiento con el DEM real).
+
+## 2026-10-21 · T1.2.d · Rendimiento de la máscara
+
+- **Tarea:** T1.2.d — Rendimiento de la máscara ([x]).
+- **Qué se hizo:** en `pipeline/horizon.py`, `site_mask` (lee la ventana del DEM real de ±101 km y calcula la máscara) y `main` (`python -m pipeline.horizon [--site ID]`) con tiempos por sitio. No hizo falta optimizar: el cálculo de T1.2.c ya está vectorizado (rayos por bloques de 45 azimuts, muestreo bilineal en numpy).
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.horizon
+  connecting_ridge   lectura 0.7 s  cálculo 0.6 s  ventana 5054×5054 px  z0 1958.6 m  máscara [-3.85, -0.71]°
+  haworth            lectura 0.6 s  cálculo 0.5 s  ...                    z0 2841.8 m  máscara [-3.59, +2.19]°
+  nobile_rim_1       lectura 0.5 s  cálculo 0.5 s  ...                    z0 6799.8 m  máscara [-3.76, +0.38]°
+  malapert_massif    lectura 0.5 s  cálculo 0.5 s  ...                    z0 5173.2 m  máscara [-3.08, -0.09]°
+  de_gerlache_rim_2  lectura 0.5 s  cálculo 0.5 s  ...                    z0 1764.1 m  máscara [-3.51, +1.10]°
+  Total 5.5 s para 5 sitio(s)
+  ```
+  ~1.1 s por sitio con 360 × 2 500 muestras (paso de 40 m hasta 100 km), muy por debajo del objetivo propuesto de 2 min. Las pruebas de T1.2.c siguen pasando (8 passed).
+- **Decisiones tomadas:** ninguna nueva. Con este margen se podría usar un paso de 20 m o varios rayos por bin si hiciera falta más rigor.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. Los valores de la máscara se revisan en T1.2.e.
+- **Siguiente tarea:** T1.2.e.
