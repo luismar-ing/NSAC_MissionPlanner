@@ -1,0 +1,23 @@
+{
+ "site_id": "haworth",
+ "lod": 0,
+ "frame": "ENU_SITE",
+ "origin": {
+  "lat": -86.36367,
+  "lon": -23.20405,
+  "elevation_m": 2841.8
+ },
+ "projection": null,
+ "grid": {
+  "nx": 101,
+  "ny": 101,
+  "spacing_m": 400.0,
+  "x0_m": -20000.0,
+  "y0_m": 20000.0
+ },
+ "height_encoding": "int16",
+ "height_scale_m": 0.25,
+ "height_offset_m": 0.0,
+ "bin_file": "lod0.bin",
+ "byte_length": 20402
+}

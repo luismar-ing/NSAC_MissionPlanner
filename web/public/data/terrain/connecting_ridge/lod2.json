@@ -1,0 +1,23 @@
+{
+ "site_id": "connecting_ridge",
+ "lod": 2,
+ "frame": "ENU_SITE",
+ "origin": {
+  "lat": -89.43904,
+  "lon": -137.09641,
+  "elevation_m": 1958.6
+ },
+ "projection": null,
+ "grid": {
+  "nx": 151,
+  "ny": 151,
+  "spacing_m": 40.0,
+  "x0_m": -3000.0,
+  "y0_m": 3000.0
+ },
+ "height_encoding": "int16",
+ "height_scale_m": 0.25,
+ "height_offset_m": 0.0,
+ "bin_file": "lod2.bin",
+ "byte_length": 45602
+}

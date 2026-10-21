@@ -456,7 +456,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T1.5.b, T2.1.b, T2.1.c, T2.2.c, T2.3.c, T2.3.e · **Spec:** 7.2, 10 (T2.4), 11 regla 5 · **Decisiones:** D8 · **Est.:** 2 h
 - **Aceptación:** con `web/public/data/` vacío, `python -m pipeline.build_all` y luego `python -m pipeline.validate web/public/data` terminan en 0.
 
-##### [ ] T2.4.b — Reproducibilidad y presupuesto de tamaño
+##### [x] T2.4.b — Reproducibilidad y presupuesto de tamaño
 - **Qué:** dos ejecuciones producen los mismos sha256; informe de tamaños frente a 8.7 (series y ventanas < 15 MB; total frente a D13). Decidir si `web/public/data/` se versiona (necesario para hosting estático sin pipeline).
 - **Archivos:** `pipeline/build_all.py`, `.gitignore` (si cambia)
 - **Depende de:** T2.4.a · **Spec:** 8.7, 11 regla 5 · **Decisiones:** D13 · **Est.:** 1.5 h

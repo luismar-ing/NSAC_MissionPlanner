@@ -1,0 +1,42 @@
+[
+ {
+  "id": "connecting_ridge",
+  "name": "Connecting Ridge (Shackleton rim)",
+  "lat": -89.43904,
+  "lon": -137.09641,
+  "elevation_m": 1958.6,
+  "source": "Highest LOLA DEM pixel (40 m) inside the USGS Artemis III candidate region 'Connecting Ridge' (McClernan 2024, doi:10.5066/P13FD9ZD); elevation from LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, PSJ 4, 183, doi:10.3847/PSJ/acf3e1), relative to the 1737.4 km reference sphere"
+ },
+ {
+  "id": "haworth",
+  "name": "Haworth",
+  "lat": -86.36367,
+  "lon": -23.20405,
+  "elevation_m": 2841.8,
+  "source": "Highest LOLA DEM pixel (40 m) inside the USGS Artemis III candidate region 'Haworth' (McClernan 2024, doi:10.5066/P1MEQ6UK); elevation from LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, PSJ 4, 183, doi:10.3847/PSJ/acf3e1), relative to the 1737.4 km reference sphere"
+ },
+ {
+  "id": "nobile_rim_1",
+  "name": "Nobile Rim 1",
+  "lat": -85.23264,
+  "lon": 36.58945,
+  "elevation_m": 6799.8,
+  "source": "Highest LOLA DEM pixel (40 m) inside the USGS Artemis III candidate region 'Nobile Rim 1' (McClernan 2024, doi:10.5066/P1MEQ6UK); elevation from LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, PSJ 4, 183, doi:10.3847/PSJ/acf3e1), relative to the 1737.4 km reference sphere"
+ },
+ {
+  "id": "malapert_massif",
+  "name": "Malapert Massif",
+  "lat": -85.98827,
+  "lon": 2.06255,
+  "elevation_m": 5173.2,
+  "source": "Highest LOLA DEM pixel (40 m) inside the USGS Artemis III candidate region 'Malapert Massif' (McClernan 2024, doi:10.5066/P1MEQ6UK); elevation from LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, PSJ 4, 183, doi:10.3847/PSJ/acf3e1), relative to the 1737.4 km reference sphere"
+ },
+ {
+  "id": "de_gerlache_rim_2",
+  "name": "de Gerlache Rim 2",
+  "lat": -88.58729,
+  "lon": -67.9254,
+  "elevation_m": 1764.1,
+  "source": "Highest LOLA DEM pixel (40 m) inside the USGS Artemis III candidate region 'de Gerlache Rim 2' (McClernan 2024, doi:10.5066/P1MEQ6UK); elevation from LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, PSJ 4, 183, doi:10.3847/PSJ/acf3e1), relative to the 1737.4 km reference sphere"
+ }
+]

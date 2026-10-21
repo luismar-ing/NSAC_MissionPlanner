@@ -1,0 +1,126 @@
+{
+ "site_id": "de_gerlache_rim_2",
+ "attributes": [
+  {
+   "key": "region",
+   "label": "Artemis III candidate region",
+   "value": "de Gerlache Rim 2",
+   "unit": null,
+   "status": "available",
+   "source": "USGS (McClernan 2024, doi:10.5066/P1MEQ6UK)",
+   "method": "Official region polygon; the site is a representative point inside it, not a real mission landing site"
+  },
+  {
+   "key": "lat",
+   "label": "Latitude",
+   "value": -88.58729,
+   "unit": "deg",
+   "status": "available",
+   "source": "highest DEM pixel inside the USGS region (McClernan 2024, doi:10.5066/P1MEQ6UK); LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Planetocentric latitude"
+  },
+  {
+   "key": "lon",
+   "label": "Longitude",
+   "value": -67.9254,
+   "unit": "deg",
+   "status": "available",
+   "source": "highest DEM pixel inside the USGS region (McClernan 2024, doi:10.5066/P1MEQ6UK); LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "East longitude, -180 to 180"
+  },
+  {
+   "key": "elevation_m",
+   "label": "Elevation",
+   "value": 1764.1,
+   "unit": "m",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Height above the 1737.4 km reference sphere"
+  },
+  {
+   "key": "slope_mean_deg",
+   "label": "Mean slope",
+   "value": 12.99,
+   "unit": "deg",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Central-difference gradient of the 40 m DEM within a 1 km radius (1961 pixels), corrected for the polar stereographic scale factor (k = 1.00015)"
+  },
+  {
+   "key": "slope_max_deg",
+   "label": "Max slope",
+   "value": 24.17,
+   "unit": "deg",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Central-difference gradient of the 40 m DEM within a 1 km radius (1961 pixels), corrected for the polar stereographic scale factor (k = 1.00015)"
+  },
+  {
+   "key": "slope_radius_m",
+   "label": "Slope reference radius",
+   "value": 1000.0,
+   "unit": "m",
+   "status": "available",
+   "source": "PolePlanner parameter (decision D10)",
+   "method": "Radius of the circle used for the slope statistics"
+  }
+ ],
+ "nearby_features": [
+  {
+   "name": "de Gerlache",
+   "type": "crater",
+   "lat": -88.48,
+   "lon": -88.34,
+   "distance_km": 16.08,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 1439 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Marvin",
+   "type": "crater",
+   "lat": -89.13,
+   "lon": -87.78,
+   "distance_km": 20.13,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16008 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Bay",
+   "type": "crater",
+   "lat": -88.76,
+   "lon": -36.85,
+   "distance_km": 22.13,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16417 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Brill",
+   "type": "crater",
+   "lat": -88.27,
+   "lon": -93.41,
+   "distance_km": 23.02,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16195 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Spudis",
+   "type": "crater",
+   "lat": -89.51,
+   "lon": -84.61,
+   "distance_km": 28.92,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16007 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Cartwright",
+   "type": "crater",
+   "lat": -87.65,
+   "lon": -46.95,
+   "distance_km": 34.82,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16416 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Henson",
+   "type": "crater",
+   "lat": -88.57,
+   "lon": -130.63,
+   "distance_km": 44.85,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16004 (Crater, craters), accessed 2026-10-21"
+  }
+ ]
+}

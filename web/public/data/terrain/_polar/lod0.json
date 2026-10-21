@@ -1,0 +1,23 @@
+{
+ "site_id": "_polar",
+ "lod": 0,
+ "frame": "POLAR_STEREO",
+ "origin": {
+  "lat": -90.0,
+  "lon": 0.0,
+  "elevation_m": 1026.7
+ },
+ "projection": "+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs +type=crs",
+ "grid": {
+  "nx": 303,
+  "ny": 303,
+  "spacing_m": 2000.0,
+  "x0_m": -302000.0,
+  "y0_m": 302000.0
+ },
+ "height_encoding": "int16",
+ "height_scale_m": 0.5,
+ "height_offset_m": 0.0,
+ "bin_file": "lod0.bin",
+ "byte_length": 183618
+}

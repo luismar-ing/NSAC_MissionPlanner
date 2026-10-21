@@ -1261,3 +1261,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** decidir en T2.4.b si se versiona `web/public/data/` (15.7 MB).
 - **Siguiente tarea:** T2.4.b.
+
+## 2026-10-21 · T2.4.b · Reproducibilidad y presupuesto de tamaño
+
+- **Tarea:** T2.4.b — Reproducibilidad y presupuesto ([x]).
+- **Qué se hizo:** dos ejecuciones completas de `build_all` desde cero (con `pipeline/out/` borrado), comparación de los sha256 de todos los archivos de `web/public/data/` e informe de tamaños por categoría. **Decisión: `web/public/data/` se versiona** (ya no lo excluye `.gitignore`).
+- **Cómo se verificó:**
+  ```
+  ejecución 1: 1895 archivos, 15.69 MB; data_version 2c2f11dad7; validación del contrato: OK   (40.7 s)
+  ejecución 2: 1895 archivos, 15.69 MB; data_version 2c2f11dad7; validación del contrato: OK   (37.5 s)
+  sha256 de 1896 archivos (incluido manifest.json): DIFF VACÍO, las dos ejecuciones producen archivos idénticos
+
+  series y ventanas (8.7: < 15 MB)            4.33 MB  (gzip 0.62 MB)   → OK
+  escena 3D                                   1.58 MB  (gzip 0.64 MB)
+  trayectorias (bajo demanda)                 8.62 MB  (gzip 3.99 MB)
+  terreno (bajo demanda)                      1.15 MB  (gzip 0.98 MB)
+  manifest.json                               0.28 MB
+  TOTAL datos                                15.97 MB  (gzip 6.23 MB)
+  D13 < 50 MB: datos 15.97 + texturas web estimadas 3.09 = 19.06 MB → OK
+  ```
+- **Decisiones tomadas:** **versionar `web/public/data/`**. Sin estos archivos, el hosting estático (T7.1) y el trabajo en el front end exigirían ejecutar el pipeline, con ~760 MB de datos externos, Python y descargas manuales. Para no inflar el historial, solo se regenera cuando cambie la ciencia o el contrato.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** cada regeneración añade ~16 MB al historial de git. Si llegara a ser un problema, se movería a Git LFS o a un artefacto de release.
+- **Siguiente tarea:** cierre de la Fase 2 → hito de demo.

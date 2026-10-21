@@ -1,0 +1,134 @@
+{
+ "site_id": "connecting_ridge",
+ "attributes": [
+  {
+   "key": "region",
+   "label": "Artemis III candidate region",
+   "value": "Connecting Ridge",
+   "unit": null,
+   "status": "available",
+   "source": "USGS (McClernan 2024, doi:10.5066/P13FD9ZD)",
+   "method": "Official region polygon; the site is a representative point inside it, not a real mission landing site"
+  },
+  {
+   "key": "lat",
+   "label": "Latitude",
+   "value": -89.43904,
+   "unit": "deg",
+   "status": "available",
+   "source": "highest DEM pixel inside the USGS region (McClernan 2024, doi:10.5066/P13FD9ZD); LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Planetocentric latitude"
+  },
+  {
+   "key": "lon",
+   "label": "Longitude",
+   "value": -137.09641,
+   "unit": "deg",
+   "status": "available",
+   "source": "highest DEM pixel inside the USGS region (McClernan 2024, doi:10.5066/P13FD9ZD); LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "East longitude, -180 to 180"
+  },
+  {
+   "key": "elevation_m",
+   "label": "Elevation",
+   "value": 1958.6,
+   "unit": "m",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Height above the 1737.4 km reference sphere"
+  },
+  {
+   "key": "slope_mean_deg",
+   "label": "Mean slope",
+   "value": 8.58,
+   "unit": "deg",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Central-difference gradient of the 40 m DEM within a 1 km radius (1953 pixels), corrected for the polar stereographic scale factor (k = 1.00002)"
+  },
+  {
+   "key": "slope_max_deg",
+   "label": "Max slope",
+   "value": 20.2,
+   "unit": "deg",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Central-difference gradient of the 40 m DEM within a 1 km radius (1953 pixels), corrected for the polar stereographic scale factor (k = 1.00002)"
+  },
+  {
+   "key": "slope_radius_m",
+   "label": "Slope reference radius",
+   "value": 1000.0,
+   "unit": "m",
+   "status": "available",
+   "source": "PolePlanner parameter (decision D10)",
+   "method": "Radius of the circle used for the slope statistics"
+  }
+ ],
+ "nearby_features": [
+  {
+   "name": "Spudis",
+   "type": "crater",
+   "lat": -89.51,
+   "lon": -84.61,
+   "distance_km": 14.22,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16007 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Marvin",
+   "type": "crater",
+   "lat": -89.13,
+   "lon": -87.78,
+   "distance_km": 20.01,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16008 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Shackleton",
+   "type": "crater",
+   "lat": -89.67,
+   "lon": 129.78,
+   "distance_km": 20.2,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 5450 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Henson",
+   "type": "crater",
+   "lat": -88.57,
+   "lon": -130.63,
+   "distance_km": 26.53,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16004 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Haynes",
+   "type": "crater",
+   "lat": -88.75,
+   "lon": 167.39,
+   "distance_km": 31.56,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16418 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Sverdrup",
+   "type": "crater",
+   "lat": -88.32,
+   "lon": -153.39,
+   "distance_km": 34.94,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 5782 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "de Gerlache",
+   "type": "crater",
+   "lat": -88.48,
+   "lon": -88.34,
+   "distance_km": 37.15,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 1439 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Brill",
+   "type": "crater",
+   "lat": -88.27,
+   "lon": -93.41,
+   "distance_km": 41.84,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16195 (Crater, craters), accessed 2026-10-21"
+  }
+ ]
+}

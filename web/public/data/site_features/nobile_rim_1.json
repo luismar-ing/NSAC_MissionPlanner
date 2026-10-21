@@ -1,0 +1,134 @@
+{
+ "site_id": "nobile_rim_1",
+ "attributes": [
+  {
+   "key": "region",
+   "label": "Artemis III candidate region",
+   "value": "Nobile Rim 1",
+   "unit": null,
+   "status": "available",
+   "source": "USGS (McClernan 2024, doi:10.5066/P1MEQ6UK)",
+   "method": "Official region polygon; the site is a representative point inside it, not a real mission landing site"
+  },
+  {
+   "key": "lat",
+   "label": "Latitude",
+   "value": -85.23264,
+   "unit": "deg",
+   "status": "available",
+   "source": "highest DEM pixel inside the USGS region (McClernan 2024, doi:10.5066/P1MEQ6UK); LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Planetocentric latitude"
+  },
+  {
+   "key": "lon",
+   "label": "Longitude",
+   "value": 36.58945,
+   "unit": "deg",
+   "status": "available",
+   "source": "highest DEM pixel inside the USGS region (McClernan 2024, doi:10.5066/P1MEQ6UK); LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "East longitude, -180 to 180"
+  },
+  {
+   "key": "elevation_m",
+   "label": "Elevation",
+   "value": 6799.8,
+   "unit": "m",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Height above the 1737.4 km reference sphere"
+  },
+  {
+   "key": "slope_mean_deg",
+   "label": "Mean slope",
+   "value": 7.7,
+   "unit": "deg",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Central-difference gradient of the 40 m DEM within a 1 km radius (1969 pixels), corrected for the polar stereographic scale factor (k = 1.00173)"
+  },
+  {
+   "key": "slope_max_deg",
+   "label": "Max slope",
+   "value": 23.59,
+   "unit": "deg",
+   "status": "available",
+   "source": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)",
+   "method": "Central-difference gradient of the 40 m DEM within a 1 km radius (1969 pixels), corrected for the polar stereographic scale factor (k = 1.00173)"
+  },
+  {
+   "key": "slope_radius_m",
+   "label": "Slope reference radius",
+   "value": 1000.0,
+   "unit": "m",
+   "status": "available",
+   "source": "PolePlanner parameter (decision D10)",
+   "method": "Radius of the circle used for the slope statistics"
+  }
+ ],
+ "nearby_features": [
+  {
+   "name": "Masina",
+   "type": "crater",
+   "lat": -85.42,
+   "lon": 32.15,
+   "distance_km": 12.35,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16269 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Dawa",
+   "type": "crater",
+   "lat": -85.45,
+   "lon": 31.66,
+   "distance_km": 13.81,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16270 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Jaci",
+   "type": "crater",
+   "lat": -85.42,
+   "lon": 31.23,
+   "distance_km": 14.4,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16268 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Mons Mouton",
+   "type": "massif",
+   "lat": -84.6,
+   "lon": 31.0,
+   "distance_km": 24.34,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16070 (Mons, montes), accessed 2026-10-21"
+  },
+  {
+   "name": "Floss",
+   "type": "crater",
+   "lat": -84.28,
+   "lon": 42.27,
+   "distance_km": 32.86,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16251 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Stose",
+   "type": "crater",
+   "lat": -86.38,
+   "lon": 32.13,
+   "distance_km": 36.14,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16011 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Nobile",
+   "type": "crater",
+   "lat": -85.28,
+   "lon": 53.27,
+   "distance_km": 41.71,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 4321 (Crater, craters), accessed 2026-10-21"
+  },
+  {
+   "name": "Scott M",
+   "type": "crater",
+   "lat": -83.86,
+   "lon": 34.74,
+   "distance_km": 41.96,
+   "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 13016 (Satellite Feature), accessed 2026-10-21"
+  }
+ ]
+}
