@@ -654,3 +654,20 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** se añade `pipeline/plots/__init__.py`.
 - **Problemas abiertos:** conviene que el humano compare `docs/figures/sites_map.png` con un mapa oficial de las regiones (por ejemplo, el de NASA de octubre de 2024) como segunda revisión. Las pendientes en los puntos se comprueban en T2.3.a.
 - **Siguiente tarea:** **Fase 0 cerrada** → hito de demo y parada (paso g del protocolo). Después, T1.1.a.
+
+## 2026-10-21 · HITO FASE 0 · Preparación cerrada
+
+- **Estado de la guía:** Fase 0 completa (16/16). Adelantadas de la Fase 1: T1.2.b, T1.3.a, T1.3.b, T1.3.c, T1.4.a, T1.4.b y T1.4.c (7). Total: 23 [x], 85 [ ], 0 [!].
+- **Comprobación del hito:**
+  ```
+  $ python -m pytest pipeline/tests -q                         → 114 passed in 3.35s
+  $ python -m pipeline.validate pipeline/tests/fixtures/contract/valid → OK: cumple el contrato 1.0.0
+  $ python -m pipeline.validate --file pipeline/sites.json      → OK: cumple el contrato 1.0.0
+  $ python -m pipeline.fetch_data                               → 10 fuentes "present, checksum OK"
+  $ npm --prefix web test                                       → Tests 37 passed (37)
+  $ npm --prefix web run build                                  → ✓ built
+  $ npm --prefix web run dev                                    → HTTP 200
+  ```
+  Figuras: `docs/figures/sites_map.png`, `docs/figures/sites_zoom.png`.
+- **Pendiente para el humano:** confirmar los 5 sitios y el método (docs/sites.md); D1 (habilidades y horas); D8, D9 y D10 antes de la Fase 2; D11 antes de la Fase 7.
+- **Siguiente tarea:** T1.1.a (referencias de JPL Horizons).
