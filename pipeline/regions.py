@@ -26,6 +26,16 @@ REGIONS_DIR = ROOT / "data" / "regions"
 DEM_CRS = CRS.from_proj4("+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs")
 MOON_GEO = CRS.from_proj4("+proj=longlat +R=1737400 +no_defs")
 
+POLAR_KEYS = ("proj", "lat_0", "lat_ts", "lon_0", "x_0", "y_0", "R")
+
+
+def is_dem_crs(crs) -> bool:
+    """True si `crs` (rasterio o pyproj) es la estereográfica polar sur del DEM (mismos parámetros)."""
+    params = CRS.from_user_input(crs.to_wkt() if hasattr(crs, "to_wkt") else crs).to_dict()
+    ref = DEM_CRS.to_dict()
+    return all(params.get(k) == ref.get(k) for k in POLAR_KEYS)
+
+
 NINE_REGIONS_ZIP = "A3_9regions-lonlat-simplified.zip"
 CITATION_9 = ("McClernan, M. T., 2024, Down Selected Artemis III Candidate Landing Site Navigational Grids: "
               "U.S. Geological Survey data release, https://doi.org/10.5066/P1MEQ6UK")

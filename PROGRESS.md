@@ -610,3 +610,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos añadidos fuera de la lista de T0.3.a: `pipeline/regions.py`, `pipeline/tests/test_regions.py`, cambios en `fetch_data.py` y dependencia `pyshp`.
 - **Problemas abiertos:** confirmar con el humano las 5 regiones y el método (propuestos y documentados; cambiarlos es barato). Quien clone el repo tiene que bajar estos zips a mano (indicado en `data/README.md` y en el mensaje de `fetch_data`).
 - **Siguiente tarea:** T0.3.b.
+
+## 2026-10-21 · T0.3.b · Generar pipeline/sites.json
+
+- **Tarea:** T0.3.b — Generar `pipeline/sites.json` ([x]).
+- **Qué se hizo:** `pipeline/sites_source.json` (sitio → región USGS → DOI) y `pipeline/make_sites.py`. Para cada región lee solo la ventana del DEM que la cubre, marca los píxeles cuyo centro cae dentro del polígono oficial y elige el de mayor altura (método de `docs/sites.md` §3). Convierte a lat/lon planetocéntricas con longitud este en [−180, 180). En `regions.py`, `is_dem_crs` compara el CRS por sus parámetros. Prueba nueva: `pipeline/tests/test_sites.py`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.make_sites
+  connecting_ridge   lat -89.43904  lon -137.09641  z   1958.6 m  (183,184 píxeles en la región)
+  haworth            lat -86.36367  lon  -23.20405  z   2841.8 m  (554,280 píxeles en la región)
+  nobile_rim_1       lat -85.23264  lon   36.58945  z   6799.8 m  (250,000 píxeles en la región)
+  malapert_massif    lat -85.98827  lon    2.06255  z   5173.2 m  (275,625 píxeles en la región)
+  de_gerlache_rim_2  lat -88.58729  lon  -67.92540  z   1764.1 m  (250,086 píxeles en la región)
+  $ python -m pipeline.validate --file pipeline/sites.json
+  OK: pipeline/sites.json cumple el contrato 1.0.0
+  $ python -m pytest pipeline/tests/test_sites.py
+  2 passed   (contrato, lat ≤ −80°, campos no vacíos, cada sitio dentro de su polígono oficial)
+  ```
+  Comprobaciones: las cuentas de píxeles cuadran con las áreas oficiales (183 184 × 0,0016 km² ≈ 293 km²; 250 000 → 400 km²; 275 625 → 441 km²; 554 280 → 887 km²). Ningún punto está pegado al contorno ni es una ladera que sube hacia fuera: distancia al contorno ≥ 3,9 km en cuatro sitios, y en esos cuatro el punto es el más alto en ±3 km.
+- **Decisiones tomadas:** ninguna nueva (se aplica el método de T0.3.a).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** **de Gerlache Rim 2** queda a 1,2 km del contorno y hay terreno algo más alto (1 814,5 m) a menos de 3 km, probablemente fuera de la región. Se revisa en el mapa (T0.3.c). **Nobile Rim 1** sale a 6 799,8 m, cerca del máximo del DEM (7 026,8 m); es una cumbre interior de la región (que linda con Mons Mouton), no un artefacto del contorno, pero conviene confirmarlo en el mapa.
+- **Siguiente tarea:** T0.3.c.

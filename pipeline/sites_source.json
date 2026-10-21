@@ -1,0 +1,11 @@
+{
+  "_comment": "Entrada de pipeline/make_sites.py: cada sitio de D3 apunta a su región oficial USGS (docs/sites.md). El punto se elige con el DEM (cota máxima dentro del polígono).",
+  "dem": {"file": "dem/LDEM_80S_40MPP_ADJ.TIF", "citation": "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, PSJ 4, 183, doi:10.3847/PSJ/acf3e1)"},
+  "sites": [
+    {"id": "connecting_ridge", "name": "Connecting Ridge (Shackleton rim)", "region": "Connecting Ridge", "loader": "lgrs", "zip": "Connecting_Ridge.zip", "doi": "doi:10.5066/P13FD9ZD"},
+    {"id": "haworth", "name": "Haworth", "region": "Haworth", "loader": "nine", "doi": "doi:10.5066/P1MEQ6UK"},
+    {"id": "nobile_rim_1", "name": "Nobile Rim 1", "region": "Nobile Rim 1", "loader": "nine", "doi": "doi:10.5066/P1MEQ6UK"},
+    {"id": "malapert_massif", "name": "Malapert Massif", "region": "Malapert Massif", "loader": "nine", "doi": "doi:10.5066/P1MEQ6UK"},
+    {"id": "de_gerlache_rim_2", "name": "de Gerlache Rim 2", "region": "de Gerlache Rim 2", "loader": "nine", "doi": "doi:10.5066/P1MEQ6UK"}
+  ]
+}

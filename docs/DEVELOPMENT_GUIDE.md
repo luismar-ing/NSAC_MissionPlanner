@@ -160,7 +160,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.2.d · **Spec:** 6.1, 5.10, 11 regla 1 · **Decisiones:** D3 · **Est.:** 2.5 h
 - **Aceptación:** `docs/sites.md` tiene, por sitio: nombre, cita verificable, coordenadas tal como las da la fuente (o el método de elección) y fecha de consulta.
 
-##### [ ] T0.3.b — Generar pipeline/sites.json
+##### [x] T0.3.b — Generar pipeline/sites.json
 - **Qué:** `pipeline/make_sites.py` lee las coordenadas con fuente, toma `elevation_m` del DEM (bilineal) y escribe `sites.json` según el contrato, con ids estables (slug).
 - **Archivos:** `pipeline/make_sites.py`, `pipeline/sites_source.json`, `pipeline/sites.json`
 - **Depende de:** T0.3.a, T0.2.e, T0.4.b · **Spec:** 6.1, 7.2 · **Decisiones:** D3 · **Est.:** 1.5 h
