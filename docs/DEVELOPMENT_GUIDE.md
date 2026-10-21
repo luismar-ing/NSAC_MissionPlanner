@@ -238,7 +238,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T0.1.b · **Spec:** 5.2 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**
 - **Aceptación:** prueba que verifica el generador (altura del borde y radio en el raster) e imprime la elevación analítica para 3 casos.
 
-##### [ ] T1.2.c — Algoritmo de la máscara de horizonte
+##### [x] T1.2.c — Algoritmo de la máscara de horizonte
 - **Qué:** trazado de rayos por bin de 1° hasta R_max = 100 km, paso ≈ tamaño de píxel, fórmula de 5.2 con h_obs; elegir y documentar el recorte (`max(0, ·)` o conservar negativos).
 - **Archivos:** `pipeline/horizon.py`, `pipeline/tests/test_horizon.py`
 - **Depende de:** T1.2.a, T1.2.b · **Spec:** 5.2 · **Decisiones:** D12 · **Est.:** 3 h

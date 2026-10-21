@@ -813,3 +813,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno (5.2 pide «convertir coordenadas con cuidado»).
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T1.2.c.
+
+## 2026-10-21 · T1.2.c · Algoritmo de la máscara de horizonte
+
+- **Tarea:** T1.2.c — Algoritmo de la máscara de horizonte ([x]).
+- **Qué se hizo:** `pipeline/horizon.py` con `compute_mask`: un rayo por bin (az = i · 1°, N→E) trazado sobre la esfera hasta R_max = 100 km, con paso = tamaño de píxel (configurable); fórmula de 5.2 con h_obs y la caída por curvatura d²/(2R); los azimuts se procesan en bloques para limitar la memoria; error si la ventana del DEM no cubre R_max. `DemWindow` guarda las alturas en float32 (±100 km a 40 m son 5 000² píxeles). `is_dem_crs` silencia el aviso informativo de pyproj.
+- **Cómo se verificó:** DEM sintético de T1.2.b con el sitio a 150 km del polo (lat ≈ −85.05°), píxel de 50 m, paso del rayo de 10 m, R_max = 50 km:
+  ```
+  $ python -m pytest pipeline/tests/test_horizon.py -v -s
+  borde 500 m a 10 km (clip=False): esperado +2.7420°, error máx 0.0155°, medio 0.0063°   PASSED
+  borde 2 km a 40 km  (clip=False): esperado +2.2175°, error máx 0.0071°, medio 0.0034°   PASSED
+  llano               (clip=False): esperado -0.1065°, error máx 0.0000°                  PASSED
+  (los mismos con clip=True)                                                                PASSED
+  test_azimuth_dependent_rim PASSED   (pared 300 + 200·cos(az) m: N > E ≈ O > S, error máx 0.023°)
+  test_window_too_small_is_an_error PASSED
+  8 passed
+  $ python -m pytest -q   → 199 passed
+  ```
+  Tolerancia de 0.05° en los 360 bins: el error viene de rasterizar la pared (píxel de 50 m) y la interpolación bilineal en su borde interior; cuesta ~1/d rad por metro (0.006° por metro a 10 km).
+- **Decisiones tomadas:** **sin recorte de negativos** (`CLIP_NEGATIVE = False`, 5.2 paso 3): en cumbres como Malapert o Nobile el horizonte real está por debajo de 0°, y recortarlo marcaría como oscuro un Sol visible. Irá al manifiesto (`clip_negative: false`). Un solo rayo por bin, en su azimut central (contrato §6).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** la primera versión de la prueba del borde variable exigía el argmax exacto; el pico del coseno es plano, así que ahora se comprueba la forma.
+- **Siguiente tarea:** T1.2.d (rendimiento con el DEM real).

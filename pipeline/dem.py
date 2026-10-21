@@ -54,7 +54,7 @@ class DemWindow:
     """Ventana del DEM en memoria con muestreo bilineal en coordenadas del mapa."""
 
     def __init__(self, z: np.ndarray, transform):
-        self.z = np.asarray(z, dtype=np.float64)
+        self.z = np.asarray(z, dtype=np.float32)  # ±100 km a 40 m son 5 000² píxeles: float32 ocupa la mitad
         self.transform = transform
         self.res = transform.a
         if abs(transform.e + transform.a) > 1e-9 or transform.b or transform.d:
@@ -84,7 +84,7 @@ class DemWindow:
         ny, nx = self.z.shape
         ok = (c0 >= 0) & (r0 >= 0) & (c0 + 1 < nx) & (r0 + 1 < ny)
         c0c, r0c = np.clip(c0, 0, nx - 2), np.clip(r0, 0, ny - 2)
-        z00 = self.z[r0c, c0c]
+        z00 = self.z[r0c, c0c].astype(np.float64)
         z01 = self.z[r0c, c0c + 1]
         z10 = self.z[r0c + 1, c0c]
         z11 = self.z[r0c + 1, c0c + 1]

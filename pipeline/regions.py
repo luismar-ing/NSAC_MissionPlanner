@@ -31,8 +31,12 @@ POLAR_KEYS = ("proj", "lat_0", "lat_ts", "lon_0", "x_0", "y_0", "R")
 
 def is_dem_crs(crs) -> bool:
     """True si `crs` (rasterio o pyproj) es la estereográfica polar sur del DEM (mismos parámetros)."""
-    params = CRS.from_user_input(crs.to_wkt() if hasattr(crs, "to_wkt") else crs).to_dict()
-    ref = DEM_CRS.to_dict()
+    import warnings
+
+    with warnings.catch_warnings():  # to_dict pasa por PROJ string: aviso informativo de pyproj, irrelevante aquí
+        warnings.simplefilter("ignore", UserWarning)
+        params = CRS.from_user_input(crs.to_wkt() if hasattr(crs, "to_wkt") else crs).to_dict()
+        ref = DEM_CRS.to_dict()
     return all(params.get(k) == ref.get(k) for k in POLAR_KEYS)
 
 
