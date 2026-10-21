@@ -1,0 +1,12 @@
+# Finales de línea LF en todos los archivos de texto, también en Windows.
+# Las fixtures del contrato se comparan byte a byte (test_committed_fixtures_are_up_to_date).
+* text=auto eol=lf
+
+# Binarios: nunca convertir.
+*.bin binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ktx2 binary
+*.glb binary
