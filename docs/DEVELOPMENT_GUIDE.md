@@ -404,7 +404,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T0.2.a · **Spec:** 5.8, 6 · **Decisiones:** D5 · **Est.:** 1.5 h
 - **Aceptación:** `data/README.md` registra el kernel verificado (URL y cobertura con spkcov) o la nota de que no hay uno válido; en ese caso se vuelve a D5 con el humano.
 
-##### [ ] T2.2.b — Trayectoria ILLUSTRATIVE de un plan
+##### [x] T2.2.b — Trayectoria ILLUSTRATIVE de un plan
 - **Qué:** curva continua en el marco de la escena: ascenso (marca de despegue) → órbita de espera → inyección (marca) → arco simplificado (por ejemplo, cónicas empalmadas o retorno libre aproximado) hacia la posición SPICE de la Luna → aproximación y descenso hasta el sitio (marca de aterrizaje en `arrival_utc`). `mode: "ILLUSTRATIVE"`.
 - **Archivos:** `pipeline/trajectory.py`, `pipeline/tests/test_trajectory.py`
 - **Depende de:** T2.1.a, T1.5.a, T2.2.a · **Spec:** 5.8, 7.2 · **Decisiones:** D5 · **Est.:** 3 h

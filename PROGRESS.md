@@ -1091,3 +1091,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Motivo:** D5 = trayectoria ilustrativa (confirmada el 2026-10-21). Como indica la guía, la subtarea se cierra sin buscar kernels de misión. Todas las trayectorias serán `mode: "ILLUSTRATIVE"`.
 - **Cómo se verificó:** `docs/DECISIONS.md`, fila D5: «**confirmada** (2026-10-21) | Ilustrativa (ILLUSTRATIVE); `transit_days` = 3 días».
 - **Siguiente tarea:** T2.2.b.
+
+## 2026-10-21 · T2.2.b · Trayectoria ILLUSTRATIVE de un plan
+
+- **Tarea:** T2.2.b — Trayectoria ILLUSTRATIVE ([x]).
+- **Qué se hizo:** `pipeline/trajectory.py` con `build(site, arrival)` en J2000 centrado en la Tierra (marco de la escena) y `mode: "ILLUSTRATIVE"`. Es una curva por tramos con la Luna y su orientación reales (SPICE):
+  1. despegue radial desde una plataforma genérica (0°, 0°; no es un puerto espacial real) que gira con IAU_EARTH, hasta 200 km en 10 min, interpolando dirección y radio por separado;
+  2. órbita de espera circular hasta la inyección (+2 h);
+  3. transferencia con una curva de Hermite tangente a la órbita, hasta 8 000 km de la Luna (lado de la Tierra) en `lunar_arrival_utc` = llegada − 12 h;
+  4. aproximación y descenso en el marco de la Luna hasta el sitio, exactamente en `arrival_utc`.
+  123 muestras, más densas en el despegue, la salida y el descenso. Todos los parámetros son de diseño y están documentados en el módulo.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_trajectory.py -q        (5 sitios × 4 llegadas: ene, mar, ago, dic)
+  20 passed
+  Malapert, llegada 2027-03-10: muestras 123 | radio min 6378.2 km | vel. máx 7.71 km/s | final vs sitio (km): 0.0565
+  ```
+  Comprobaciones: contrato §11 (tiempos estrictamente crecientes, fases en orden, aterrizaje = último instante, id); duración = 3 días; ningún salto (velocidad implícita < 12 km/s); nunca dentro de la Tierra ni de la Luna; último punto a < 1 km de la posición SPICE del sitio en la llegada.
+- **Decisiones tomadas:** plataforma de lanzamiento genérica en (0°, 0°), sin asociarla a ningún puerto real (spec 5.8: «plataforma genérica»). Curva de Hermite en lugar de cónicas empalmadas (la spec lo deja «por ejemplo»): es suave, continua y fácil de anclar a la Luna real; queda declarada ILLUSTRATIVE.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** la primera versión bajaba a 6 331 km durante el despegue (mezcla lineal de dos puntos sobre esferas); corregido y cubierto por la prueba.
+- **Siguiente tarea:** T2.2.c.
