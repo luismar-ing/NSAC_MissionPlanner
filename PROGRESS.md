@@ -493,3 +493,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** el primer intento comparó solo 159 ventanas (pocas llegadas para L = 14 con 60 días); ahora son 100 días y 201 ventanas.
 - **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, T1.4.c (adelantable).
+
+## 2026-10-21 · T1.4.c · Puntuación y restricciones — adelantada
+
+- **Tarea:** T1.4.c — Puntuación y restricciones ([x]). **Adelantable**.
+- **Qué se hizo:** en `pipeline/windows.py`, `normalize` (norm de 5.6 sobre el rango observado), `add_scores` (score de 5.6 normalizado sobre todas las filas de todos los sitios para una misma L, pesos de `config.SCORE_WEIGHTS`) y `meets_constraints` (X, Y, Z opcionales, límites incluidos). Servirá de referencia para la paridad con el front end (T3.5.a).
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_windows.py -v
+  test_normalize PASSED
+  test_best_and_worst_scores PASSED                         (mejor = 1.0, peor = 0.0, medio = 0.5)
+  test_score_in_unit_interval_and_normalized_across_sites PASSED
+  test_more_sun_never_lowers_the_score PASSED
+  test_weights_need_not_sum_to_one PASSED
+  test_constraints_optional_and_inclusive PASSED
+  20 passed in 0.21s
+  ```
+- **Decisiones tomadas (no definidas por la spec):** una métrica con valor constante en todas las filas se normaliza a 0.5 (neutra). El score se divide por w1 + w2 + w3, para que quede en [0, 1] con cualquier peso positivo (con los pesos por defecto, que suman 1, no cambia nada).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** cerrar T0.2.e (descarga terminada).

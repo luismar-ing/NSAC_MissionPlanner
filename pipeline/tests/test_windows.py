@@ -5,7 +5,15 @@ from datetime import datetime, timezone
 import numpy as np
 import pytest
 
-from pipeline.windows import daily_aggregates, longest_run, longest_run_in_windows, window_metrics
+from pipeline.windows import (
+    add_scores,
+    daily_aggregates,
+    longest_run,
+    longest_run_in_windows,
+    meets_constraints,
+    normalize,
+    window_metrics,
+)
 
 T0 = datetime(2027, 1, 1, tzinfo=timezone.utc)
 STEP = 30
@@ -130,3 +138,59 @@ def test_rejects_series_too_short():
 
 def test_longest_run_in_windows_without_gaps():
     assert longest_run_in_windows(np.ones(100), np.array([0, 10]), 20).tolist() == [0, 0]
+
+
+# ---------------------------------------------------------------- score y restricciones (T1.4.c)
+
+
+W = {"w1": 0.4, "w2": 0.3, "w3": 0.3}
+
+
+def row(sun, dark, earth_mean, earth_min=None):
+    return {"sun_pct": sun, "longest_dark_h": dark, "earth_h_mean": earth_mean,
+            "earth_h_min": earth_mean if earth_min is None else earth_min}
+
+
+def test_normalize():
+    assert normalize([10, 20, 30]).tolist() == [0.0, 0.5, 1.0]
+    assert normalize([7, 7]).tolist() == [0.5, 0.5]
+
+
+def test_best_and_worst_scores():
+    rows = {"a": [row(100, 0, 24)], "b": [row(0, 100, 0)], "c": [row(50, 50, 12)]}
+    add_scores(rows, W, ndigits=None)
+    assert rows["a"][0]["score"] == pytest.approx(1.0)
+    assert rows["b"][0]["score"] == pytest.approx(0.0)
+    assert rows["c"][0]["score"] == pytest.approx(0.5)
+
+
+def test_score_in_unit_interval_and_normalized_across_sites():
+    rng = np.random.default_rng(7)
+    rows = {s: [row(*rng.uniform([0, 0, 0], [100, 336, 24])) for _ in range(50)] for s in "abcde"}
+    add_scores(rows, W)
+    scores = [r["score"] for rs in rows.values() for r in rs]
+    assert min(scores) >= 0 and max(scores) <= 1
+
+
+def test_more_sun_never_lowers_the_score():
+    base = {"a": [row(40, 30, 10)], "b": [row(10, 80, 2)], "c": [row(90, 5, 20)]}
+    better = {"a": [row(60, 30, 10)], "b": [row(10, 80, 2)], "c": [row(90, 5, 20)]}
+    add_scores(base, W, ndigits=None)
+    add_scores(better, W, ndigits=None)
+    assert better["a"][0]["score"] >= base["a"][0]["score"]
+
+
+def test_weights_need_not_sum_to_one():
+    a = {"x": [row(100, 0, 24)], "y": [row(0, 100, 0)]}
+    add_scores(a, {"w1": 2, "w2": 0, "w3": 0})
+    assert [a["x"][0]["score"], a["y"][0]["score"]] == [1.0, 0.0]
+
+
+def test_constraints_optional_and_inclusive():
+    r = row(80, 12, 15, earth_min=6)
+    assert meets_constraints(r)  # todos los controles desactivados
+    assert meets_constraints(r, min_sun_pct=80, max_dark_h=12, min_earth_h=6)  # límites incluidos
+    assert not meets_constraints(r, min_sun_pct=80.01)
+    assert not meets_constraints(r, max_dark_h=11.99)
+    assert not meets_constraints(r, min_earth_h=6.01)
+    assert meets_constraints(r, min_sun_pct=None, max_dark_h=None, min_earth_h=5)

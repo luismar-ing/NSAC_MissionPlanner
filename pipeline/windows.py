@@ -117,3 +117,42 @@ def window_metrics(start_utc: datetime, step_min: int, sun_vis: np.ndarray, eart
         }
         for d in range(n_arrivals)
     ]
+
+
+def normalize(values: np.ndarray) -> np.ndarray:
+    """norm de 5.6: lleva los valores a [0, 1] sobre el rango observado.
+
+    Si todos los valores son iguales la métrica no distingue planes: se devuelve 0.5 (neutro).
+    """
+    v = np.asarray(values, dtype=float)
+    lo, hi = v.min(), v.max()
+    return np.full(v.shape, 0.5) if hi == lo else (v - lo) / (hi - lo)
+
+
+def add_scores(rows_by_site: dict[str, list[dict]], weights: dict[str, float], ndigits: int | None = 4) -> None:
+    """Añade `score` (spec 5.6) a todas las filas de una misma L, normalizando sobre todos los sitios.
+
+    score = (w1·norm(sun_pct) + w2·(1 − norm(longest_dark_h)) + w3·norm(earth_h_mean)) / (w1 + w2 + w3)
+    La división por la suma de pesos mantiene el score en [0, 1] aunque los pesos no sumen 1.
+    """
+    rows = [r for site_rows in rows_by_site.values() for r in site_rows]
+    if not rows:
+        return
+    w1, w2, w3 = weights["w1"], weights["w2"], weights["w3"]
+    total = w1 + w2 + w3
+    if total <= 0:
+        raise ValueError("la suma de pesos debe ser positiva")
+    sun = normalize([r["sun_pct"] for r in rows])
+    dark = normalize([r["longest_dark_h"] for r in rows])
+    earth = normalize([r["earth_h_mean"] for r in rows])
+    score = (w1 * sun + w2 * (1 - dark) + w3 * earth) / total
+    for r, s in zip(rows, score):
+        r["score"] = round(float(s), ndigits) if ndigits is not None else float(s)
+
+
+def meets_constraints(row: dict, min_sun_pct: float | None = None, max_dark_h: float | None = None,
+                      min_earth_h: float | None = None) -> bool:
+    """Spec 5.6: sun_pct ≥ X, longest_dark_h ≤ Y, earth_h_per_day_min ≥ Z; None = control desactivado."""
+    return ((min_sun_pct is None or row["sun_pct"] >= min_sun_pct)
+            and (max_dark_h is None or row["longest_dark_h"] <= max_dark_h)
+            and (min_earth_h is None or row["earth_h_min"] >= min_earth_h))

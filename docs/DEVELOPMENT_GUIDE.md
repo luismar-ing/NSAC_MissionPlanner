@@ -296,7 +296,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.4.a · **Spec:** 5.5, 10 (T1.4) · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba aleatoria: 200 ventanas coinciden (diferencia < 1e-9) con un cálculo ingenuo.
 
-##### [ ] T1.4.c — Puntuación y restricciones
+##### [x] T1.4.c — Puntuación y restricciones
 - **Qué:** `score` de 5.6 con `norm` sobre el rango observado (documentar el ámbito: todos los sitios y llegadas para cada L), pesos como parámetros; función de restricciones X, Y, Z opcionales (referencia para la paridad con el front end).
 - **Archivos:** `pipeline/windows.py`, `pipeline/tests/test_windows.py`
 - **Depende de:** T1.4.b · **Spec:** 5.6 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**
