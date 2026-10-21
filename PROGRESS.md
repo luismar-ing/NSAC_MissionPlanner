@@ -71,3 +71,20 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - D5: falta saber si la trayectoria es ilustrativa o real; A2: otras decisiones ya tomadas.
   - Esfuerzo estimado del MVP (178 h) alto para 24 días: el plan de recorte se revisa en cada cierre de fase.
 - **Siguiente tarea:** T0.1.a (no depende de ninguna decisión). Después, T0.1.b y T0.1.c; T0.4.a espera a D6 y D7.
+
+## 2026-10-21 · DECISIONES · Confirmación de D3, D4, D5, D6, D7, D12 y D13
+
+- **Tarea:** registro de decisiones (no es una subtarea de la guía).
+- **Qué se hizo:** el humano aceptó en el chat los valores por defecto de D3, D4, D5 (ilustrativa, `transit_days` = 3 días), D6, D7, D12 y D13. Se marcaron como **confirmada** (2026-10-21) en `docs/DECISIONS.md`, con su respuesta.
+- **Cómo se verificó:** estados en `docs/DECISIONS.md` tras la edición:
+  ```
+  D1 pendiente (parcial) · D2 confirmada (2026-10-20)
+  D3, D4, D5, D6, D7 confirmada (2026-10-21)
+  D8, D9, D10, D11 pendiente
+  D12, D13 confirmada (2026-10-21)
+  ```
+  Todas las decisiones que citan las subtareas de las Fases 0 y 1 (D2, D3, D4, D5, D6, D7, D12, D13) están confirmadas.
+- **Decisiones tomadas:** las 7 anteriores. Consecuencia de D5: T2.2.a se cerrará como «no aplica (D5)» cuando llegue su turno.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** D1 (habilidades y horas del equipo) y A2 (otras decisiones) siguen pendientes, pero no bloquean subtareas. D8, D9, D10 y D11 se necesitan antes de las Fases 2, 4 y 7.
+- **Siguiente tarea:** T0.1.a.
