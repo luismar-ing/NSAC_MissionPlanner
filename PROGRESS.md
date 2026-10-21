@@ -1724,3 +1724,22 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno. La medida de 3 s es en local; sobre la red depende del hosting (T7.1.a). Los JSON pesan 2 MB sin comprimir, y los hostings estáticos los sirven comprimidos.
 - **Problemas abiertos:** ninguno. **Fase 3 completa.**
 - **Siguiente tarea:** hito de la Fase 3; después, Fase 4 (T4.1.a).
+
+## 2026-10-21 · HITO FASE 3 · Búsqueda y comparación 2D con datos reales
+
+- **Estado de la guía:** Fases 0–3 completas (Pista S omitida, A4). Total: 69 [x], 39 [ ], 0 [!].
+- **Comprobación del hito** (pasos 2 y 3 del guion, sección 12):
+  ```
+  $ .venv/Scripts/python -m pytest -q   → 275 passed
+  $ npm --prefix web test                → Test Files 15 passed · Tests 112 passed
+  $ npm --prefix web run typecheck       → exit 0
+  $ npm --prefix web run build           → OK (376 kB JS, 116 kB con gzip)
+  ```
+  Recorrido en el navegador con datos REAL: activar y mover los tres controles (el calendario se reilumina en ≤ 20 ms; «583 of 1825 7-day plans meet the constraints»), anclar planes (clic + «Pin selected plan», doble clic, Enter o «Pin best 3» sobre un rango), comparar hasta 5 paneles (silueta, cinta, métricas con insignias y texto «why»), mover el reloj compartido (los 5 paneles en ≤ 30 ms), seleccionar un plan (título del panel) y ver «At the site»: panorama 360°, control de tiempo y panel del sitio con la fuente de cada valor.
+- **Resultados clave de la Fase 3:**
+  - Calendario en canvas (A5, transpuesto) con rampas OKLab por métrica; restricciones en < 25 ms.
+  - Paneles 2D solo en SVG (0 contextos WebGL), escala vertical compartida, exageración configurable.
+  - La racha de oscuridad resaltada coincide con `longest_dark_h` en las 5 475 ventanas; el panorama y la silueta usan el mismo az/el en el mismo instante; paridad Python ↔ TS sin discrepancias en 100 celdas (61 en el límite exacto).
+  - Carga del shell 2D (build de producción, local): 356–517 ms.
+- **Problemas abiertos para el humano:** D1 y D11 siguen pendientes (no bloquean la Fase 4). A5 sigue revisable. «Pin best 3» tiende a elegir planes que empatan en todo (score saturado, T1.4.d): mejora opcional anotada en T3.3.d.
+- **Siguiente tarea:** Fase 4 (T4.1.a, escena 3D).
