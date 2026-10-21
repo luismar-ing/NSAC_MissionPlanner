@@ -8,6 +8,9 @@ import { DataStore } from "../src/lib/data";
 import { loadPlanData, type PlanData } from "../src/lib/planData";
 import { makeProjection } from "../src/lib/projection";
 import { appStore } from "../src/store/appStore";
+import { HorizonSilhouette } from "../src/panels2d/HorizonSilhouette";
+import { TimeControl } from "../src/components/TimeControl";
+import { sharedElevationScale } from "../src/lib/scale";
 import { discRadii, EARTH_DIAMETER_DEG, Panorama, panoramaRange, sampleAtTime, SUN_DIAMETER_DEG } from "../src/views/Panorama";
 
 const REAL = join(__dirname, "..", "public", "data");
@@ -27,6 +30,7 @@ beforeAll(async () => {
     disconnect() {}
   } as unknown as typeof ResizeObserver;
   Object.defineProperty(HTMLElement.prototype, "clientWidth", { configurable: true, get: () => WIDTH });
+  Object.defineProperty(HTMLElement.prototype, "clientHeight", { configurable: true, get: () => 220 });
   globalThis.fetch = fileFetch;
   await appStore.getState().loadCore();
   const st = appStore.getState();
@@ -93,5 +97,47 @@ describe("panorama content", () => {
   it("draws no canvas (SVG only)", () => {
     render(<Panorama data={haworth} timeMs={haworth.series.startMs} />);
     expect(document.querySelectorAll("canvas")).toHaveLength(0);
+  });
+});
+
+describe("time control and coherence with the panels (T3.4.b)", () => {
+  it("at the same instant the panorama and the panel silhouette use exactly the same az/el", () => {
+    const scale = sharedElevationScale([haworth]);
+    for (const h of [0, 0.5, 13, 50.5, 99, 167.5]) {
+      render(
+        <>
+          <HorizonSilhouette data={haworth} scale={scale} exaggeration={null} compareTime={h} />
+          <Panorama data={haworth} timeMs={haworth.series.startMs + h * 3_600_000} />
+        </>,
+      );
+      for (const [panel, pano] of [
+        ["sun-marker", "sun-disc"],
+        ["earth-marker", "earth-disc"],
+      ]) {
+        const a = screen.getByTestId(panel);
+        const b = screen.getByTestId(pano);
+        expect(b.dataset.az, `${panel} at ${h} h`).toBe(a.dataset.az);
+        expect(b.dataset.el).toBe(a.dataset.el);
+        expect(b.dataset.visible).toBe(a.dataset.visible);
+      }
+      cleanup();
+    }
+  });
+
+  it("the time control moves missionTime within the plan window and can match the tray clock", () => {
+    const s = haworth.series;
+    appStore.getState().selectPlan("haworth_20270309_7d");
+    expect(appStore.getState().missionTime).toBe(s.startMs);
+    render(<TimeControl startMs={s.startMs} windowDays={7} stepMin={s.stepMin} />);
+    const slider = screen.getByRole("slider", { name: /mission time/i }) as HTMLInputElement;
+    expect(Number(slider.max)).toBe(167.5);
+    fireEvent.change(slider, { target: { value: "25.5" } });
+    expect(appStore.getState().missionTime).toBe(s.startMs + 25.5 * 3_600_000);
+    expect(slider.getAttribute("aria-valuetext")).toBe("Day 2, 01:30");
+    appStore.getState().setCompareTime(70);
+    fireEvent.click(screen.getByRole("button", { name: "Match tray clock" }));
+    expect(appStore.getState().missionTime).toBe(s.startMs + 70 * 3_600_000);
+    appStore.getState().setCompareTime(0);
+    appStore.getState().selectPlan(null);
   });
 });

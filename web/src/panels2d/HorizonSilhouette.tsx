@@ -94,8 +94,8 @@ export const HorizonSilhouette = memo(function HorizonSilhouette({ data, scale, 
               </text>
             ) : (
               <>
-                <Earth x={azToX(p, series.earthAz[k])} y={elToY(p, series.earthEl[k])} visible={series.earthVis[k] === 1} />
-                <Sun x={azToX(p, series.sunAz[k])} y={elToY(p, series.sunEl[k])} visible={series.sunVis[k] === 1} />
+                <Earth x={azToX(p, series.earthAz[k])} y={elToY(p, series.earthEl[k])} azel={[series.earthAz[k], series.earthEl[k]]} visible={series.earthVis[k] === 1} />
+                <Sun x={azToX(p, series.sunAz[k])} y={elToY(p, series.sunEl[k])} azel={[series.sunAz[k], series.sunEl[k]]} visible={series.sunVis[k] === 1} />
               </>
             )}
           </g>
@@ -105,10 +105,10 @@ export const HorizonSilhouette = memo(function HorizonSilhouette({ data, scale, 
   );
 });
 
-function Sun({ x, y, visible }: { x: number; y: number; visible: boolean }) {
+function Sun({ x, y, azel, visible }: { x: number; y: number; azel: [number, number]; visible: boolean }) {
   const rays = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4);
   return (
-    <g data-testid="sun-marker" data-visible={visible} transform={`translate(${x},${y})`}>
+    <g data-testid="sun-marker" data-az={azel[0]} data-el={azel[1]} data-visible={visible} transform={`translate(${x},${y})`}>
       {rays.map((a) => (
         <line key={a} x1={Math.cos(a) * 7} y1={Math.sin(a) * 7} x2={Math.cos(a) * 10} y2={Math.sin(a) * 10} stroke={COLORS.sun} strokeWidth={1.5} />
       ))}
@@ -117,9 +117,9 @@ function Sun({ x, y, visible }: { x: number; y: number; visible: boolean }) {
   );
 }
 
-function Earth({ x, y, visible }: { x: number; y: number; visible: boolean }) {
+function Earth({ x, y, azel, visible }: { x: number; y: number; azel: [number, number]; visible: boolean }) {
   return (
-    <g data-testid="earth-marker" data-visible={visible} transform={`translate(${x},${y})`}>
+    <g data-testid="earth-marker" data-az={azel[0]} data-el={azel[1]} data-visible={visible} transform={`translate(${x},${y})`}>
       <circle r={9} fill="none" stroke={COLORS.earth} strokeWidth={1} strokeOpacity={0.7} />
       <circle r={5.5} fill={visible ? COLORS.earth : COLORS.bg} stroke={COLORS.earth} strokeWidth={2} />
     </g>

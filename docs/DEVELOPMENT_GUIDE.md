@@ -572,7 +572,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.3.b · **Spec:** 8.4 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba: el tamaño de los discos en px es 0.53° y 1.9° por la escala; revisión visual.
 
-##### [ ] T3.4.b — Control de tiempo y coherencia con los paneles
+##### [x] T3.4.b — Control de tiempo y coherencia con los paneles
 - **Qué:** scrubber y reproducción ligados a `missionTime` (sincronizados más tarde con la escena).
 - **Archivos:** `web/src/components/TimeControl.tsx`, `web/tests/panorama.test.ts`
 - **Depende de:** T3.4.a · **Spec:** 8.4, 10 (T3.4) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

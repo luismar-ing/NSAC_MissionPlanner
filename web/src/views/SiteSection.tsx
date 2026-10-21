@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { loadPlanData, type PlanData } from "../lib/planData";
 import { STRINGS } from "../lib/strings";
 import { useApp } from "../store/appStore";
+import { TimeControl } from "../components/TimeControl";
 import { Panorama } from "./Panorama";
 
 /**
@@ -37,6 +38,7 @@ export function SiteSection() {
       <p className="site-heading">
         <strong>{plan.site.name}</strong> · {STRINGS.arrival} {plan.plan.arrival_utc.slice(0, 10)} · {STRINGS.windowDays(plan.plan.window_days)}
       </p>
+      <TimeControl startMs={plan.series.startMs} windowDays={plan.plan.window_days} stepMin={plan.series.stepMin} />
       <Panorama data={plan} timeMs={missionTime} />
     </>
   );

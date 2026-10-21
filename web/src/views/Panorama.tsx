@@ -122,8 +122,8 @@ export function Panorama({ data, timeMs }: Props) {
                 </text>
               </g>
             ))}
-            <Body testid="earth-disc" x={azToX(p, earth.az)} y={elToY(p, earth.el)} r={discs.earth} color={COLORS.earth} visible={earth.vis} />
-            <Body testid="sun-disc" x={azToX(p, sun.az)} y={elToY(p, sun.el)} r={discs.sun} color={COLORS.sun} visible={sun.vis} />
+            <Body testid="earth-disc" azel={[earth.az, earth.el]} x={azToX(p, earth.az)} y={elToY(p, earth.el)} r={discs.earth} color={COLORS.earth} visible={earth.vis} />
+            <Body testid="sun-disc" azel={[sun.az, sun.el]} x={azToX(p, sun.az)} y={elToY(p, sun.el)} r={discs.sun} color={COLORS.sun} visible={sun.vis} />
             <text x={w - 4} y={12} textAnchor="end" fill={COLORS.textMuted} fontSize={10}>
               {STRINGS.silhouette.shown(exaggerationOf(p))} · {STRINGS.panorama.ringNote}
             </text>
@@ -164,9 +164,9 @@ export function Panorama({ data, timeMs }: Props) {
 const CARD: Record<number, string> = { 0: "N", 90: "E", 180: "S", 270: "W" };
 
 /** Disc at angular scale (filled = visible, hollow = blocked) plus a dashed finder ring that is not to scale. */
-function Body({ testid, x, y, r, color, visible }: { testid: string; x: number; y: number; r: number; color: string; visible: boolean }) {
+function Body({ testid, azel, x, y, r, color, visible }: { testid: string; azel: [number, number]; x: number; y: number; r: number; color: string; visible: boolean }) {
   return (
-    <g data-testid={testid} data-r={r} data-visible={visible} transform={`translate(${x},${y})`}>
+    <g data-testid={testid} data-az={azel[0]} data-el={azel[1]} data-r={r} data-visible={visible} transform={`translate(${x},${y})`}>
       <circle r={Math.max(r + 5, 9)} fill="none" stroke={color} strokeWidth={1} strokeDasharray="2 2" />
       <circle className="disc" r={r} fill={visible ? color : "none"} stroke={color} strokeWidth={visible ? 0 : 1} />
     </g>

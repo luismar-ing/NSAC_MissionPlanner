@@ -107,6 +107,15 @@ export const STRINGS = {
     noLink: "No Earth link",
     outside: "outside the plan window",
   },
+  timeControl: {
+    label: "Mission time at the site",
+    play: "Play the mission clock",
+    pause: "Pause the mission clock",
+    speed: "Playback speed",
+    speedLabel: (h: number) => `${h} h/s`,
+    match: "Match tray clock",
+    matchTitle: "Jump to the same time since arrival as the comparison tray",
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

@@ -1647,3 +1647,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** la prueba es `panorama.test.tsx` (necesita jsdom), no `.ts`. Archivo extra `SiteSection.tsx`. La corrección del ancho va en este commit porque se encontró aquí y es de 4 líneas de CSS.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T3.4.b.
+
+## 2026-10-21 · T3.4.b · Control de tiempo y coherencia con los paneles
+
+- **Tarea:** T3.4.b — Control de tiempo y coherencia con los paneles ([x]).
+- **Qué se hizo:**
+  - `web/src/components/TimeControl.tsx`: deslizador de la ventana del plan seleccionado (pasos de 30 min) ligado a `missionTime`, el reloj que compartirá la escena 3D en la Fase 4. Reproducción a 1, 6 o 24 h/s con pausa, etiqueta «Day N, hh:mm» de la muestra en pantalla y botón «Match tray clock», que lleva `missionTime` a la llegada + `compareTime`.
+  - Los marcadores de la silueta y los discos del panorama exponen su az/el en `data-az`/`data-el`, para comparar las dos vistas en las pruebas.
+  - Botones de texto del scrubber de la bandeja: ancho automático. Con el ancho fijo de 28 px de `icon-btn`, «−1d» y «Match tray clock» se salían y ensanchaban la página.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 105 passed
+    panorama.test.tsx: at the same instant the panorama and the panel silhouette use exactly the same az/el
+                         (Sol y Tierra, az, el y visibilidad idénticos en 0, 0.5, 13, 50.5, 99 y 167.5 h)
+                       the time control moves missionTime within the plan window and can match the tray clock
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  La primera versión de «Match tray clock» leía `compareTime` del último render y la prueba lo detectó (70 h de diferencia); ahora lo lee del store al hacer clic. En el navegador, la reproducción a 6 h/s avanza 23 muestras en 2 s (11.5 h), con el Sol rasante (el −0.05°) detrás de la loma del este de Haworth, «In shadow» y «Earth link». Con 774 px de ancho, `scrollWidth` 759: sin scroll horizontal.
+- **Decisiones tomadas:** `missionTime` y `compareTime` son relojes distintos (absoluto del plan elegido y relativo de la bandeja, spec 8.1 y 8.4); se enlazan bajo demanda con «Match tray clock», no siempre, para que la reproducción del sitio no mueva la bandeja.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T3.4.c.

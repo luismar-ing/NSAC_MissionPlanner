@@ -576,6 +576,9 @@ button {
 }
 
 .scrubber .icon-btn {
+  width: auto;
+  min-width: 28px;
+  padding: 0 6px;
   font-size: var(--font-sm);
   white-space: nowrap;
 }
@@ -659,4 +662,11 @@ button {
 .status.on.earth {
   border-color: var(--color-earth);
   color: var(--color-earth);
+}
+
+/* ------------------------------------------------------------------ time control (T3.4.b) */
+
+.time-control {
+  flex-wrap: wrap;
+  margin-bottom: var(--space-sm);
 }
