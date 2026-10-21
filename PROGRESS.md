@@ -724,3 +724,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T1.1.c.
+
+## 2026-10-21 · T1.1.c · Az/el del Sol y la Tierra, vectorizado
+
+- **Tarea:** T1.1.c — Az/el del Sol y la Tierra ([x]).
+- **Qué se hizo:** en `pipeline/ephemeris.py`:
+  - `et_grid`: rejilla ET uniforme; comprueba que no hay un segundo intercalar en el rango.
+  - `target_enu_km`: vector sitio → Sol/Tierra con LT+S, vía `spiceypy.spkcpo` (observador de posición constante en MOON_ME, centro MOON), rotado a ENU.
+  - `target_az_el`.
+  - `elevation_bounds_deg`: límites por latitud de `docs/validation.md` §2.
+  Pruebas en `pipeline/tests/test_ephemeris.py`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_ephemeris.py -v -s
+  test_grid_has_30_days_at_30_min PASSED
+  malapert_massif sun: el [-3.103, +4.519]°, límite ±5.61°; az recorre 1.01 vueltas
+  malapert_massif earth: el [-3.097, +10.473]°, límite ±11.51°; az recorre 0.04 vueltas
+  connecting_ridge sun: el [+0.039, +1.529]°, límite ±2.16°; az recorre 1.01 vueltas
+  connecting_ridge earth: el [-7.545, +6.143]°, límite ±8.06°; az recorre 0.04 vueltas
+  test_sun_goes_around_the_sky_once_per_lunar_day PASSED   (1.01 vueltas en 30 días)
+  test_earth_stays_in_a_small_patch_of_sky PASSED          (la Tierra oscila, no recorre el cielo)
+  5 passed
+  ```
+- **Decisiones tomadas:** `spkcpo` en lugar de `spkpos` (spec 5.1). Es la forma de SPICE de calcular estados con LT+S para un observador fijo en la superficie: el tiempo de luz se calcula desde el sitio y no desde el centro de la Luna. Mismo tipo de corrección que pide la spec.
+- **Desviaciones de la spec / cambios en la guía:** **límite de la Tierra corregido de colat + 7.0° a colat + 7.5°**. Connecting Ridge dio −7.545° frente a un límite de 7.56°, porque en T1.1.a no conté la paralaje topocéntrica de la Tierra (~0.26°). Actualizados `ephemeris.py`, `test_horizons_refs.py`, `docs/validation.md` §2 y la aceptación de T1.1.c en la guía.
+- **Problemas abiertos:** el bucle sobre `spkcpo` es escalar. Se medirá el tiempo de un año completo en T1.1.e.
+- **Siguiente tarea:** T1.1.d.

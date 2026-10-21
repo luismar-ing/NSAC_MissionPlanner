@@ -21,6 +21,6 @@ def test_reference_file(site, target):
     assert "AIRLESS" in header_value(text, "Atmos refraction")
     assert f"'{site['lon']:.5f},{site['lat']:.5f}," in text  # el sitio consultado es el de sites.json
     colat = 90 - abs(site["lat"])
-    bound = colat + (1.6 if target == "sun" else 7.0)  # docs/validation.md §2
+    bound = colat + (1.6 if target == "sun" else 7.5)  # docs/validation.md §2
     assert all(abs(r["el_deg"]) <= bound for r in rows)
     assert all(0 <= r["az_deg"] < 360 for r in rows)

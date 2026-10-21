@@ -46,7 +46,7 @@ de_gerlache_rim_2    1.41°       2.58°           3.01°  OK              exced
 
 **Criterio usado desde ahora (sustituye al ±1.6° literal de 5.7 y T1.1):**
 - Sol: |sun_el| ≤ (90° − |lat|) + 1.6°.
-- Tierra: |earth_el| ≤ (90° − |lat|) + 7.0°. Margen de 7.0° = libración en latitud (~6.7°) más paralaje; los valores de Horizons lo cumplen (máximo 10.24° en Malapert, cuyo límite es 11.0°).
+- Tierra: |earth_el| ≤ (90° − |lat|) + 7.5°. Margen = libración en latitud (~6.7°) + paralaje topocéntrica de la Tierra (hasta ~0.26°, por estar el observador a 1737 km del centro lunar) + holgura. En T1.1.a se fijó 7.0°, pero en T1.1.c Connecting Ridge dio −7.545° (límite 7.56°): faltaba la paralaje. Los valores de Horizons cumplen 7.5° (máximo 10.24° en Malapert, cuyo límite es 11.5°).
 - El espíritu de 5.7 se mantiene: un valor fuera de estos límites indica un error de marcos o de signos.
 
 Desviación documentada también en `PROGRESS.md` (T1.1.a) y en la guía (T1.1.c, T1.1.e y T1.5.b).

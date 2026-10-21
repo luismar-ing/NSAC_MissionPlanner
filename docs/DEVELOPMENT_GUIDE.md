@@ -206,11 +206,11 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T0.2.c, T0.3.b · **Spec:** 5.1 · **Decisiones:** D12 · **Est.:** 2 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_enu.py -v` pasa: base ortonormal (error < 1e-12), U radial, E × N = U, N apunta al polo norte proyectado en un punto de prueba.
 
-##### [ ] T1.1.c — Az/el del Sol y la Tierra, vectorizado
+##### [x] T1.1.c — Az/el del Sol y la Tierra, vectorizado
 - **Qué:** vectores del Sol y la Tierra respecto al observador con corrección LT+S (spkpos como dice 5.1, o spkcpo para un observador en superficie: documentar), transformación a ENU, azimut 0–360° desde el Norte hacia el Este y elevación, sobre una rejilla temporal.
 - **Archivos:** `pipeline/ephemeris.py`, `pipeline/tests/test_ephemeris.py`
 - **Depende de:** T1.1.b · **Spec:** 5.1, 5.7 · **Decisiones:** — · **Est.:** 3 h
-- **Aceptación:** prueba para un sitio y 30 días a 30 min: |sun_el| ≤ (90° − |lat|) + 1.6°, |earth_el| ≤ (90° − |lat|) + 7.0° (límites de `docs/validation.md` §2, que corrigen el ±1.6° de 5.7, válido solo en el polo) y azimuts en [0, 360).
+- **Aceptación:** prueba para un sitio y 30 días a 30 min: |sun_el| ≤ (90° − |lat|) + 1.6°, |earth_el| ≤ (90° − |lat|) + 7.5° (límites de `docs/validation.md` §2, que corrigen el ±1.6° de 5.7, válido solo en el polo) y azimuts en [0, 360).
 
 ##### [ ] T1.1.d — Comparación contra Horizons
 - **Qué:** prueba que compara contra las referencias de T1.1.a y escribe la tabla de errores (borrador) en `docs/validation.md`. Error medido como separación angular, o en elevación y azimut·cos(el) (documentar).
