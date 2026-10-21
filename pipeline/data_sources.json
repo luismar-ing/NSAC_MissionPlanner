@@ -45,6 +45,15 @@
       "bytes": 19478,
       "md5": null,
       "sha256": "a47c71e9c9f33796bdafb2c9d69a7ee447b6016ecad80f71cd6f3e479f9cf768"
+    },
+    {
+      "id": "lola_dem_80s_40m",
+      "group": "dem",
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_40MPP_ADJ.TIF",
+      "path": "dem/LDEM_80S_40MPP_ADJ.TIF",
+      "bytes": 716299920,
+      "md5": null,
+      "sha256": "b7f3567bfa405dbcb42f867f6cd3c9932ca9752b4363ce1eef835f9115c1dd76"
     }
   ]
 }

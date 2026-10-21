@@ -3,7 +3,7 @@
 Esta carpeta guarda los datos pesados (kernels SPICE, DEM LOLA, texturas). **No se versionan**: solo este README.
 Se descargan con `python -m pipeline.fetch_data` (registro de fuentes y checksums: `pipeline/data_sources.json`).
 
-Descargado: kernels SPICE (2026-10-21). Cada fila se completa al verificar y descargar la fuente (T0.2.a, T0.2.d, T0.2.f, T2.2.a, T2.3.b). No se escribe ningún nombre de archivo ni URL que no se haya comprobado.
+Descargado: kernels SPICE y DEM LOLA (2026-10-21). Cada fila se completa al verificar y descargar la fuente (T0.2.a, T0.2.d, T0.2.f, T2.2.a, T2.3.b). No se escribe ningún nombre de archivo ni URL que no se haya comprobado.
 
 ## Kernels SPICE (T0.2.a)
 
@@ -30,7 +30,7 @@ Fuente: NASA GSFC Planetary Geodynamics Data Archive (PGDA), producto «A New Vi
 
 | Producto | URL | Resolución | Proyección (de la cabecera) | Referencia de alturas | Tamaño (bytes) | SHA-256 | Fecha | Cita |
 |---|---|---|---|---|---|---|---|---|
-| `LDEM_80S_40MPP_ADJ.TIF` (COG, float32, nodata NaN, 15 200 × 15 200, overviews 2–32) | https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_40MPP_ADJ.TIF | 40 m/píxel, 80°S–90°S (x, y en ±304 000 m) | `+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m` (IAU 30135, «Moon (2015) - Sphere / Ocentric / South Polar»); coordenadas en MOON_ME de DE421 | Altura en m sobre la esfera de referencia de 1 737 400 m (rango −7 296.5 a +7 026.8 m) | 716 299 920 | | | Barker, M. K. et al. 2023, *Planetary Science Journal* 4, 183, doi:10.3847/PSJ/acf3e1 |
+| `LDEM_80S_40MPP_ADJ.TIF` (COG, float32, nodata NaN, 15 200 × 15 200, overviews 2–32) | https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_40MPP_ADJ.TIF | 40 m/píxel, 80°S–90°S (x, y en ±304 000 m) | `+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m` (IAU 30135, «Moon (2015) - Sphere / Ocentric / South Polar»); coordenadas en MOON_ME de DE421 | Altura en m sobre la esfera de referencia de 1 737 400 m (rango −7 296.5 a +7 026.8 m) | 716 299 920 | `b7f3567bfa405dbcb42f867f6cd3c9932ca9752b4363ce1eef835f9115c1dd76` | 2026-10-21 | Barker, M. K. et al. 2023, *Planetary Science Journal* 4, 183, doi:10.3847/PSJ/acf3e1 |
 
 Notas de la selección:
 - **Fuente:** la spec sugiere el PDS Geosciences Node. Se usa PGDA, que es el archivo del equipo LOLA en NASA GSFC: tiene el producto polar más reciente («ADJ», ajustado, Barker et al. 2023), con DOI, en GeoTIFF COG legible con rasterio. Los productos GDR polares de PDS (ODE) son anteriores; ODE lista, por ejemplo, `LDEM_80S_20M` con 30 400 × 30 400 píxeles en 16 bits.

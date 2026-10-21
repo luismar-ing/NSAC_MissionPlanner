@@ -140,7 +140,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.1.a · **Spec:** 5.2, 6 · **Decisiones:** D3 · **Est.:** 2 h
 - **Aceptación:** `data/README.md` contiene el producto con URL comprobada (HTTP 200) y resolución, proyección y radio de referencia copiados del label.
 
-##### [~] T0.2.e — Descargar el DEM y verificar su lectura
+##### [x] T0.2.e — Descargar el DEM y verificar su lectura
 - **Qué:** añadir el DEM a `fetch_data.py`; `pipeline/inspect_dem.py` imprime CRS, tamaño, resolución, rango de alturas y el valor cerca del polo.
 - **Archivos:** `pipeline/fetch_data.py`, `pipeline/data_sources.json`, `pipeline/inspect_dem.py`, `data/README.md`
 - **Depende de:** T0.2.d, T0.2.b · **Spec:** 6 · **Decisiones:** — · **Est.:** 2 h

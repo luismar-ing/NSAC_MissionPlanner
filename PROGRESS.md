@@ -513,3 +513,28 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** cerrar T0.2.e (descarga terminada).
+
+## 2026-10-21 · T0.2.e · Descargar el DEM y verificar su lectura
+
+- **Tarea:** T0.2.e — Descargar el DEM y verificar su lectura ([x]).
+- **Qué se hizo:** DEM añadido al registro (`pipeline/data_sources.json`, grupo `dem`) y descargado con `fetch_data --dem` (716 299 920 bytes, en segundo plano mientras se hacían T1.2.b, T1.3.a–c y T1.4.a–c). `pipeline/inspect_dem.py` imprime CRS, tamaño, resolución, extensión, rango de alturas (con una muestra 1/8 para no leer 0,9 GB) y el valor junto al polo, y comprueba que coinciden con la cabecera leída en T0.2.d. SHA-256 y fecha en `data/README.md`.
+- **Cómo se verificó:**
+  ```
+  [lola_dem_80s_40m] downloaded, checksum registrado: sha256 b7f3567bfa405dbcb42f867f6cd3c9932ca9752b4363ce1eef835f9115c1dd76
+  === 2ª ejecución
+  [lola_dem_80s_40m] present, checksum OK (dem/LDEM_80S_40MPP_ADJ.TIF)
+  === python -m pipeline.inspect_dem
+  CRS (PROJ)  : +proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs=True
+  Tamaño      : 15200 x 15200 píxeles, 1 banda(s), float32, nodata=nan
+  Resolución  : 40.0 x 40.0 m/píxel
+  Extensión   : x [-304000, 304000] m, y [-304000, 304000] m
+  Alturas     : min -7292.0 m, max 7024.5 m, media -1500.6 m (sobre la esfera de 1737400 m; muestra 1/8, 3,610,000 píxeles)
+  Sin datos   : 0.00 % de la muestra
+  Polo (0, 0) : 1285.9 m; ventana de 1 km: 1085.7 a 1343.8 m
+  OK   (exit 0, 1.4 s)
+  ```
+  El rango coincide con el `actual_range` de la cabecera (−7 296.5 a +7 026.8 m; la muestra 1/8 no ve los extremos exactos).
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T0.2.f (texturas).
