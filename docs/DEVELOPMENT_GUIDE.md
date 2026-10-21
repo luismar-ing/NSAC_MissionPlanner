@@ -310,7 +310,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 
 ### T1.5 plans.json (spec 5.8)
 
-##### [ ] T1.5.a — Generar plans.json
+##### [x] T1.5.a — Generar plans.json
 - **Qué:** planes según 5.8, D6 y D7: esquema de ids, `launch_utc = arrival_utc − transit_days`, `trajectory_id`.
 - **Archivos:** `pipeline/plans.py`, `pipeline/plans.json`
 - **Depende de:** T1.4.d · **Spec:** 5.8, 7.2 · **Decisiones:** D5, D6, D7 · **Est.:** 1.5 h

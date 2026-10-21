@@ -923,3 +923,21 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ⚠️ **el score de 5.6 se satura**: hasta el 37 % de las ventanas de 3 días empatan a 1.0 (todas las métricas en su mejor valor posible). Es correcto según la spec, pero el calendario (T3.2) y la insignia «best» (T3.3.d) necesitarán un desempate (por ejemplo, el menor `longest_comm_gap_h`) o mostrar «perfect window». Anotado para la Fase 3; no se cambia la fórmula sin consultar.
 - **Siguiente tarea:** T1.5.a.
+
+## 2026-10-21 · T1.5.a · Generar plans.json
+
+- **Tarea:** T1.5.a — Generar `plans.json` ([x]).
+- **Qué se hizo:** `pipeline/plans.py` (`python -m pipeline.plans`): un plan por sitio × día de llegada × L (D6), indexado por llegada (D7), con `transit_days` = 3 (D5), `launch_utc` derivado y `trajectory_id` por sitio y día. Comprobaciones cruzadas (`check`). Salida `pipeline/plans.json` (versionado, JSON compacto). Prueba `pipeline/tests/test_plans.py`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.plans
+  5475 planes = 5 sitios × 365 llegadas × 3 L; 1.15 MB → pipeline\plans.json
+  primero: {'id': 'connecting_ridge_20270101_3d', 'site_id': 'connecting_ridge', 'arrival_utc': '2027-01-01T00:00:00Z',
+            'window_days': 3, 'transit_days': 3, 'launch_utc': '2026-12-29T00:00:00Z', 'trajectory_id': 'connecting_ridge_20270101'}
+  contrato + comprobaciones cruzadas: OK     (exit 0)
+  $ python -m pytest pipeline/tests/test_plans.py → 2 passed
+  ```
+- **Decisiones tomadas:** ninguna nueva (D5, D6 y D7 ya confirmadas).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** 1.15 MB entra en el presupuesto de series (< 15 MB). Si la carga inicial (< 3 s) lo pidiera, el front end podría generar los planes a partir de `sites` y `date_range`, que son deterministas.
+- **Siguiente tarea:** T1.5.b.
