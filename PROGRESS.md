@@ -248,3 +248,30 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** se añadieron `pipeline/tests/__init__.py` y `pipeline/tests/fixtures/__init__.py` para poder ejecutar el generador con `python -m`.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T0.4.c.
+
+## 2026-10-21 · T0.4.c · Tipos TypeScript y validación en el front end
+
+- **Tarea:** T0.4.c — Tipos TypeScript y validación en el front end ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/contract.ts`: esquemas zod (`strictObject`) de los 11 tipos de archivo, con las mismas reglas que `pipeline/contract.py`, tipos inferidos (`Manifest`, `Plan`, `Timeseries`, ...), registro `SCHEMAS`, `kindForPath` (mismas reglas que en Python) y utilidades de tiempo (`parseInstant`, `parseDay`, `formatInstant`).
+  - `web/tests/contract.test.ts`: prueba de paridad sobre las fixtures compartidas de `pipeline/tests/fixtures/contract/`.
+  - Dependencias exactas nuevas: `zod` 4.6.7 y `@types/node` 26.6.5 (dev, para leer las fixtures en las pruebas); `tsconfig.json` añade los tipos de Node.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test -- contract
+   Test Files  1 passed (1)
+        Tests  36 passed (36)
+  $ npm --prefix web run typecheck
+  typecheck exit: 0
+  ```
+  Las 23 fixtures válidas se aceptan y las 11 inválidas se rechazan por el mismo motivo que en Python, por ejemplo:
+  ```
+  plans__launch_mismatch.json: 0: launch_utc must be arrival_utc - transit_days = 2026-12-29T00:00:00Z
+  timeseries__length_mismatch.json: : sun_vis has 63 values, expected n = 64
+  site_features__available_without_source.json: attributes.0: elevation_m: an available attribute needs a source (rule 1, spec 5.10)
+  ```
+  Suite completa del front end: `Tests 37 passed (37)`; build correcto.
+- **Decisiones tomadas:** los mensajes del front end van en inglés (D2). Las comprobaciones entre archivos se harán en el cargador (T3.1.a), como indica la sección 14 del contrato.
+- **Desviaciones de la spec / cambios en la guía:** corrección en T0.4.b (commit 04e28de): `.gitattributes` con `* text=auto eol=lf`. Un clon limpio en Windows extraía las fixtures con CRLF y fallaba `test_committed_fixtures_are_up_to_date`; tras el cambio pasan las 58 pruebas del pipeline en un clon limpio.
+- **Problemas abiertos:** diferencia menor e inevitable: en JSON/JS, `3.0` y `3` son el mismo número, así que zod no distingue un entero escrito como float (pydantic estricto sí). No afecta a datos generados por el pipeline.
+- **Siguiente tarea:** T0.2.a.

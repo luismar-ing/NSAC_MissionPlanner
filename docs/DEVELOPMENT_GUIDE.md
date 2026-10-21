@@ -108,7 +108,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.4.a, T0.1.b · **Spec:** 7.2 · **Decisiones:** — · **Est.:** 3 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_contract.py -v` pasa: las fixtures válidas se aceptan y al menos una inválida por tipo de archivo se rechaza con un mensaje claro; `python -m pipeline.validate pipeline/tests/fixtures/contract/valid` termina en 0.
 
-##### [ ] T0.4.c — Tipos TypeScript y validación en el front end
+##### [x] T0.4.c — Tipos TypeScript y validación en el front end
 - **Qué:** esquemas zod equivalentes con tipos inferidos; prueba de paridad que valida las mismas fixtures de `pipeline/tests/fixtures/contract/` (válidas aceptadas, inválidas rechazadas).
 - **Archivos:** `web/src/lib/contract.ts`, `web/tests/contract.test.ts`, `web/package.json`
 - **Depende de:** T0.4.b, T0.1.c · **Spec:** 7.2, 10 (T3.1) · **Decisiones:** — · **Est.:** 2.5 h
