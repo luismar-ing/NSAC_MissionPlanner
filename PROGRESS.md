@@ -538,3 +538,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T0.2.f (texturas).
+
+## 2026-10-21 · T0.2.f · Texturas de la Tierra y la Luna (verificación de licencia)
+
+- **Tarea:** T0.2.f — Texturas ([x]).
+- **Qué se hizo:** texturas identificadas en NASA SVS y registradas en `pipeline/data_sources.json` (grupo `textures`) y `data/README.md` (URL, resolución, licencia, crédito, tamaño, SHA-256): Luna `lroc_color_poles_4k.tif` (SVS 4720) y Tierra `flat_earth_Largest_still.0330.jpg` (SVS 3615, Blue Marble NG con nubes). Créditos añadidos al README.
+- **Cómo se verificó:**
+  ```
+  [moon_color_lroc_poles_4k] downloaded, checksum registrado: sha256 918649a7f8ed2f1329b2cd95bb0d25483befdcb60ae1a66db681a637cc21344f
+  [earth_bmng_clouds_8k] downloaded, checksum registrado: sha256 5ea6b68a4412421cae11711ae4fec1a7b1f2dbd7265c0c3004d487a03c43be9a
+  [moon_color_lroc_poles_4k] present, checksum OK (textures/lroc_color_poles_4k.tif)
+  [earth_bmng_clouds_8k] present, checksum OK (textures/flat_earth_Largest_still.0330.jpg)
+  data/textures/lroc_color_poles_4k.tif: 4096x2048 modo RGB
+    -> prueba web 4096x2048 JPEG q85: 1.55 MB
+  data/textures/flat_earth_Largest_still.0330.jpg: 8192x4096 modo RGB
+    -> prueba web 4096x2048 JPEG q85: 1.54 MB
+  Total texturas web (prueba): 3.09 MB
+  ```
+  Licencia: la página de ayuda de SVS dice «All of our content is in the public domain (unless otherwise noted)».
+- **Decisiones tomadas:** reserva de 10 MB para texturas web dentro de los 50 MB de D13 (la prueba usa 3,1 MB). Versión «poles» de la Luna por el zoom al polo sur. La textura lunar es solo visual («optimized for aesthetics, not science», según SVS).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** el servidor clásico de Blue Marble (Visible Earth, NEO) ya no publica listados; por eso se usa SVS 3615.
+- **Siguiente tarea:** T0.3.a (sitios); ver el bloqueo en la siguiente entrada.

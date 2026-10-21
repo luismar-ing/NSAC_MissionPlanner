@@ -54,6 +54,24 @@
       "bytes": 716299920,
       "md5": null,
       "sha256": "b7f3567bfa405dbcb42f867f6cd3c9932ca9752b4363ce1eef835f9115c1dd76"
+    },
+    {
+      "id": "moon_color_lroc_poles_4k",
+      "group": "textures",
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_4k.tif",
+      "path": "textures/lroc_color_poles_4k.tif",
+      "bytes": 13095388,
+      "md5": null,
+      "sha256": "918649a7f8ed2f1329b2cd95bb0d25483befdcb60ae1a66db681a637cc21344f"
+    },
+    {
+      "id": "earth_bmng_clouds_8k",
+      "group": "textures",
+      "url": "https://svs.gsfc.nasa.gov/vis/a000000/a003600/a003615/flat_earth_Largest_still.0330.jpg",
+      "path": "textures/flat_earth_Largest_still.0330.jpg",
+      "bytes": 6003000,
+      "md5": null,
+      "sha256": "5ea6b68a4412421cae11711ae4fec1a7b1f2dbd7265c0c3004d487a03c43be9a"
     }
   ]
 }

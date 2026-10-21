@@ -146,7 +146,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.2.d, T0.2.b · **Spec:** 6 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** `python -m pipeline.inspect_dem` imprime un CRS polar estereográfico, una resolución igual a la del label y un rango de alturas plausible (unos pocos km alrededor del radio de referencia); checksum registrado.
 
-##### [ ] T0.2.f — Texturas de la Tierra y la Luna (verificación de licencia)
+##### [x] T0.2.f — Texturas de la Tierra y la Luna (verificación de licencia)
 - **Qué:** identificar mapas globales publicados por NASA (SVS, LRO) para la Tierra y la Luna, verificar licencia y resolución, elegir tamaños dentro del presupuesto D13 y añadirlos a `fetch_data.py`. La conversión a formatos web se hace en T4.1.c.
 - **Archivos:** `pipeline/fetch_data.py`, `pipeline/data_sources.json`, `data/README.md`
 - **Depende de:** T0.2.b · **Spec:** 6, 8.7, 11 regla 12 · **Decisiones:** D13 · **Est.:** 1.5 h

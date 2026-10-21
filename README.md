@@ -45,7 +45,7 @@ Everything is precomputed offline; the browser only filters and draws.
 |---|---|---|
 | Create a virtual environment | `python -m venv .venv` | available |
 | Install dependencies | `.venv/Scripts/python -m pip install -r pipeline/requirements.txt` (Windows) or `.venv/bin/python -m pip install -r pipeline/requirements.txt` | available |
-| Download external data | `python -m pipeline.fetch_data` | available (SPICE kernels) |
+| Download external data | `python -m pipeline.fetch_data` | available |
 | Build all data | `python -m pipeline.build_all` | TBD |
 | Validate data | `python -m pipeline.validate web/public/data` | available |
 | Run tests | `.venv/Scripts/python -m pytest` (configured in `pyproject.toml`) | available |
@@ -74,4 +74,5 @@ Exact files, URLs, licenses and checksums are recorded in [`data/README.md`](dat
 - **NASA / LRO LOLA:** Lunar Orbiter Laser Altimeter elevation data (PDS Geosciences Node).
 - **NAIF / SPICE (NASA JPL):** ephemerides, lunar orientation and leap-second kernels.
 - **JPL Horizons:** reference values used to validate Sun and Earth positions.
-- **Textures and rocket model:** to be added with their licenses.
+- **NASA Scientific Visualization Studio:** Moon color map (LRO LROC, CGI Moon Kit) and Earth map (Blue Marble Next Generation, courtesy of Reto Stockli, NASA/GSFC, and NASA Earth Observatory). Public domain.
+- **Rocket model:** to be added with its license.

@@ -3,7 +3,7 @@
 Esta carpeta guarda los datos pesados (kernels SPICE, DEM LOLA, texturas). **No se versionan**: solo este README.
 Se descargan con `python -m pipeline.fetch_data` (registro de fuentes y checksums: `pipeline/data_sources.json`).
 
-Descargado: kernels SPICE y DEM LOLA (2026-10-21). Cada fila se completa al verificar y descargar la fuente (T0.2.a, T0.2.d, T0.2.f, T2.2.a, T2.3.b). No se escribe ningún nombre de archivo ni URL que no se haya comprobado.
+Descargado: kernels SPICE, DEM LOLA y texturas (2026-10-21). Cada fila se completa al verificar y descargar la fuente (T0.2.a, T0.2.d, T0.2.f, T2.2.a, T2.3.b). No se escribe ningún nombre de archivo ni URL que no se haya comprobado.
 
 ## Kernels SPICE (T0.2.a)
 
@@ -41,8 +41,17 @@ Notas de la selección:
 
 ## Texturas (T0.2.f)
 
-| Cuerpo | Fuente | URL | Resolución | Licencia | Tamaño | SHA-256 | Fecha |
+Fuente: NASA Scientific Visualization Studio (SVS). Verificado el 2026-10-21 (URLs HTTP 200). Política de uso de SVS (https://svs.gsfc.nasa.gov/help/): «All of our content is in the public domain (unless otherwise noted)»; las páginas de estas texturas no indican otra cosa.
+
+| Cuerpo | Fuente | URL | Resolución | Licencia y crédito | Tamaño (bytes) | SHA-256 | Fecha |
 |---|---|---|---|---|---|---|---|
+| Luna (color) | SVS 4720 «CGI Moon Kit», versión 2019 con polos: `lroc_color_poles_4k.tif` | https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_4k.tif | 4096 × 2048, equirectangular, RGB | Dominio público (SVS). Crédito: «NASA's Scientific Visualization Studio». La página avisa: «optimized for aesthetics, not science». | 13 095 388 | `918649a7f8ed2f1329b2cd95bb0d25483befdcb60ae1a66db681a637cc21344f` | 2026-10-21 |
+| Tierra (color con nubes) | SVS 3615 «Equirectangular Projected Earth»: `flat_earth_Largest_still.0330.jpg` | https://svs.gsfc.nasa.gov/vis/a000000/a003600/a003615/flat_earth_Largest_still.0330.jpg | 8192 × 4096, equirectangular, RGB | Dominio público (SVS). Crédito: «NASA/Goddard Space Flight Center Scientific Visualization Studio»; datos: «The Blue Marble Next Generation data is courtesy of Reto Stockli (NASA/GSFC) and NASA's Earth Observatory.» | 6 003 000 | `5ea6b68a4412421cae11711ae4fec1a7b1f2dbd7265c0c3004d487a03c43be9a` | 2026-10-21 |
+
+Notas de la selección:
+- **Luna:** se usa la versión «poles» de 2019, que cubre las regiones polares; la escena hace zoom al polo sur. La versión 2025 (`lroc_color_16bit_srgb_4k.tif`, 59 MB) pesa 4,5 veces más. La textura es solo visual (la página lo advierte); la ciencia sale del DEM LOLA.
+- **Tierra:** el servidor original de Blue Marble NG (Visible Earth, NEO) redirige ahora a science.nasa.gov y no publica listados de archivos; SVS 3615 ofrece la Tierra equirectangular para envolver una esfera, con crédito BMNG.
+- **Presupuesto (D13 < 50 MB):** se reservan 10 MB para texturas web. Prueba de conversión a 4096 × 2048 JPEG calidad 85: Luna 1,55 MB + Tierra 1,54 MB = 3,09 MB. La conversión definitiva (y la de 2k para móvil) se hace en T4.1.c. Los originales de `data/textures/` no se publican.
 
 ## Otras fuentes (trayectoria real, nomenclatura, cohete)
 
