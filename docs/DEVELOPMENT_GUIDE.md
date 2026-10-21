@@ -450,7 +450,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 
 ### T2.4 build_all.py (spec 7.2, regla 5)
 
-##### [ ] T2.4.a — build_all.py y manifest.json
+##### [x] T2.4.a — build_all.py y manifest.json
 - **Qué:** un único comando que ejecuta todo el pipeline y escribe `web/public/data/` y `manifest.json` (versión, parámetros, rango de fechas, modo de trayectoria, modo de escala, `data_status: "REAL"`).
 - **Archivos:** `pipeline/build_all.py`, `web/public/data/**`
 - **Depende de:** T1.5.b, T2.1.b, T2.1.c, T2.2.c, T2.3.c, T2.3.e · **Spec:** 7.2, 10 (T2.4), 11 regla 5 · **Decisiones:** D8 · **Est.:** 2 h

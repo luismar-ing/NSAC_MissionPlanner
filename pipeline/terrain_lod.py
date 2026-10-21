@@ -168,8 +168,13 @@ def main(argv=None) -> int:
 
     from pipeline.validate import validate_file
 
+    import argparse
+
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    ap = argparse.ArgumentParser(description="Terreno en LOD (T2.3.d/e)")
+    ap.add_argument("--no-plots", action="store_true")
+    args = ap.parse_args(argv)
     sites = json.loads((ROOT / "pipeline" / "sites.json").read_text(encoding="utf-8"))
     total, errors = 0, []
     t0 = time.perf_counter()
@@ -188,7 +193,8 @@ def main(argv=None) -> int:
     total += size
     print(f"_polar             lod0: {h['grid']['nx']}×{h['grid']['ny']} nodos cada {h['grid']['spacing_m']:.0f} m "
           f"(±{-h['grid']['x0_m'] / 1000:.0f} km, origen en el polo z = {h['origin']['elevation_m']} m)  {size / 1e3:6.1f} kB")
-    plot_polar(h, ROOT / "docs" / "figures" / "polar_context.png")
+    if not args.no_plots:
+        plot_polar(h, ROOT / "docs" / "figures" / "polar_context.png")
     print(f"Total {total / 1e6:.2f} MB en {time.perf_counter() - t0:.1f} s; contrato: {'OK' if not errors else errors[:3]}")
     return 0 if not errors else 1
 

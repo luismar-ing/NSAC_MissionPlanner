@@ -1236,3 +1236,28 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. T2.3 completa.
 - **Siguiente tarea:** T2.4.a.
+
+## 2026-10-21 · T2.4.a · build_all.py y manifest.json
+
+- **Tarea:** T2.4.a — `build_all.py` y `manifest.json` ([x]).
+- **Qué se hizo:** `pipeline/build_all.py` (`python -m pipeline.build_all`). Ejecuta los 9 pasos del pipeline (efemérides → horizontes → banderas → ventanas → planes → escena → trayectorias → características → terreno) y ensambla `web/public/data/` en el formato del contrato:
+  - series cuantizadas a 0.01° con las banderas;
+  - máscaras a 3 decimales;
+  - el resto copiado de `pipeline/out/`.
+  `manifest.json` lleva todos los parámetros (D4, D5, D8, D12, criterio del Sol, horizonte con `clip_negative: false`, kernels cargados, DEM), `data_status: "REAL"` y `files` con bytes y sha256. `data_version` y `generated_utc` salen del commit de git (deterministas). `--assemble` solo reensambla. `terrain_lod` admite `--no-plots`. Comandos en `CLAUDE.md` y `README.md`.
+- **Cómo se verificó:** con `web/public/data/` vacío (solo `.gitkeep`):
+  ```
+  $ python -m pipeline.build_all
+  == efemérides de los sitios (6.5 s) | == máscaras de horizonte (11.2 s) | == banderas (0.2 s) | == ventanas (0.6 s)
+  == planes (0.4 s) | == escena (0.8 s) | == trayectorias ILLUSTRATIVE (14.3 s) | == características (0.2 s) | == terreno (1.2 s)
+  == ensamblado de web/public/data
+  1895 archivos, 15.69 MB; data_version 455c37685b-dirty; validación del contrato: OK
+  Total 42.7 s     (exit 0)
+  $ python -m pipeline.validate web/public/data
+  OK: web/public/data cumple el contrato 1.0.0
+  ```
+  Manifiesto: `data_status` REAL, 5 sitios; llegadas 2027-01-01 → 2027-12-31; series hasta 2028-01-15; escena desde 2026-12-28; `trajectory_mode` ILLUSTRATIVE; `scale_mode` `exaggerated_bodies_compressed_distances` (D8); MOON_ME / J2000; 5 kernels; DEM LDEM_80S_40MPP_ADJ.
+- **Decisiones tomadas:** manifiesto determinista (versión del commit; `-dirty` si hay cambios sin commit en `pipeline/`). El punto de control de Shackleton no se publica.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** decidir en T2.4.b si se versiona `web/public/data/` (15.7 MB).
+- **Siguiente tarea:** T2.4.b.

@@ -33,7 +33,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Características de los sitios | `.venv/Scripts/python -m pipeline.site_features` (`--fetch-gazetteer` para reconsultar el nomenclátor) | disponible |
 | Terreno en LOD | `.venv/Scripts/python -m pipeline.terrain_lod` (→ `pipeline/out/terrain/`) | disponible |
 | Datos SYNTHETIC | `python -m pipeline.synthetic` | por definir (TS.1.a) |
-| Correr el pipeline | `python -m pipeline.build_all` | por definir (T2.4.a) |
+| Correr el pipeline | `.venv/Scripts/python -m pipeline.build_all` (`--assemble` solo reensambla) → `web/public/data/` | disponible |
 | Tests pipeline | `.venv/Scripts/python -m pytest` (config en `pyproject.toml`) | disponible |
 | Instalar front end | `npm --prefix web ci` | disponible |
 | Servidor de desarrollo | `npm --prefix web run dev` | disponible |
