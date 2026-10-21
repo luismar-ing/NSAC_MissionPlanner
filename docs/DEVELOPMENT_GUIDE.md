@@ -140,7 +140,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.1.a · **Spec:** 5.2, 6 · **Decisiones:** D3 · **Est.:** 2 h
 - **Aceptación:** `data/README.md` contiene el producto con URL comprobada (HTTP 200) y resolución, proyección y radio de referencia copiados del label.
 
-##### [ ] T0.2.e — Descargar el DEM y verificar su lectura
+##### [~] T0.2.e — Descargar el DEM y verificar su lectura
 - **Qué:** añadir el DEM a `fetch_data.py`; `pipeline/inspect_dem.py` imprime CRS, tamaño, resolución, rango de alturas y el valor cerca del polo.
 - **Archivos:** `pipeline/fetch_data.py`, `pipeline/data_sources.json`, `pipeline/inspect_dem.py`, `data/README.md`
 - **Depende de:** T0.2.d, T0.2.b · **Spec:** 6 · **Decisiones:** — · **Est.:** 2 h
@@ -232,7 +232,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T0.2.e · **Spec:** 5.2 (notas) · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** pruebas: ida y vuelta lat/lon → x/y → lat/lon con error < 1 m; un punto de referencia del label (por ejemplo, el centro de proyección) cae donde indica el label.
 
-##### [ ] T1.2.b — DEM sintético de prueba (cráter conocido)
+##### [x] T1.2.b — DEM sintético de prueba (cráter conocido)
 - **Qué:** generador de un DEM sintético (cráter con borde de altura H a distancia D) en el mismo formato que el real y fórmula analítica de la elevación esperada del horizonte, con el término de curvatura d²/(2·R_luna).
 - **Archivos:** `pipeline/tests/synthetic_dem.py`, `pipeline/tests/test_synthetic_dem.py`
 - **Depende de:** T0.1.b · **Spec:** 5.2 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**

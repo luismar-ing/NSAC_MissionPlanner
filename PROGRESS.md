@@ -372,3 +372,27 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** la spec sugiere el PDS Geosciences Node como fuente; se usa PGDA (archivo del equipo LOLA en NASA GSFC, producto más reciente y con DOI). Motivo en `data/README.md`.
 - **Problemas abiertos:** la página PGDA no declara una licencia explícita, solo pide citar el artículo. Si hiciera falta, se consulta al humano antes de la entrega.
 - **Siguiente tarea:** T0.2.e (descarga de 716 MB).
+
+## 2026-10-21 · T1.2.b · DEM sintético de prueba (cráter conocido) — adelantada
+
+- **Tarea:** T1.2.b — DEM sintético de prueba ([x]). Marcada **Adelantable**. Se hizo mientras se descargaba el DEM real (T0.2.e en curso): T0.2.f tenía que esperar porque `fetch_data` reescribe `data_sources.json` al terminar, y T0.3.a está bloqueada (ver la entrada de T0.3.a).
+- **Qué se hizo:**
+  - `pipeline/tests/synthetic_dem.py` (SYNTHETIC, solo para pruebas): cráter anular centrado en el observador, de cima plana entre D − w/2 y D + w/2, con altura constante o función del azimut, en el mismo formato que el DEM real (GeoTIFF float32, estereográfica polar sur con R = 1 737 400 m, nodata NaN). Solución analítica `expected_horizon_deg` con la fórmula de 5.2 (`atan2(z − z0 − h_obs − d²/2R, d)`), con y sin recorte.
+  - `pipeline/tests/test_synthetic_dem.py` (7 pruebas) y `pipeline/tests/conftest.py` (salida UTF-8 en Windows para las pruebas que imprimen evidencia).
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_synthetic_dem.py -v -s
+  Borde en x ∈ [9850, 10150] m (esperado 10 000 ± 200 m), altura 500 m          PASSED
+  test_rim_height_can_vary_with_azimuth                                           PASSED
+  test_geotiff_has_the_real_dem_format                                            PASSED
+  test_curvature_formula_matches_5_2                                              PASSED
+  borde 500 m a 10 km: horizonte = +2.7420° (sin recortar), +2.7420° (recortado)   PASSED
+  borde 2 km a 40 km: horizonte = +2.2175° (sin recortar), +2.2175° (recortado)    PASSED
+  llano (sin borde): horizonte = -0.1065° (sin recortar), +0.0000° (recortado)     PASSED
+  7 passed in 0.54s
+  ```
+  Comprobación a mano: 500 m de borde con borde interior a 9 800 m → atan((500 − 3 − 27.6)/9 800) = 2.742°. Llano con h_obs = 3 m → −atan(√(2·3/1 737 400)) = −0.1065°, con el máximo en d* = √(2·R·h_obs) ≈ 3.2 km.
+- **Decisiones tomadas:** el azimut del DEM sintético se mide sobre la cuadrícula del mapa (0° = +y). La conversión al Norte local real en el polo es trabajo de T1.2.a; para validar el algoritmo basta con que generador y solución usen la misma convención.
+- **Desviaciones de la spec / cambios en la guía:** se añade `pipeline/tests/conftest.py`.
+- **Problemas abiertos:** ninguno en esta subtarea. Un valor de referencia que calculé a mano (2 878,1 m) estaba mal; el correcto es 2 877,86 m y la prueba lo detectó.
+- **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga del DEM.
