@@ -57,6 +57,8 @@ export const STRINGS = {
     illustrativeTitle: "The trajectory of this plan is ILLUSTRATIVE: simplified, computed with the real Moon position; not a real mission trajectory.",
     unpin: (site: string) => `Remove ${site} from the comparison`,
     pinOneMore: "Pin at least one more plan to compare.",
+    best: "Best",
+    bestTitle: "Best value of this metric among the plans in the tray (ties share the badge).",
   },
   silhouette: {
     aria: (site: string) => `Horizon silhouette at ${site} with the Sun and Earth tracks over the window`,

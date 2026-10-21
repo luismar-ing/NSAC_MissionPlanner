@@ -1563,3 +1563,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivo extra `web/src/lib/ribbon.ts`.
 - **Problemas abiertos:** «Pin best 3» elige planes casi idénticos (todo verde), por la saturación del score (T1.4.d). Lo trata el desempate de T3.3.d.
 - **Siguiente tarea:** T3.3.d.
+
+## 2026-10-21 · T3.3.d · Cuadro de métricas, texto «why» e insignias de mejor
+
+- **Tarea:** T3.3.d — Cuadro de métricas, texto "why" e insignias de mejor ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/why.ts`: `METRICS` (las seis de 8.1, en su orden y con su dirección: más es mejor, salvo `longest_dark_h` y `longest_comm_gap_h`), `bestBadges` y `whyText`.
+  - Regla de empates: todos los planes que alcanzan el mejor valor llevan la insignia. Si **todos** los paneles visibles empatan en una métrica, nadie la lleva, porque esa métrica no los distingue. Con un solo plan no hay insignias.
+  - `whyText`: en inglés y solo con cifras del propio plan. Cita hasta dos puntos fuertes por prioridad (Sol, oscuridad, Tierra mínima, cortes de enlace, Tierra media y, en último lugar, el score, que resume a los demás). Añade un aviso si la oscuridad pasa de 48 h o la Tierra baja de 12 h/día. Sin insignias, describe Sol y oscuridad.
+  - `web/src/panels2d/MetricsBox.tsx`: lista con cifras tabulares e insignia «★ Best» (estrella y palabra, además del color) con tooltip. La bandeja calcula las insignias una vez por conjunto de planes visibles.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 93 passed
+    why.test.ts: go to the right panel per metric, in the right direction
+                 ties share the badge; a metric where everyone ties gets none
+                 one plan alone gets no badges
+                 follows the spec example → "Best option for 92% sunlight and a longest dark of only 14 h."
+                 cites the plan's real figures for every window of the data (≥ 150 textos: cada número del texto es una métrica del plan)
+                 warns about long darkness even when the plan is best at something else
+    tray.test.tsx: puts each best badge on the right panel (Haworth 2027-03-09 vs Malapert 2027-10-15, datos reales)
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador, con 4 planes: los tres de «Pin best 3» (100 % de Sol, 0 h de oscuridad, score 1.00) comparten las insignias de Sol, oscuridad y score con «Best option for 100% sunlight and no dark stretch.»; Haworth 2027-03-09 no lleva ninguna y dice «38.1% sunlight, longest dark 89.5 h.». La Tierra (24 h/día en todos) no lleva insignia.
+- **Decisiones tomadas:** la regla de empates descrita arriba. El texto de la spec («Mejor opción por 92% de sol y oscuridad máxima de 14 h») se reproduce tal cual en inglés.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** «Pin best 3» (T3.2.c) tiende a elegir planes con score 1.00 que empatan en todo, por la saturación del score (T1.4.d). Las insignias lo muestran bien (empate compartido), pero la comparación resultante dice poco. Posible mejora fuera de esta subtarea: desempatar en `bestInRange` por `earth_h_mean` o por margen de Sol.
+- **Siguiente tarea:** T3.3.e.

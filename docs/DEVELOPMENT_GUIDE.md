@@ -552,7 +552,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.3.a · **Spec:** 8.1, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** prueba: la racha resaltada coincide con `longest_dark_h` de los datos; revisión visual.
 
-##### [ ] T3.3.d — Cuadro de métricas, texto "why" e insignias de mejor
+##### [x] T3.3.d — Cuadro de métricas, texto "why" e insignias de mejor
 - **Qué:** las seis métricas de 8.1, texto corto en inglés generado desde las métricas, insignia "best" por métrica entre los paneles visibles (con forma o etiqueta además del color).
 - **Archivos:** `web/src/panels2d/MetricsBox.tsx`, `web/src/lib/why.ts`, `web/tests/why.test.ts`
 - **Depende de:** T3.3.a, T3.1.d · **Spec:** 8.1, 5.5 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**

@@ -2,6 +2,8 @@ import type { PlanData } from "../lib/planData";
 import type { ElevationScale } from "../lib/scale";
 import { STRINGS } from "../lib/strings";
 import { HorizonSilhouette } from "./HorizonSilhouette";
+import type { MetricKey } from "../lib/why";
+import { MetricsBox } from "./MetricsBox";
 import { TimeRibbon } from "./TimeRibbon";
 
 interface Props {
@@ -11,6 +13,7 @@ interface Props {
   selected: boolean;
   exaggeration: number | null;
   compareTime: number;
+  best: Set<MetricKey>;
   onSelect(): void;
   onUnpin(): void;
 }
@@ -19,7 +22,7 @@ interface Props {
  * One comparison panel (spec 8.1). Identical format for every plan; the silhouette (T3.3.b), the timeline
  * (T3.3.c) and the metrics box (T3.3.d) fill the reserved slots.
  */
-export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration, compareTime, onSelect, onUnpin }: Props) {
+export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration, compareTime, best, onSelect, onUnpin }: Props) {
   const { plan, site } = data;
   return (
     <article
@@ -50,7 +53,9 @@ export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration,
       <div className="plan-slot ribbon-slot" data-slot="ribbon">
         <TimeRibbon series={data.series} compareTime={compareTime} />
       </div>
-      <div className="plan-slot metrics-slot" data-slot="metrics" />
+      <div className="plan-slot metrics-slot" data-slot="metrics">
+        <MetricsBox metrics={data.metrics} best={best} />
+      </div>
     </article>
   );
 }

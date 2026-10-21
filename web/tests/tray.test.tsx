@@ -108,3 +108,29 @@ describe("silhouette (T3.3.b)", () => {
     expect(sun.dataset.visible).toBe(String(pd.series.sunVis[0] === 1));
   });
 });
+
+describe("metrics box (T3.3.d)", () => {
+  it("puts each best badge on the right panel", async () => {
+    // Haworth 2027-03-09 (38.1 % Sun, 89.5 h dark) against Malapert 2027-10-15
+    appStore.getState().pinPlan("haworth_20270309_7d");
+    appStore.getState().pinPlan("malapert_massif_20271015_7d");
+    render(<Tray />);
+    const boxes = await screen.findAllByTestId("metrics-box");
+    const store = new DataStore("/base/", fileFetch as never);
+    const st = appStore.getState();
+    const rows = await Promise.all(
+      ["haworth_20270309_7d", "malapert_massif_20271015_7d"].map((id) => loadPlanData(store, st.plansById.get(id)!, st.sites).then((p) => p.metrics)),
+    );
+    for (const key of ["sun_pct", "longest_dark_h", "score"] as const) {
+      const lower = key === "longest_dark_h";
+      const vals = rows.map((r) => r[key]);
+      const best = lower ? Math.min(...vals) : Math.max(...vals);
+      boxes.forEach((b, i) => {
+        const el = b.querySelector(`[data-metric="${key}"]`) as HTMLElement;
+        const expected = vals[i] === best && !vals.every((v) => v === best);
+        expect(el.dataset.best, `${key} panel ${i}`).toBe(String(expected));
+      });
+    }
+    expect(boxes[0].querySelector('[data-testid="why"]')!.textContent).toContain("38.1");
+  });
+});

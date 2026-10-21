@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadPlanData, type PlanData } from "../lib/planData";
 import { sharedElevationScale } from "../lib/scale";
 import { STRINGS } from "../lib/strings";
+import { bestBadges } from "../lib/why";
 import { useApp } from "../store/appStore";
 import { PlanPanel } from "./PlanPanel";
 
@@ -37,6 +38,7 @@ export function Tray() {
   const key = visible.map((p) => p.plan.id).join(",");
   // recomputed only when the set of visible plans changes
   const scale = useMemo(() => sharedElevationScale(visible), [key]);
+  const best = useMemo(() => bestBadges(visible.map((p) => p.metrics)), [key]);
 
   if (!ids.length) return <p className="placeholder">{STRINGS.trayEmpty}</p>;
   return (
@@ -54,7 +56,7 @@ export function Tray() {
         </div>
       </div>
       <div className="tray-grid" style={{ ["--cols" as string]: Math.max(2, ids.length) }} data-testid="tray-grid">
-        {visible.map((p) => (
+        {visible.map((p, i) => (
           <PlanPanel
             key={p.plan.id}
             data={p}
@@ -63,6 +65,7 @@ export function Tray() {
             selected={selectedPlanId === p.plan.id}
             exaggeration={exaggeration}
             compareTime={compareTime}
+            best={best[i]}
             onSelect={() => selectPlan(p.plan.id)}
             onUnpin={() => unpinPlan(p.plan.id)}
           />
