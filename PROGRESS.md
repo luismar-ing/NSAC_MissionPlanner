@@ -1317,3 +1317,35 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - Comprobación de la guía (IDs, dependencias, campos): 0 errores.
 - **Por qué no se desvía de la spec:** la sección 14 propone los datos sintéticos como *mitigación* para no esperar al pipeline; ese riesgo ya no existe. La regla 1 (marcar lo SYNTHETIC) se mantiene en el cargador.
 - **Siguiente tarea:** T3.1.a.
+
+## 2026-10-21 · T3.1.a · Carga de datos validada y aviso SYNTHETIC
+
+- **Tarea:** T3.1.a — Carga de datos validada ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/data.ts`: `DataStore` con `loadCore` (manifest + sites + plans, para el shell inicial) y carga bajo demanda de horizon, timeseries, daily, windows, site_features, trajectory, scene y terrain (cabecera + int16 → Float32Array en metros). Valida con zod, guarda en caché (con reintento si falla), aplica las comprobaciones cruzadas del contrato §14 que dependen del archivo cargado y lanza errores tipados `DataError` (`network`, `parse`, `validation`, `consistency`).
+  - Carpeta de datos `data` por defecto, o `?data=<carpeta>` saneado.
+  - `web/src/components/SyntheticBanner.tsx`: aviso permanente («SYNTHETIC DATA», `role="alert"`) si `data_status` es SYNTHETIC.
+  - `App.tsx`: estados de carga, error y listo, con un resumen del conjunto de datos.
+  - `web/tests/data.test.ts` (8 pruebas).
+  - `.claude/launch.json` para abrir el servidor de desarrollo en el navegador integrado.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test -- data   → Tests 8 passed (8)
+    loads the core shell and it is REAL (no SYNTHETIC banner)          (5 sitios, 5475 planes)
+    loads per-site files on demand and validates them                  (timeseries n=18192, windows 365, horizon 360, trayectoria ILLUSTRATIVE, terreno con nodo central ≈ 0)
+    caches: a second request does not refetch
+    rejects an invalid file with a validation error                    («elev_deg has 3 values…»)
+    reports a missing file as a network error
+    applies the cross-file checks of contract §14                      (site_id interno distinto → consistency)
+    raises the permanent SYNTHETIC banner                              (fixtures del contrato)
+    defaults to data and accepts a safe override                       (?data=../secret → data)
+  $ npm --prefix web run typecheck  → exit 0
+  $ npm --prefix web test           → Tests 45 passed
+  ```
+  En el navegador integrado (servidor de desarrollo): «5 sites, 5475 mission plans, arrivals 2027-01-01 to 2027-12-31 (REAL data, version 2c2f11dad7).»; sin aviso SYNTHETIC; sin errores en consola; `manifest.json`, `sites.json` y `plans.json` devuelven 200.
+- **Decisiones tomadas:** las pruebas renderizan el aviso con `react-dom/server` (sin jsdom). La carga de `terrain` decodifica el int16 en el cliente.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:**
+  - En desarrollo cada archivo se pide dos veces porque React StrictMode monta el efecto dos veces y crea dos `DataStore`. Se resuelve en T3.1.b con un único store en el estado global; en producción no ocurre.
+  - Durante la revisión apareció `web/public/data/manifest.json` regenerado sobre un commit posterior (solo cambiaban `data_version` y `generated_utc`; los datos eran idénticos). No se identificó qué ejecución lo produjo. Se restauró la versión con commit.
+- **Siguiente tarea:** T3.1.b.

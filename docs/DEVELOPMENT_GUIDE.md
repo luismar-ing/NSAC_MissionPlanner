@@ -488,7 +488,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 
 ### T3.1 Proyecto, estado global y carga de datos (spec 7, 8)
 
-##### [ ] T3.1.a — Carga de datos validada y selector REAL/SYNTHETIC
+##### [x] T3.1.a — Carga de datos validada y selector REAL/SYNTHETIC
 - **Qué:** carga del manifiesto primero y de los demás archivos bajo demanda, validación zod y caché; directorio de datos seleccionable (`data` por defecto; otro con `?data=<carpeta>`, p. ej. las fixtures del contrato en las pruebas); aviso "SYNTHETIC DATA" permanente si `data_status` es SYNTHETIC; estados de carga y error.
 - **Archivos:** `web/src/lib/data.ts`, `web/src/components/SyntheticBanner.tsx`, `web/tests/data.test.ts`
 - **Depende de:** T0.4.c, T2.4.b · **Spec:** 7, 7.2, 10 (T3.1), 11 regla 1 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
