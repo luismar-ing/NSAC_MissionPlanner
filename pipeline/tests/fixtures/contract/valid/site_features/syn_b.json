@@ -1,0 +1,1 @@
+{"site_id":"syn_b","attributes":[{"key":"elevation_m","label":"Elevation","value":200.0,"unit":"m","status":"available","source":"SYNTHETIC","method":"SYNTHETIC fixture"},{"key":"slope_mean_deg","label":"Mean slope","value":null,"unit":"deg","status":"not available","source":null,"method":null}],"nearby_features":[]}

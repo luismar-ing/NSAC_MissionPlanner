@@ -47,7 +47,7 @@ Everything is precomputed offline; the browser only filters and draws.
 | Install dependencies | `.venv/Scripts/python -m pip install -r pipeline/requirements.txt` (Windows) or `.venv/bin/python -m pip install -r pipeline/requirements.txt` | available |
 | Download external data | `python -m pipeline.fetch_data` | TBD |
 | Build all data | `python -m pipeline.build_all` | TBD |
-| Validate data | `python -m pipeline.validate web/public/data` | TBD |
+| Validate data | `python -m pipeline.validate web/public/data` | available |
 | Run tests | `.venv/Scripts/python -m pytest` (configured in `pyproject.toml`) | available |
 
 ## Front end

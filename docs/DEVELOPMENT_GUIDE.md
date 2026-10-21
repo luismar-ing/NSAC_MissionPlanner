@@ -102,7 +102,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.1.a · **Spec:** 7.2, 5.1, 5.8 · **Decisiones:** D6, D7 · **Est.:** 2.5 h
 - **Aceptación:** los 10 tipos de archivo de 7.2 (sites, plans, horizon, timeseries, daily, windows, scene/ephemeris, trajectory, site_features, terrain) y `manifest.json` están documentados; un grep de cada nombre de campo de 7.2 lo encuentra en el documento.
 
-##### [ ] T0.4.b — Validación en Python
+##### [x] T0.4.b — Validación en Python
 - **Qué:** modelos pydantic v2 y CLI que valida un directorio completo o un archivo, con comprobaciones entre archivos (ids de sitio existentes, longitudes de arrays coherentes, `launch_utc = arrival_utc − transit_days`). Fixtures mínimas válidas e inválidas, marcadas SYNTHETIC.
 - **Archivos:** `pipeline/contract.py`, `pipeline/validate.py`, `pipeline/tests/test_contract.py`, `pipeline/tests/fixtures/contract/**`
 - **Depende de:** T0.4.a, T0.1.b · **Spec:** 7.2 · **Decisiones:** — · **Est.:** 3 h

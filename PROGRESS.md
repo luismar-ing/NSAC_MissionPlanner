@@ -212,3 +212,39 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** añadidos y cambios respecto a 7.2 listados en la sección 15 del contrato. El único cambio de forma es `trajectory.t0_utc` + `t_s` (segundos) en lugar de `t_utc`, por tamaño (D6, D13); la información es la misma.
 - **Problemas abiertos:** `params.scale_mode` depende de D8 (pendiente); el contrato solo exige un string.
 - **Siguiente tarea:** T0.4.b.
+
+## 2026-10-21 · T0.4.b · Validación en Python
+
+- **Tarea:** T0.4.b — Validación en Python ([x]).
+- **Qué se hizo:**
+  - `pipeline/contract.py`: modelos pydantic v2 (estrictos, `extra="forbid"`) para los 11 tipos de archivo del contrato, con validación de formatos de fecha, rangos, longitudes de arrays (numpy), normas de vectores y cuaterniones, ids derivados y fórmulas (`launch_utc = arrival_utc − transit_days`).
+  - `pipeline/validate.py`: CLI `python -m pipeline.validate <dir>` o `--file <archivo> [--kind K]` con las 12 comprobaciones entre archivos de la sección 14 del contrato; código de salida 0/1; salida en UTF-8.
+  - `pipeline/tests/fixtures/make_contract_fixtures.py`: generador determinista de fixtures SYNTHETIC: `valid/` (2 sitios, 2 días de llegada, paso de 6 h, 33 archivos) e `invalid/` (un caso por tipo, nombre `{kind}__{caso}.json`).
+  - `pipeline/tests/test_contract.py`: 49 pruebas.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_contract.py -v
+  ...
+  49 passed in 1.83s
+  $ python -m pipeline.validate pipeline/tests/fixtures/contract/valid
+  OK: pipeline/tests/fixtures/contract/valid cumple el contrato 1.0.0     (exit 0)
+  ```
+  Motivo de rechazo de cada fixture inválida (`python -m pipeline.validate --file ...`, exit 1):
+  ```
+  daily__pct_out_of_range: days.0.sun_pct: Input should be less than or equal to 100
+  horizon__wrong_length: elev_deg tiene 359 valores, se esperaban 360
+  manifest__bad_status: data_status: Input should be 'REAL' or 'SYNTHETIC'
+  plans__launch_mismatch: launch_utc debe ser arrival_utc - transit_days = 2026-12-29T00:00:00Z
+  scene_ephemeris__quat_not_normalized: moon_quat no normalizado (norma fuera de 1 ± 1e-06)
+  site_features__available_without_source: elevation_m: un atributo disponible necesita source (regla 1, spec 5.10)
+  sites__missing_source: 0.source: Field required
+  terrain_header__byte_length: byte_length debe ser nx · ny · 2
+  timeseries__length_mismatch: sun_vis tiene 63 valores, se esperaban n = 64
+  trajectory__time_not_increasing: t_s debe ser estrictamente creciente
+  windows__score_out_of_range: rows.0.score: Input should be less than or equal to 1
+  ```
+  Suite completa: `58 passed in 4.10s`.
+- **Decisiones tomadas:** las fixtures se generan con un script y una prueba comprueba que las versionadas están al día. Las comprobaciones científicas (5.7) quedan fuera del contrato, como dice su sección 14.
+- **Desviaciones de la spec / cambios en la guía:** se añadieron `pipeline/tests/__init__.py` y `pipeline/tests/fixtures/__init__.py` para poder ejecutar el generador con `python -m`.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T0.4.c.

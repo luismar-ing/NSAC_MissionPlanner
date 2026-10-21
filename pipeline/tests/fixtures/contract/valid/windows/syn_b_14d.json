@@ -1,0 +1,1 @@
+{"site_id":"syn_b","window_days":14,"rows":[{"start":"2027-01-01T00:00:00Z","sun_pct":50.0,"longest_dark_h":6.0,"earth_h_min":12.0,"earth_h_mean":18.0,"longest_comm_gap_h":6.0,"score":0.6},{"start":"2027-01-02T00:00:00Z","sun_pct":50.0,"longest_dark_h":6.0,"earth_h_min":12.0,"earth_h_mean":18.0,"longest_comm_gap_h":6.0,"score":0.55}]}
