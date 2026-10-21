@@ -122,7 +122,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.1.a · **Spec:** 5.1, 6 · **Decisiones:** D4 · **Est.:** 2 h
 - **Aceptación:** tabla en `data/README.md` con todos los tipos de kernel; cada URL responde HTTP 200 (salida de la comprobación mostrada).
 
-##### [ ] T0.2.b — Descarga reproducible y meta-kernel
+##### [x] T0.2.b — Descarga reproducible y meta-kernel
 - **Qué:** `pipeline/fetch_data.py` descarga de forma idempotente a `data/kernels/`, calcula y verifica SHA-256 contra `pipeline/data_sources.json`; meta-kernel con rutas relativas.
 - **Archivos:** `pipeline/fetch_data.py`, `pipeline/data_sources.json`, `pipeline/spice/poleplanner.tm`, `data/README.md`
 - **Depende de:** T0.2.a, T0.1.b · **Spec:** 6, 11 regla 5 · **Decisiones:** — · **Est.:** 2 h

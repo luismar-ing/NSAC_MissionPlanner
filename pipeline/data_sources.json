@@ -1,0 +1,50 @@
+{
+  "_comment": "Fuentes externas descargadas por pipeline/fetch_data.py. 'path' es relativo a data/. 'sha256' se registra en la primera descarga y se verifica después. Ver data/README.md.",
+  "sources": [
+    {
+      "id": "de440s",
+      "group": "kernels",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp",
+      "path": "kernels/de440s.bsp",
+      "bytes": 32726016,
+      "md5": "3917ee56769db332790c751e2168843d",
+      "sha256": "c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2"
+    },
+    {
+      "id": "naif0012",
+      "group": "kernels",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/naif0012.tls",
+      "path": "kernels/naif0012.tls",
+      "bytes": 5257,
+      "md5": null,
+      "sha256": "678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b"
+    },
+    {
+      "id": "pck00011",
+      "group": "kernels",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc",
+      "path": "kernels/pck00011.tpc",
+      "bytes": 131226,
+      "md5": null,
+      "sha256": "3dff7b1dbeceaa01f25467767d3fa25816051c85d162d1edf04acb310ee28bb1"
+    },
+    {
+      "id": "moon_pa_de440",
+      "group": "kernels",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de440_200625.bpc",
+      "path": "kernels/moon_pa_de440_200625.bpc",
+      "bytes": 12863488,
+      "md5": null,
+      "sha256": "60cd55aa401ea2ea97360636f567554bfe4e37bb829f901b4460a455dfaf783f"
+    },
+    {
+      "id": "moon_de440_fk",
+      "group": "kernels",
+      "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_de440_250416.tf",
+      "path": "kernels/moon_de440_250416.tf",
+      "bytes": 19478,
+      "md5": null,
+      "sha256": "a47c71e9c9f33796bdafb2c9d69a7ee447b6016ecad80f71cd6f3e479f9cf768"
+    }
+  ]
+}

@@ -296,3 +296,35 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno (la spec sugiere DE440 «por ejemplo»).
 - **Problemas abiertos:** leer `AACLEARANCE_STATEMENT.pdf` de NAIF y resumir las condiciones de uso antes de la entrega (regla 12; se hará en T5.3.b). Total a descargar en T0.2.b: ~45.7 MB.
 - **Siguiente tarea:** T0.2.b.
+
+## 2026-10-21 · T0.2.b · Descarga reproducible y meta-kernel
+
+- **Tarea:** T0.2.b — Descarga reproducible y meta-kernel ([x]).
+- **Qué se hizo:**
+  - `pipeline/data_sources.json`: registro de fuentes (url, ruta en `data/`, tamaño, MD5 publicado, SHA-256).
+  - `pipeline/fetch_data.py`: descarga idempotente (solo si falta, vía `.part`) con verificación de tamaño, MD5 publicado y SHA-256. El SHA-256 se registra en la primera descarga y se exige después. Grupos `--kernels`, `--dem`, `--textures`. Solo usa la biblioteca estándar.
+  - `pipeline/spice/poleplanner.tm`: meta-kernel con rutas relativas a la raíz (`data/kernels`).
+  - `pipeline/tests/test_fetch_data.py`: detecta tamaño, MD5 y SHA-256 alterados.
+  - `data/README.md`: SHA-256 y fecha de descarga de los 5 kernels.
+- **Cómo se verificó:**
+  ```
+  === 1ª ejecución
+  [de440s] downloaded, checksum registrado: sha256 c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2
+  [naif0012] downloaded, checksum registrado: sha256 678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b
+  [pck00011] downloaded, checksum registrado: sha256 3dff7b1dbeceaa01f25467767d3fa25816051c85d162d1edf04acb310ee28bb1
+  [moon_pa_de440] downloaded, checksum registrado: sha256 60cd55aa401ea2ea97360636f567554bfe4e37bb829f901b4460a455dfaf783f
+  [moon_de440_fk] downloaded, checksum registrado: sha256 a47c71e9c9f33796bdafb2c9d69a7ee447b6016ecad80f71cd6f3e479f9cf768
+  exit: 0
+  === 2ª ejecución
+  [de440s] present, checksum OK (kernels/de440s.bsp)
+  [naif0012] present, checksum OK (kernels/naif0012.tls)
+  [pck00011] present, checksum OK (kernels/pck00011.tpc)
+  [moon_pa_de440] present, checksum OK (kernels/moon_pa_de440_200625.bpc)
+  [moon_de440_fk] present, checksum OK (kernels/moon_de440_250416.tf)
+  exit: 0
+  ```
+  El MD5 de `de440s.bsp` coincide con el publicado por NAIF (`3917ee56…843d`); si no, `check()` habría dado error. `pytest pipeline/tests/test_fetch_data.py`: `2 passed`. `git status` no muestra `data/kernels/` (ignorado).
+- **Decisiones tomadas:** el meta-kernel usa rutas relativas a la raíz, y `spice_utils` (T0.2.c) hará el `furnsh` desde la raíz (SPICE limita la longitud de las rutas y las resuelve respecto al directorio de trabajo).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T0.2.c.

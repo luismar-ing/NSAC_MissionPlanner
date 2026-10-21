@@ -1,9 +1,9 @@
 # data/: fuentes de datos externas
 
 Esta carpeta guarda los datos pesados (kernels SPICE, DEM LOLA, texturas). **No se versionan**: solo este README.
-Se descargan con `python -m pipeline.fetch_data` (por crear en T0.2.b).
+Se descargan con `python -m pipeline.fetch_data` (registro de fuentes y checksums: `pipeline/data_sources.json`).
 
-Todavía no se ha descargado nada. Cada fila se completa al verificar y descargar la fuente (T0.2.a, T0.2.d, T0.2.f, T2.2.a, T2.3.b). No se escribe ningún nombre de archivo ni URL que no se haya comprobado.
+Descargado: kernels SPICE (2026-10-21). Cada fila se completa al verificar y descargar la fuente (T0.2.a, T0.2.d, T0.2.f, T2.2.a, T2.3.b). No se escribe ningún nombre de archivo ni URL que no se haya comprobado.
 
 ## Kernels SPICE (T0.2.a)
 
@@ -12,11 +12,11 @@ Verificado el 2026-10-21: todas las URLs responden HTTP 200; nombres, tamaños y
 
 | Tipo | Archivo exacto | URL | Tamaño (bytes) | Cobertura publicada | Checksum publicado por NAIF | SHA-256 (T0.2.b) | Fecha de descarga |
 |---|---|---|---|---|---|---|---|
-| SPK planetario (DE440, versión corta) | `de440s.bsp` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp | 32 726 016 | 1849-12-26 a 2150-01-22 (ET) | MD5 `3917ee56769db332790c751e2168843d` (`aa_checksums.txt`) | | |
-| LSK (segundos intercalares) | `naif0012.tls` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/naif0012.tls | 5 257 | Último salto: 2017-01-01 (idéntico a `latest_leapseconds.tls`) | — | | |
-| PCK de texto (constantes, IAU_EARTH, radios) | `pck00011.tpc` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc | 131 226 | Sin límite (modelo analítico) | — | | |
-| PCK binario de orientación lunar (DE440) | `moon_pa_de440_200625.bpc` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de440_200625.bpc | 12 863 488 | 1549-12-31 a 2650-01-25 (ET) | — | | |
-| FK lunar (define MOON_PA y MOON_ME para DE440) | `moon_de440_250416.tf` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_de440_250416.tf | 19 478 | — (marcos fijos) | — | | |
+| SPK planetario (DE440, versión corta) | `de440s.bsp` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp | 32 726 016 | 1849-12-26 a 2150-01-22 (ET) | MD5 `3917ee56769db332790c751e2168843d` (`aa_checksums.txt`) | `c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2` | 2026-10-21 |
+| LSK (segundos intercalares) | `naif0012.tls` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/naif0012.tls | 5 257 | Último salto: 2017-01-01 (idéntico a `latest_leapseconds.tls`) | — | `678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b` | 2026-10-21 |
+| PCK de texto (constantes, IAU_EARTH, radios) | `pck00011.tpc` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc | 131 226 | Sin límite (modelo analítico) | — | `3dff7b1dbeceaa01f25467767d3fa25816051c85d162d1edf04acb310ee28bb1` | 2026-10-21 |
+| PCK binario de orientación lunar (DE440) | `moon_pa_de440_200625.bpc` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de440_200625.bpc | 12 863 488 | 1549-12-31 a 2650-01-25 (ET) | — | `60cd55aa401ea2ea97360636f567554bfe4e37bb829f901b4460a455dfaf783f` | 2026-10-21 |
+| FK lunar (define MOON_PA y MOON_ME para DE440) | `moon_de440_250416.tf` | https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_de440_250416.tf | 19 478 | — (marcos fijos) | — | `a47c71e9c9f33796bdafb2c9d69a7ee447b6016ecad80f71cd6f3e479f9cf768` | 2026-10-21 |
 
 Notas de la selección:
 - **SPK:** `de440s.bsp` es la versión de periodo corto de DE440 (la spec sugiere DE440) y cubre de sobra el rango D4 (2027). Se descarta `de440.bsp` (119 799 808 bytes, mismo modelo y periodo más largo) por tamaño. Existe un DE442 más reciente, pero el PCK y el FK lunares publicados son de la serie DE440. Usar la misma serie mantiene coherentes efemérides y orientación.
