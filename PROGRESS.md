@@ -697,7 +697,7 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   malapert_massif    earth 7 filas  el [ -2.283, +10.244]°  ...
   de_gerlache_rim_2  sun   7 filas  el [ -2.585,  +2.562]°  ...
   $ python -m pytest pipeline/tests/test_horizons_refs.py   → 10 passed
-  $ python -m pytest -q                                      → 128 passed
+  $ python -m pytest -q                                      → 124 passed
   ```
   Convenciones leídas en la propia respuesta: marco del sitio «MEAN_ME (high precision)»; esfera «1737.4, 1737.4, 1737.4 km»; azimut «clockwise from north: North(0) → East(90)»; «Compensated for light-time, the gravitational deflection of light, stellar aberration»; efemérides «DE441».
 - **Decisiones tomadas:** altitud de la consulta = (elevación del DEM + h_obs) / 1000 km, porque Horizons y el DEM usan la misma esfera de 1737.4 km. T1.1.b usará **MOON_ME**, el marco de Horizons y del DEM. Las diferencias DE440 (nuestro) / DE441 (Horizons) se medirán en T1.1.d.
