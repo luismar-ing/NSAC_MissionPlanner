@@ -1084,3 +1084,10 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. T2.1 completa.
 - **Siguiente tarea:** T2.2.a (no aplica por D5) → T2.2.b.
+
+## 2026-10-21 · T2.2.a · Kernel de misión publicado — no aplica
+
+- **Tarea:** T2.2.a ([x], **no aplica**).
+- **Motivo:** D5 = trayectoria ilustrativa (confirmada el 2026-10-21). Como indica la guía, la subtarea se cierra sin buscar kernels de misión. Todas las trayectorias serán `mode: "ILLUSTRATIVE"`.
+- **Cómo se verificó:** `docs/DECISIONS.md`, fila D5: «**confirmada** (2026-10-21) | Ilustrativa (ILLUSTRATIVE); `transit_days` = 3 días».
+- **Siguiente tarea:** T2.2.b.

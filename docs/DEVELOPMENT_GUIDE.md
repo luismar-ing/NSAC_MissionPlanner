@@ -397,7 +397,8 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 
 ### T2.2 trajectory.py (spec 5.8)
 
-##### [ ] T2.2.a — Kernel de misión publicado (verificación; solo si D5 = real)
+##### [x] T2.2.a — Kernel de misión publicado (verificación; solo si D5 = real)
+- **Nota:** no aplica (D5 = ilustrativa, confirmada el 2026-10-21). Todas las trayectorias son ILLUSTRATIVE.
 - **Qué:** buscar en NAIF un SPK de una misión publicada que cubra el periodo; registrarlo o dejar constancia de que no existe. Si D5 = ilustrativa: marcar `[x]` con la nota "no aplica (D5)".
 - **Archivos:** `data/README.md`
 - **Depende de:** T0.2.a · **Spec:** 5.8, 6 · **Decisiones:** D5 · **Est.:** 1.5 h
