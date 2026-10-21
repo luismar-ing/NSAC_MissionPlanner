@@ -40,4 +40,8 @@ Para cada región: **el punto del DEM LOLA (40 m/píxel, T0.2.d) de máxima elev
 
 ## 4. Punto de control para los sanity checks (T1.3.d)
 
-Fondo de cráter permanentemente sombreado, elegido del DEM y documentado aquí en T1.3.d. No es un sitio candidato.
+**No es un sitio candidato**; solo sirve para el sanity check de 5.7 («los fondos de cráteres permanentemente sombreados tienen ~0 %»).
+
+- **Fuente:** nomenclátor planetario IAU/USGS (https://planetarynames.wr.usgs.gov), entrada **Shackleton**, Feature ID 5450, aprobada en 1994: centro −89.67°, 129.78°E (planetográfico +Este; en la Luna esférica coincide con el planetocéntrico), diámetro 20.92 km. Consultado el 2026-10-21.
+- **Método:** píxel más bajo del DEM LOLA a ≤ 3 km de ese centro (`pipeline/visibility.py`, `control_point`).
+- **Resultado:** −89.62485°, 118.68281°, z = −2 871.9 m. Horizonte de hasta +26.93° (las paredes del cráter); 0.00 % de Sol y 0.00 % de Tierra en el año.

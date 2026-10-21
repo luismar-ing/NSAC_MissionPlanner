@@ -276,7 +276,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.3.a · **Spec:** 5.3 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** pruebas con fracción 0, 0.5 y 1 sobre una máscara plana conocida.
 
-##### [ ] T1.3.d — Banderas de todos los sitios y control de fondo de cráter
+##### [x] T1.3.d — Banderas de todos los sitios y control de fondo de cráter
 - **Qué:** aplicar las banderas a las series de T1.1.e con las máscaras de T1.2.e. Añadir un punto de control en un fondo de cráter (elegido del DEM y documentado; no es un sitio candidato) para el sanity check de 5.7.
 - **Archivos:** `pipeline/visibility.py`, `docs/sites.md`
 - **Depende de:** T1.3.b, T1.1.e, T1.2.e · **Spec:** 5.7 · **Decisiones:** — · **Est.:** 1.5 h

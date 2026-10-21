@@ -882,3 +882,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. T1.2 completa.
 - **Siguiente tarea:** T1.3.d.
+
+## 2026-10-21 · T1.3.d · Banderas de todos los sitios y control de fondo de cráter
+
+- **Tarea:** T1.3.d — Banderas de todos los sitios y control de fondo de cráter ([x]).
+- **Qué se hizo:** en `pipeline/visibility.py`, `control_point` (fondo de Shackleton: centro oficial del nomenclátor IAU/USGS, Feature ID 5450, −89.67°, 129.78°E; píxel más bajo del DEM a ≤ 3 km), `site_flags` (Sol por borde superior 5.3 y Tierra con margen 5.4) y `main` (`python -m pipeline.visibility`). Banderas en `pipeline/out/flags_{id}.npz`; control documentado en `docs/sites.md` §4.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.visibility
+  Control: CONTROL: Shackleton crater floor en -89.62485°, 118.68281°, z = -2871.9 m
+  connecting_ridge           Sol visible  95.12 %   Tierra visible  60.06 %   (máscara máx -0.71°)
+  haworth                    Sol visible  78.57 %   Tierra visible  71.59 %   (máscara máx +2.19°)
+  nobile_rim_1               Sol visible  71.09 %   Tierra visible  74.27 %   (máscara máx +0.38°)
+  malapert_massif            Sol visible  76.54 %   Tierra visible  77.03 %   (máscara máx -0.09°)
+  de_gerlache_rim_2          Sol visible  87.85 %   Tierra visible  53.13 %   (máscara máx +1.10°)
+  control_shackleton_floor   Sol visible   0.00 %   Tierra visible   0.00 %   (máscara máx +26.93°)
+  Sanity 5.7: control ≈ 0 % de Sol → 0.00 %; todos los sitios > control → True     (exit 0)
+  ```
+  Periodo: 2027-01-01 → 2028-01-15 cada 30 min (n = 18 192), criterio del borde superior del Sol y margen de antena de 0.5°.
+- **Decisiones tomadas:** Shackleton como control: el centro sale del nomenclátor oficial y el punto, del DEM. El control no entra en `sites.json` ni en los datos del front end.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. El % de Sol es geométrico (máscara de 100 km a 40 m), sin sombras de relieve más allá de R_max ni del propio módulo.
+- **Siguiente tarea:** T1.4.d.
