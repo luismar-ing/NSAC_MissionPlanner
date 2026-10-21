@@ -1395,3 +1395,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** la revisión visual definitiva con el humano es T5.2.e.
 - **Siguiente tarea:** T3.1.d.
+
+## 2026-10-21 · T3.1.d · Filtrado por restricciones e índice de métricas
+
+- **Tarea:** T3.1.d — Filtrado e índice ([x]).
+- **Qué se hizo:** `web/src/lib/constraints.ts` con funciones puras:
+  - `meetsConstraints`: regla de 5.6, igual que `pipeline/windows.py` (límites incluidos; `null` = control desactivado).
+  - `buildWindowIndex`: un `Float32Array` por métrica, ordenado [sitio][día].
+  - `validMask`: máscara Uint8 de celdas válidas, reutilizable sin crear memoria nueva.
+  - `lookup`, `dayIndex` y `countValid`.
+  Pruebas en `web/tests/constraints.test.ts`.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test -- constraints
+  validMask: 0.039 ms per update (5 sites × 365 days × 3 L = 5475 cells)
+  Tests 4 passed
+    is optional and inclusive, like pipeline/windows.py
+    indexes every cell and looks up known values           (Haworth, L=7, 2027-03-10 frente al JSON)
+    the mask agrees with meetsConstraints cell by cell     (3 L × 5 sitios × 365 días)
+    re-filters all 5 sites × 365 days × 3 L in under 10 ms
+  $ npm --prefix web test → 59 passed;  typecheck → exit 0
+  ```
+  0.039 ms por actualización, frente al objetivo de < 10 ms (8.7 pide < 100 ms para todo el repintado).
+- **Decisiones tomadas:** almacenamiento Float32. La máscara compara contra el límite redondeado a Float32 (`Math.fround`), para que la igualdad en el límite se mantenga.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. T3.1 completa.
+- **Siguiente tarea:** T3.2.a.

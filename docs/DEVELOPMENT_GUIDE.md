@@ -506,7 +506,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.1.b · **Spec:** 8.0, 9 · **Decisiones:** D2 · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** ningún color hexadecimal fuera del módulo de tokens (grep sin resultados); captura a 1920×1080 revisada.
 
-##### [ ] T3.1.d — Filtrado por restricciones e índice de métricas
+##### [x] T3.1.d — Filtrado por restricciones e índice de métricas
 - **Qué:** funciones puras: restricciones X, Y, Z opcionales sobre `windows`; índice (sitio, llegada, L) → métricas.
 - **Archivos:** `web/src/lib/constraints.ts`, `web/tests/constraints.test.ts`
 - **Depende de:** T3.1.b · **Spec:** 5.6, 8.5, 8.7 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**
