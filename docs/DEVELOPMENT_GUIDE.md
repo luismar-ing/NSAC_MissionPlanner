@@ -383,7 +383,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T1.1.e · **Spec:** 5.8, 7.2 · **Decisiones:** D4 · **Est.:** 3 h
 - **Aceptación:** `python -m pipeline.validate --file pipeline/out/scene/ephemeris.json` termina en 0; tamaño impreso.
 
-##### [ ] T2.1.b — Convención del cuaternión
+##### [x] T2.1.b — Convención del cuaternión
 - **Qué:** prueba: rotar la posición del sitio en el marco lunar con el cuaternión del archivo y sumar la posición de la Luna reproduce la posición SPICE del sitio en el marco común; error de interpolación (slerp) a mitad de intervalo. Documentar el orden de componentes para three.js en `docs/DATA_CONTRACT.md`.
 - **Archivos:** `pipeline/tests/test_scene.py`, `docs/DATA_CONTRACT.md`
 - **Depende de:** T2.1.a · **Spec:** 5.9, 7.2 · **Decisiones:** — · **Est.:** 1.5 h

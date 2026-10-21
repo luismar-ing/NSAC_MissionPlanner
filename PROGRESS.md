@@ -1038,3 +1038,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** 1.58 MB solo para la escena; se revisará el presupuesto en T2.4.b (series < 15 MB).
 - **Siguiente tarea:** T2.1.b.
+
+## 2026-10-21 · T2.1.b · Convención del cuaternión
+
+- **Tarea:** T2.1.b — Convención del cuaternión ([x]).
+- **Qué se hizo:** `pipeline/tests/test_scene.py`:
+  - Comprobación independiente: la posición Tierra → sitio reconstruida desde el archivo (`moon_pos_km` + `q·sitio·q⁻¹`) frente a SPICE `spkcpo` con observador en el sitio, para los 5 sitios.
+  - Error de interpolación a mitad de intervalo (Catmull-Rom + slerp, y lineal como comparación).
+  - Cuaterniones unitarios y continuos; cuaternión de la Tierra frente a `pxform`.
+  El contrato §10 documenta la convención (`q·v·q⁻¹`, orden `[x,y,z,w]`) y la interpolación obligatoria.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_scene.py -v -s
+  En las muestras: error máx 66.2 m (redondeo de moon_pos_km a 0.1 km)            PASSED
+  A mitad de intervalo: Catmull-Rom + slerp 67.2 m; lineal + slerp 5.08 km         PASSED
+  test_quaternions_are_continuous_and_unit PASSED
+  test_earth_quaternion_matches_spice PASSED
+  4 passed
+  ```
+  Criterio de la guía: < 0.1 km en las muestras (66 m) y < 1 km interpolado (67 m). ✓
+- **Decisiones tomadas:** **interpolación cúbica de Catmull-Rom obligatoria para posiciones** en el front end (T4.1.c). La lineal da 5 km de error a mitad de intervalo, porque la órbita es curva en 60 min. Rotaciones con slerp.
+- **Desviaciones de la spec / cambios en la guía:** contrato §10 ampliado con la regla de interpolación (no cambia el formato).
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T2.1.c.

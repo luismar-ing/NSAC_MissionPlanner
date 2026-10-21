@@ -188,7 +188,9 @@ Muestreo grueso para la escena 3D (spec 5.8, 7.2).
 | `earth_frame` | string | Marco fijo a la Tierra usado. Valor: `"IAU_EARTH"` (modelo IAU de `pck00011.tpc`; decidido en T2.1.a). |
 | `earth_quat` | `[x,y,z,w][]` | Longitud `n`. Rotación de vectores de `earth_frame` a `frame`. Norma 1 ± 1e-6. |
 
-**Cuaterniones:** orden `[x, y, z, w]` (el de three.js). SPICE (`m2q`) devuelve `[w, x, y, z]`: el pipeline reordena. Un vector `v` en el marco origen se lleva a `frame` con `q · v · q⁻¹`. Entre muestras se interpola con slerp (T2.1.b).
+**Cuaterniones:** orden `[x, y, z, w]` (el de three.js). SPICE (`m2q`) devuelve `[w, x, y, z]`: el pipeline reordena. Un vector `v` en el marco origen se lleva a `frame` con `q · v · q⁻¹` (comprobado en T2.1.a/b). Muestras consecutivas tienen producto escalar > 0 (sin saltos de signo).
+
+**Interpolación (obligatoria para el front end, T2.1.b):** rotaciones con **slerp**; posiciones (`moon_pos_km`) con **cúbica de Catmull-Rom** usando las muestras k−1, k, k+1 y k+2. Error medido a mitad de intervalo, para la posición de los sitios: 67 m con Catmull-Rom + slerp, frente a **5.08 km con interpolación lineal** (la órbita es curva en 60 min). La dirección del Sol puede interpolarse linealmente y renormalizarse (gira ~0.04° por hora).
 
 ## 11. `trajectory/{trajectory_id}.json`
 
