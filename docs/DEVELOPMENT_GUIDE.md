@@ -534,7 +534,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 
 ### T3.3 Bandeja de paneles 2D (spec 8.1)
 
-##### [ ] T3.3.a — Panel y cuadrícula de la bandeja
+##### [x] T3.3.a — Panel y cuadrícula de la bandeja
 - **Qué:** panel con cabecera (sitio, llegada, L e insignia ILLUSTRATIVE si aplica); cuadrícula de 2 a 5 paneles idénticos; deslizable en móvil.
 - **Archivos:** `web/src/panels2d/PlanPanel.tsx`, `web/src/panels2d/Tray.tsx`
 - **Depende de:** T3.1.c · **Spec:** 8.0, 8.1, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

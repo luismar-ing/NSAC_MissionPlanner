@@ -52,6 +52,12 @@ export const STRINGS = {
     clearRange: "Clear range",
     help: "Click a cell to select it · double-click or press Enter to pin · drag to select a range · arrow keys move the selection",
   },
+  panel: {
+    aria: (site: string, date: string, L: number) => `Plan: ${site}, arrival ${date}, ${L}-day window`,
+    illustrativeTitle: "The trajectory of this plan is ILLUSTRATIVE: simplified, computed with the real Moon position; not a real mission trajectory.",
+    unpin: (site: string) => `Remove ${site} from the comparison`,
+    pinOneMore: "Pin at least one more plan to compare.",
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

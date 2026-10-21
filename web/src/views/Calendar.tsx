@@ -71,6 +71,9 @@ export function Calendar() {
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
+    // Initial width straight from layout: ResizeObserver may not report while the page is in the background
+    const initial = Math.floor(el.getBoundingClientRect().width);
+    if (initial > 0) setWidth(initial);
     const ro = new ResizeObserver(([e]) => setWidth(Math.floor(e.contentRect.width)));
     ro.observe(el);
     return () => ro.disconnect();

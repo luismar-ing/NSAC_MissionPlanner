@@ -1494,3 +1494,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno. La spec dice «Arrastre: selecciona un rango» sin fijar qué hace el rango; se añade «Pin best 3» para el paso 2 del guion de la demo.
 - **Problemas abiertos:** ninguno. T3.2 completa.
 - **Siguiente tarea:** T3.3.a.
+
+## 2026-10-21 · T3.3.a · Panel y cuadrícula de la bandeja
+
+- **Tarea:** T3.3.a — Panel y cuadrícula de la bandeja ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/planData.ts`: `loadPlanData` (plan, sitio, máscara, serie recortada a `[llegada, llegada + L)` en grados, fila de métricas) y `sampleAt` (muestra en horas desde la llegada).
+  - `web/src/lib/scale.ts`: `sharedElevationScale`, un único rango vertical para todos los paneles visibles (máscaras y trayectorias del Sol y la Tierra).
+  - `web/src/panels2d/PlanPanel.tsx`: cabecera (sitio, llegada, L), insignia ILLUSTRATIVE (borde punteado y tooltip con la explicación), botón × para quitarlo, título que selecciona el plan, y huecos para la silueta, la cinta y las métricas.
+  - `web/src/panels2d/Tray.tsx`: cuadrícula de columnas iguales (2 a 5), carga los datos de cada plan y comparte la escala. En móvil la bandeja se desliza en horizontal (scroll-snap).
+  - `Calendar.tsx`: lee el ancho inicial del contenedor al montarse. Con el panel del navegador oculto, el ResizeObserver no informaba y el calendario no se dibujaba nunca.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 75 passed
+    tray.test.tsx: slices the window of a plan from the site series (sun_pct recortado = 38.1 % del JSON)
+                   renders one identical panel per pinned plan, all with the same vertical scale
+                   the shared scale covers every mask and track
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador a 1920×1080, anclando desde el calendario: 2 paneles de 891×377 px, 3 de 589×377 y 5 de 347×377, todos con escala «-5:11», sin scroll horizontal. Captura de 5 paneles revisada. Tras corregir el CSS, la insignia ILLUSTRATIVE queda dentro del panel en los 5 (el nombre largo «Connecting Ridge (Shackleton rim)» se recorta con «…»).
+- **Decisiones tomadas:** paneles de 220 px de silueta, 56 px de cinta y métricas debajo, con formato idéntico (spec 9).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** los botones de Chrome no encogen en filas flex sin `width: 0` (corregido). Robustez del calendario con la página en segundo plano (corregida).
+- **Siguiente tarea:** T3.3.b.

@@ -2,6 +2,7 @@ import { SyntheticBanner } from "../components/SyntheticBanner";
 import { STRINGS } from "../lib/strings";
 import { useApp } from "../store/appStore";
 import { ConstraintControls } from "../components/ConstraintControls";
+import { Tray } from "../panels2d/Tray";
 import { Calendar } from "./Calendar";
 
 /**
@@ -37,7 +38,7 @@ export function CompareView() {
         <h2 id="tray-title" className="panel-title">
           {STRINGS.trayTitle}
         </h2>
-        <p className="placeholder">{STRINGS.trayEmpty}</p>
+        <Tray />
       </section>
     </>
   );
