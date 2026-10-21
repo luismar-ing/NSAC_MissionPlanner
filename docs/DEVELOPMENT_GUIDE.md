@@ -526,7 +526,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.2.a · **Spec:** 5.6, 8.5, 8.7, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** tiempo medido (performance.mark) entre mover un control y terminar el repintado < 100 ms, con la salida mostrada; controles usables con teclado.
 
-##### [ ] T3.2.c — Selección, anclaje y rango
+##### [x] T3.2.c — Selección, anclaje y rango
 - **Qué:** clic selecciona (estado global); botón "Pin" o doble clic anclan a la bandeja (máx. 5, con aviso); arrastrar selecciona un rango.
 - **Archivos:** `web/src/views/Calendar.tsx`, `web/tests/calendar.test.tsx`
 - **Depende de:** T3.2.b · **Spec:** 8.5, 10 (T3.2) · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**

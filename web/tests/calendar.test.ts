@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { arrivalDate, cellAt, cellColorIndices, cellRect, makeLayout, monthTicks } from "../src/lib/calendar";
+import { arrivalDate, bestInRange, cellAt, cellColorIndices, cellRect, makeLayout, monthTicks } from "../src/lib/calendar";
 import { lutIndex, lutLightness, rampLut } from "../src/lib/colorScale";
 import { buildWindowIndex } from "../src/lib/constraints";
 
@@ -50,5 +50,21 @@ describe("layout", () => {
     const ticks = monthTicks("2027-01-01", 365);
     expect(ticks.map((t) => t.label)).toEqual(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
     expect(arrivalDate("2027-01-01", 68)).toBe("2027-03-10");
+  });
+});
+
+describe("best in range (diversified picks)", () => {
+  it("takes the best plan of distinct sites first", () => {
+    const idx = index(7);
+    const best = bestInRange(idx, null, { site0: 0, site1: 2, day0: 90, day1: 155 }, 3);
+    expect(new Set(best.map((c) => c.site)).size).toBe(3);
+  });
+  it("repeats a site only with arrivals at least L days apart", () => {
+    const idx = index(7);
+    const best = bestInRange(idx, null, { site0: 1, site1: 1, day0: 0, day1: 120 }, 3);
+    expect(best).toHaveLength(3);
+    const days = best.map((c) => c.day).sort((a, b) => a - b);
+    expect(days[1] - days[0]).toBeGreaterThanOrEqual(7);
+    expect(days[2] - days[1]).toBeGreaterThanOrEqual(7);
   });
 });

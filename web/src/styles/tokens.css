@@ -289,3 +289,60 @@ button {
   color: var(--color-text);
   font-size: var(--font-sm);
 }
+
+/* ------------------------------------------------------------------ calendar interaction (T3.2.c) */
+
+.btn {
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--color-text-muted);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn.ghost {
+  background: transparent;
+}
+
+.pin-count {
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 36px;
+  margin-top: var(--space-sm);
+}
+
+.calendar-help {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+.range-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-sm);
+}
+
+.notice {
+  margin: 0;
+  color: var(--color-focus);
+  font-size: var(--font-sm);
+}

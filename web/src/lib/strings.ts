@@ -43,6 +43,15 @@ export const STRINGS = {
     off: "off",
     count: (valid: number, total: number, L: number) => `${valid} of ${total} ${L}-day plans meet the constraints`,
   },
+  pin: {
+    selected: "Pin selected plan",
+    count: (n: number, max: number) => `${n}/${max} pinned`,
+    rangeSummary: (days: number, sites: number, valid: number) =>
+      `Range: ${days} arrival day${days === 1 ? "" : "s"} × ${sites} site${sites === 1 ? "" : "s"} (${valid} valid)`,
+    best: (n: number) => `Pin best ${n}`,
+    clearRange: "Clear range",
+    help: "Click a cell to select it · double-click or press Enter to pin · drag to select a range · arrow keys move the selection",
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

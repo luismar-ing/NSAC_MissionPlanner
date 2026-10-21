@@ -1467,3 +1467,30 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** la primera medición usaba solo `requestAnimationFrame` y repetía el mismo valor con el panel oculto; corregida.
 - **Siguiente tarea:** T3.2.c.
+
+## 2026-10-21 · T3.2.c · Selección, anclaje y rango
+
+- **Tarea:** T3.2.c — Selección, anclaje y rango ([x]).
+- **Qué se hizo:** en `web/src/views/Calendar.tsx`:
+  - Clic: selecciona el plan (`selectPlan`; contorno blanco con anillo del color de fondo).
+  - Doble clic, botón «Pin selected plan» o Enter: anclan el plan (máximo 5; aviso visible si la bandeja está llena; contador «n/5 pinned»; marcador triangular sobre las celdas ancladas, una forma y no solo un color).
+  - Arrastre: selecciona un rango (contorno discontinuo; resumen «Range: N arrival days × M sites (K valid)»; «Pin best 3» y «Clear range»).
+  - Flechas: mueven la selección; el canvas es enfocable con teclado.
+  - Al cambiar L se conservan el sitio y la llegada seleccionados.
+  En `lib/calendar.ts`: `planIdFor`, `makeRange` y `bestInRange`, que **diversifica** (primero el mejor plan de cada sitio; repite sitio solo si hay menos sitios que planes pedidos, y con llegadas separadas al menos L días). En el store: `selectedRange`. Dependencias de desarrollo exactas: `jsdom` 29.1.1, `@testing-library/react` 16.3.3 y `@testing-library/dom` 10.4.2.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 72 passed
+    calendar.test.tsx (jsdom + Testing Library):
+      click selects the plan in the global state                 (Haworth, día 68 → haworth_20270310_7d)
+      double-click pins to the tray; the 6th pin is rejected     (aviso «at most 5» visible)
+      drag selects a range and 'Pin best' pins its best cells
+      arrow keys move the selection and Enter pins it
+    calendar.test.ts: takes the best plan of distinct sites first | repeats a site only with arrivals at least L days apart
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador integrado, con el ratón real: el arrastre de Connecting Ridge (abril) a Nobile Rim 1 (junio) da «66 arrival days × 3 sites (198 valid)»; «Pin best 3» → «3/5 pinned» con un marcador en cada uno de los 3 sitios.
+- **Decisiones tomadas:** «Pin best» diversificado. La primera versión elegía días consecutivos de un mismo sitio, por los empates a score 1.0 de T1.4.d, y eso no sirve para comparar. Acciones accesibles con ratón y con teclado.
+- **Desviaciones de la spec / cambios en la guía:** ninguno. La spec dice «Arrastre: selecciona un rango» sin fijar qué hace el rango; se añade «Pin best 3» para el paso 2 del guion de la demo.
+- **Problemas abiertos:** ninguno. T3.2 completa.
+- **Siguiente tarea:** T3.3.a.

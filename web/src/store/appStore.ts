@@ -5,6 +5,7 @@
  */
 import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
+import type { CellRange } from "../lib/calendar";
 import { buildWindowIndex, type WindowIndex } from "../lib/constraints";
 import type { Manifest, Plan, Site } from "../lib/contract";
 import { DataStore } from "../lib/data";
@@ -41,6 +42,8 @@ export interface AppState {
   notice: string | null; // last user-facing message (e.g. tray full)
   windowIndex: Partial<Record<number, WindowIndex>>; // per window length L, built on demand
   validCount: { valid: number; total: number } | null; // cells meeting the constraints for the current L
+  selectedRange: CellRange | null; // calendar drag selection (spec 8.5), in calendar cell coordinates
+  setRange(r: CellRange | null): void;
   setValidCount(v: { valid: number; total: number } | null): void;
 
   loadCore(): Promise<void>;
@@ -78,6 +81,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     notice: null,
     windowIndex: {},
     validCount: null,
+    selectedRange: null,
+    setRange(r) {
+      set({ selectedRange: r });
+    },
     setValidCount(v) {
       set({ validCount: v });
     },
@@ -130,7 +137,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     setWindow(days) {
       const allowed = get().manifest?.params.window_days ?? [3, 7, 14];
       if (!allowed.includes(days)) return set({ notice: `Window must be one of ${allowed.join(", ")} days` });
-      set({ selectedWindow: days });
+      const sel = get().selectedPlanId ? get().plansById.get(get().selectedPlanId as string) : undefined;
+      // keep the same site and arrival selected when switching L
+      const selectedPlanId = sel ? sel.id.replace(/_\d+d$/, `_${days}d`) : null;
+      set({ selectedWindow: days, selectedPlanId: selectedPlanId && get().plansById.has(selectedPlanId) ? selectedPlanId : null });
     },
 
     pinPlan(id) {

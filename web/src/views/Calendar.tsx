@@ -1,24 +1,37 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { arrivalDate, calendarHeight, cellAt, cellColorIndices, cellRect, makeLayout, monthTicks, type CalendarLayout } from "../lib/calendar";
+import {
+  arrivalDate,
+  bestInRange,
+  calendarHeight,
+  cellAt,
+  cellColorIndices,
+  cellRect,
+  dayWidth,
+  makeLayout,
+  makeRange,
+  monthTicks,
+  planIdFor,
+  type CalendarLayout,
+} from "../lib/calendar";
 import { MODE_DOMAIN, MODE_METRIC, rampLut, type CalendarMode } from "../lib/colorScale";
-import { countValid, lookup, validMask, type WindowIndex } from "../lib/constraints";
+import { countValid, dayIndex, lookup, validMask, type WindowIndex } from "../lib/constraints";
 import { STRINGS } from "../lib/strings";
-import { useApp } from "../store/appStore";
+import { MAX_COMPARE, useApp } from "../store/appStore";
 import { COLORS, FONT } from "../styles/tokens";
 
 const MODES: CalendarMode[] = ["combined", "energy", "comms"];
 const LUTS: Record<CalendarMode, string[]> = { combined: rampLut("combined"), energy: rampLut("energy"), comms: rampLut("comms") };
+const BEST_N = 3; // demo step 2: pin 3 plans
 
-interface Hover {
+interface Cell {
   site: number;
   day: number;
-  x: number;
-  y: number;
 }
 
 /**
  * Arrival calendar heatmap (spec 8.5): one row per site, one column per arrival day, colour = metric of the
- * selected mode. Canvas (no WebGL, rule 7). Hover shows the cell's metrics.
+ * selected mode. Canvas (no WebGL, rule 7). Click selects, double-click / Enter / "Pin" pins to the tray,
+ * drag selects a range, arrow keys move the selection. Hover shows the cell's metrics.
  */
 export function Calendar() {
   const L = useApp((s) => s.selectedWindow);
@@ -28,10 +41,22 @@ export function Calendar() {
   const setValidCount = useApp((s) => s.setValidCount);
   const setWindow = useApp((s) => s.setWindow);
   const windowDays = useApp((s) => s.manifest?.params.window_days ?? [3, 7, 14]);
+  const selectedPlanId = useApp((s) => s.selectedPlanId);
+  const comparePlans = useApp((s) => s.comparePlans);
+  const plansById = useApp((s) => s.plansById);
+  const selectPlan = useApp((s) => s.selectPlan);
+  const pinPlan = useApp((s) => s.pinPlan);
+  const range = useApp((s) => s.selectedRange);
+  const setRange = useApp((s) => s.setRange);
+  const notice = useApp((s) => s.notice);
+  const clearNotice = useApp((s) => s.clearNotice);
+
   const [mode, setMode] = useState<CalendarMode>("combined");
   const [index, setIndex] = useState<WindowIndex | null>(null);
   const [width, setWidth] = useState(0);
-  const [hover, setHover] = useState<Hover | null>(null);
+  const [hover, setHover] = useState<(Cell & { x: number; y: number }) | null>(null);
+  const dragFrom = useRef<Cell | null>(null);
+  const dragged = useRef(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -51,6 +76,12 @@ export function Calendar() {
     return () => ro.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(clearNotice, 4000);
+    return () => clearTimeout(t);
+  }, [notice, clearNotice]);
+
   const layout: CalendarLayout | null = useMemo(
     () => (index && width > 0 ? makeLayout(width, index.siteIds.length, index.nDays) : null),
     [index, width],
@@ -62,6 +93,17 @@ export function Calendar() {
   useEffect(() => {
     setValidCount(mask ? { valid: countValid(mask), total: mask.length } : null);
   }, [mask, setValidCount]);
+
+  const cellOfPlan = (id: string | null): Cell | null => {
+    const p = id ? plansById.get(id) : undefined;
+    if (!p || !index || p.window_days !== L) return null;
+    const site = index.siteIds.indexOf(p.site_id);
+    const day = dayIndex(index, p.arrival_utc);
+    return site >= 0 && day >= 0 && day < index.nDays ? { site, day } : null;
+  };
+  const planOfCell = (c: Cell) => (index ? planIdFor(index.siteIds[c.site], arrivalDate(index.firstArrival, c.day), L) : "");
+  const selectedCell = cellOfPlan(selectedPlanId);
+  const pinnedCells = comparePlans.map(cellOfPlan).filter((c): c is Cell => c !== null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,8 +124,7 @@ export function Calendar() {
       for (let d = 0; d < layout.nDays; d++) {
         const [x, y, w, hh] = cellRect(layout, s, d);
         const k = s * layout.nDays + d;
-        const dim = anyConstraint && !mask[k];
-        ctx.globalAlpha = dim ? 0.22 : 1; // spec 8.5: valid cells highlighted, the rest dimmed
+        ctx.globalAlpha = anyConstraint && !mask[k] ? 0.22 : 1; // spec 8.5: valid cells highlighted, the rest dimmed
         ctx.fillStyle = lut[colors[k]];
         ctx.fillRect(x, y, w + 0.6, hh); // +0.6 px hides sub-pixel seams between columns
       }
@@ -125,6 +166,41 @@ export function Calendar() {
       ctx.fillRect(x, layout.axisH - 6, 1, 6);
       ctx.fillText(t.label, x + 3, layout.axisH - 6);
     }
+    // Range (dashed outline), pinned cells (triangle marker: shape, not only colour) and selection (white box)
+    const dw = dayWidth(layout);
+    if (range) {
+      const [x0, y0] = cellRect(layout, range.site0, range.day0);
+      const [x1, y1, w1, h1] = cellRect(layout, range.site1, range.day1);
+      ctx.save();
+      ctx.setLineDash([5, 3]);
+      ctx.strokeStyle = COLORS.focus;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x0 - 1, y0 - 1, x1 + w1 - x0 + 2, y1 + h1 - y0 + 2);
+      ctx.restore();
+    }
+    for (const c of pinnedCells) {
+      const [x, y] = cellRect(layout, c.site, c.day);
+      const cx = x + dw / 2;
+      ctx.fillStyle = COLORS.text;
+      ctx.strokeStyle = COLORS.bg;
+      ctx.lineWidth = 2; // surface ring so the marker reads on any cell colour
+      ctx.beginPath();
+      ctx.moveTo(cx, y + 9);
+      ctx.lineTo(cx - 5, y);
+      ctx.lineTo(cx + 5, y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+    }
+    if (selectedCell) {
+      const [x, y, w, hh] = cellRect(layout, selectedCell.site, selectedCell.day);
+      ctx.strokeStyle = COLORS.bg;
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x - 2, y - 2, Math.max(w, 3) + 4, hh + 4);
+      ctx.strokeStyle = COLORS.text;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 2, y - 2, Math.max(w, 3) + 4, hh + 4);
+    }
     // Spec 8.7: time from the last control change until the canvas is redrawn (< 100 ms). Measured
     // synchronously (rAF is paused in background tabs); the next-frame time is added when available.
     if (performance.getEntriesByName("constraint-change").length) {
@@ -136,14 +212,67 @@ export function Calendar() {
         canvas.dataset.lastFrameMs = (performance.now() - start).toFixed(1);
       });
     }
-  }, [layout, index, colors, mask, anyConstraint, mode, sites]);
+  }, [layout, index, colors, mask, anyConstraint, mode, sites, range, selectedPlanId, comparePlans]);
 
-  const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!layout) return;
+  const cellFromEvent = (e: React.MouseEvent<HTMLCanvasElement>): (Cell & { x: number; y: number }) | null => {
+    if (!layout) return null;
     const r = e.currentTarget.getBoundingClientRect();
-    const c = cellAt(layout, e.clientX - r.left, e.clientY - r.top);
-    setHover(c ? { ...c, x: e.clientX - r.left, y: e.clientY - r.top } : null);
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const c = cellAt(layout, x, y);
+    return c ? { ...c, x, y } : null;
   };
+
+  const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    dragFrom.current = cellFromEvent(e);
+    dragged.current = false;
+  };
+  const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const c = cellFromEvent(e);
+    setHover(c);
+    if (e.buttons === 1 && dragFrom.current && c && (c.day !== dragFrom.current.day || c.site !== dragFrom.current.site)) {
+      dragged.current = true;
+      setRange(makeRange(dragFrom.current, c));
+    }
+  };
+  const onMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const c = cellFromEvent(e);
+    if (!dragged.current && c) {
+      selectPlan(planOfCell(c)); // a plain click selects (spec 8.5)
+      setRange(null);
+    }
+    dragFrom.current = null;
+  };
+  const onDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const c = cellFromEvent(e);
+    if (c) pinPlan(planOfCell(c)); // explicit gesture pins (spec 8.5)
+  };
+  const onKeyDown = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if (!index) return;
+    const cur = selectedCell ?? { site: 0, day: 0 };
+    const moves: Record<string, Cell> = {
+      ArrowLeft: { site: cur.site, day: Math.max(0, cur.day - 1) },
+      ArrowRight: { site: cur.site, day: Math.min(index.nDays - 1, cur.day + 1) },
+      ArrowUp: { site: Math.max(0, cur.site - 1), day: cur.day },
+      ArrowDown: { site: Math.min(index.siteIds.length - 1, cur.site + 1), day: cur.day },
+    };
+    if (moves[e.key]) {
+      e.preventDefault();
+      selectPlan(planOfCell(moves[e.key]));
+    } else if (e.key === "Enter" && selectedPlanId) {
+      e.preventDefault();
+      pinPlan(selectedPlanId);
+    }
+  };
+
+  const best = index && range ? bestInRange(index, anyConstraint ? mask : null, range, BEST_N) : [];
+  const rangeValid = index && range && mask
+    ? (() => {
+        let n = 0;
+        for (let s = range.site0; s <= range.site1; s++) for (let d = range.day0; d <= range.day1; d++) n += anyConstraint ? mask[s * index.nDays + d] : 1;
+        return n;
+      })()
+    : 0;
 
   const hoverInfo = hover && index ? (() => {
     const siteId = index.siteIds[hover.site];
@@ -164,7 +293,7 @@ export function Calendar() {
         </div>
         <div className="segmented" role="group" aria-label={STRINGS.windowLabel}>
           {windowDays.map((d) => (
-            <button key={d} type="button" aria-pressed={L === d} className={L === d ? "on" : ""} onClick={() => setWindow(d)}>
+            <button key={d} type="button" aria-pressed={L === d} className={L === d ? "on" : ""} onClick={() => { setWindow(d); setRange(null); }}>
               {STRINGS.windowDays(d)}
             </button>
           ))}
@@ -178,10 +307,26 @@ export function Calendar() {
           />
           <span className="legend-value">{hi}</span>
         </div>
+        <button type="button" className="btn" disabled={!selectedPlanId || comparePlans.includes(selectedPlanId)} onClick={() => selectedPlanId && pinPlan(selectedPlanId)}>
+          {STRINGS.pin.selected}
+        </button>
+        <span className="pin-count">{STRINGS.pin.count(comparePlans.length, MAX_COMPARE)}</span>
       </div>
       <div ref={wrapRef} className="calendar-canvas-wrap">
         {!index && <p className="placeholder">{STRINGS.loading}</p>}
-        <canvas ref={canvasRef} onMouseMove={onMove} onMouseLeave={() => setHover(null)} aria-label={STRINGS.calendarAria(L)} role="img" />
+        <canvas
+          ref={canvasRef}
+          tabIndex={0}
+          role="img"
+          aria-label={STRINGS.calendarAria(L)}
+          data-testid="calendar-canvas"
+          onMouseDown={onMouseDown}
+          onMouseMove={onMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={() => setHover(null)}
+          onDoubleClick={onDoubleClick}
+          onKeyDown={onKeyDown}
+        />
         {hover && hoverInfo?.m && (
           <div className="tooltip" style={{ left: hover.x + 14, top: hover.y + 14 }} role="status">
             <strong>{hoverInfo.site}</strong>
@@ -193,6 +338,26 @@ export function Calendar() {
             <span>{STRINGS.fmt.earth(hoverInfo.m.earth_h_min, hoverInfo.m.earth_h_mean)}</span>
             <span>{STRINGS.fmt.score(hoverInfo.m.score)}</span>
           </div>
+        )}
+      </div>
+      <div className="calendar-footer">
+        {range && index ? (
+          <div className="range-bar" role="group" aria-label="Range selection">
+            <span>{STRINGS.pin.rangeSummary(range.day1 - range.day0 + 1, range.site1 - range.site0 + 1, rangeValid)}</span>
+            <button type="button" className="btn" disabled={best.length === 0} onClick={() => best.forEach((c) => pinPlan(planOfCell(c)))}>
+              {STRINGS.pin.best(Math.min(BEST_N, best.length))}
+            </button>
+            <button type="button" className="btn ghost" onClick={() => setRange(null)}>
+              {STRINGS.pin.clearRange}
+            </button>
+          </div>
+        ) : (
+          <small className="calendar-help">{STRINGS.pin.help}</small>
+        )}
+        {notice && (
+          <p className="notice" role="status" aria-live="polite">
+            {notice}
+          </p>
         )}
       </div>
     </div>

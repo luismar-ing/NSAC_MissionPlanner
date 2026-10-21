@@ -62,3 +62,53 @@ export function monthTicks(firstArrival: string, nDays: number): { day: number; 
 export function arrivalDate(firstArrival: string, day: number): string {
   return new Date(Date.parse(`${firstArrival}T00:00:00Z`) + day * 86_400_000).toISOString().slice(0, 10);
 }
+
+/** Plan id of a calendar cell (contract §1: {site_id}_{YYYYMMDD}_{L}d). */
+export function planIdFor(siteId: string, arrival: string, windowDays: number): string {
+  return `${siteId}_${arrival.slice(0, 10).replaceAll("-", "")}_${windowDays}d`;
+}
+
+export interface CellRange {
+  site0: number;
+  site1: number;
+  day0: number;
+  day1: number;
+}
+
+/** Normalised range (inclusive) from two corner cells. */
+export function makeRange(a: { site: number; day: number }, b: { site: number; day: number }): CellRange {
+  return { site0: Math.min(a.site, b.site), site1: Math.max(a.site, b.site), day0: Math.min(a.day, b.day), day1: Math.max(a.day, b.day) };
+}
+
+/**
+ * Best cells of a range for comparison: valid cells (mask = 1) ranked by score (desc), then shorter comm gap,
+ * then earlier date. Picks are diversified: first the best cell of each distinct site; a site repeats only if
+ * the range has fewer sites than n, and then only with arrivals at least `index.windowDays` apart. (Many
+ * cells tie at score 1.0, so without this the picks would be near-identical consecutive days of one site.)
+ */
+export function bestInRange(index: WindowIndex, mask: Uint8Array | null, range: CellRange, n: number): { site: number; day: number }[] {
+  const cells: { site: number; day: number; score: number; gap: number }[] = [];
+  for (let s = range.site0; s <= range.site1; s++) {
+    for (let d = range.day0; d <= range.day1; d++) {
+      const k = s * index.nDays + d;
+      if (mask && !mask[k]) continue;
+      cells.push({ site: s, day: d, score: index.metrics.score[k], gap: index.metrics.longest_comm_gap_h[k] });
+    }
+  }
+  cells.sort((a, b) => b.score - a.score || a.gap - b.gap || a.day - b.day || a.site - b.site);
+  const picked: { site: number; day: number }[] = [];
+  const usedSites = new Set<number>();
+  for (const c of cells) {
+    if (picked.length === n) break;
+    if (!usedSites.has(c.site)) {
+      picked.push({ site: c.site, day: c.day });
+      usedSites.add(c.site);
+    }
+  }
+  for (const c of cells) {
+    if (picked.length === n) break;
+    if (picked.some((p) => p.site === c.site && Math.abs(p.day - c.day) < index.windowDays)) continue;
+    picked.push({ site: c.site, day: c.day });
+  }
+  return picked;
+}
