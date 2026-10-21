@@ -218,7 +218,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.1.a, T1.1.c · **Spec:** 5.7, 10 (T1.1) · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_vs_horizons.py -v` pasa con error < 0.05° para el Sol y la Tierra en al menos 5 instantes por sitio; la tabla con la salida real está en `docs/validation.md`.
 
-##### [ ] T1.1.e — Series de un año para todos los sitios
+##### [x] T1.1.e — Series de un año para todos los sitios
 - **Qué:** az/el del Sol y la Tierra para el rango D4 con paso de 30 min (parametrizable a 10) para todos los sitios; intermedios en `pipeline/out/`; figura de verificación de las elevaciones a lo largo del año.
 - **Archivos:** `pipeline/ephemeris.py`, `docs/figures/ephemeris_{site}.png`
 - **Depende de:** T1.1.d · **Spec:** 5.1, 5.7 · **Decisiones:** D4 · **Est.:** 2 h

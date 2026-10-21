@@ -771,3 +771,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** la primera versión calculaba la separación con `arccos` (precisión limitada a ~0.004″); se cambió a `atan2`. La tabla queda coherente: Δ = 0 ⇒ separación = 0.
 - **Siguiente tarea:** T1.1.e.
+
+## 2026-10-21 · T1.1.e · Series de un año para todos los sitios
+
+- **Tarea:** T1.1.e — Series de un año ([x]).
+- **Qué se hizo:** en `pipeline/ephemeris.py`, `site_series` (az/el del Sol y la Tierra en el rango de series del contrato §2, 2027-01-01 → 2028-01-15, cada 30 min; `--step-min 10` opcional), `save_series` y `load_series` (intermedio `pipeline/out/ephem_{sitio}.npz`, no versionado), `plot_series` y la línea de comandos `python -m pipeline.ephemeris`. Figuras en `docs/figures/ephemeris_{sitio}.png`. Comando añadido a `CLAUDE.md`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.ephemeris
+  connecting_ridge   n=18192  Sol el [-2.086, +2.073]° (lím ±2.16, OK)  Tierra el [-7.553, +6.215]° (lím ±8.06, OK)    1.4 s
+  haworth            n=18192  Sol el [-5.154, +5.144]° (lím ±5.24, OK)  Tierra el [-3.972, +10.074]° (lím ±11.14, OK)   1.4 s
+  nobile_rim_1       n=18192  Sol el [-6.302, +6.309]° (lím ±6.37, OK)  Tierra el [-2.978, +10.037]° (lím ±12.27, OK)   1.3 s
+  malapert_massif    n=18192  Sol el [-5.536, +5.528]° (lím ±5.61, OK)  Tierra el [-3.104, +10.538]° (lím ±11.51, OK)   1.3 s
+  de_gerlache_rim_2  n=18192  Sol el [-2.924, +2.919]° (lím ±3.01, OK)  Tierra el [-6.741, +7.268]° (lím ±8.91, OK)    1.3 s
+  Total 8.3 s; todo dentro de los límites
+  ```
+  n = 18 192 = 379 días × 48. El máximo del Sol ≈ colatitud + 1.54° en todos los sitios (inclinación del eje lunar), como predice §2. Figura de Malapert revisada: el Sol oscila con el día lunar (~29.5 d) y su amplitud varía a lo largo del año; la Tierra oscila con la libración (~27 d) entre −3° y +10.5°, sobre el horizonte geométrico la mayor parte del tiempo (sitio en la cara visible, lon 2°E).
+- **Decisiones tomadas:** los intermedios se guardan en `.npz` comprimido. El formato del contrato (`timeseries/{site}.json`, cuantizado) lo escribe `build_all` (T2.4.a).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T1.2.a (T1.1 completa).

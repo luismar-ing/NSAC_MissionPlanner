@@ -7,6 +7,8 @@ Ver docs/validation.md §1.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
 from pipeline import config
@@ -101,3 +103,95 @@ def elevation_bounds_deg(lat_deg: float) -> dict[str, float]:
     colat = 90.0 - abs(lat_deg)
     # Tierra: libración en latitud (~6.7°) + paralaje topocéntrica (≤ ~0.26°) + holgura
     return {"sun": colat + 1.6, "earth": colat + 7.5}
+
+
+# ---------------------------------------------------------------- series de un año (T1.1.e)
+
+OUT_DIR = Path(__file__).with_name("out")
+
+
+def site_series(site: dict, step_min: int = config.STEP_MIN) -> dict:
+    """Az/el del Sol y la Tierra en todo el rango de series (contrato §2)."""
+    start, end = config.timeseries_range()
+    ets = et_grid(start, end, step_min)
+    out = {"site_id": site["id"], "start_utc": start.strftime("%Y-%m-%dT%H:%M:%SZ"), "step_min": step_min, "n": len(ets)}
+    for target in TARGET_NAMES:
+        az, el = target_az_el(site, target, ets)
+        out[f"{target}_az"], out[f"{target}_el"] = az, el
+    return out
+
+
+def save_series(series: dict) -> Path:
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = OUT_DIR / f"ephem_{series['site_id']}.npz"
+    np.savez_compressed(path, **{k: np.asarray(v) for k, v in series.items()})
+    return path
+
+
+def load_series(site_id: str) -> dict:
+    data = np.load(OUT_DIR / f"ephem_{site_id}.npz")
+    return {k: (data[k].item() if data[k].ndim == 0 else data[k]) for k in data.files}
+
+
+def plot_series(series: dict, site: dict, path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    days = np.arange(series["n"]) * series["step_min"] / 1440.0
+    b = elevation_bounds_deg(site["lat"])
+    fig, ax = plt.subplots(figsize=(12, 4), dpi=110)
+    ax.plot(days, series["earth_el"], lw=0.6, color="#4aa3ff", label="Earth elevation")
+    ax.plot(days, series["sun_el"], lw=0.6, color="#ffb347", label="Sun elevation")
+    for v, c in ((b["sun"], "#ffb347"), (b["earth"], "#4aa3ff")):
+        ax.axhline(v, color=c, ls=":", lw=0.8)
+        ax.axhline(-v, color=c, ls=":", lw=0.8)
+    ax.axhline(0, color="k", lw=0.5)
+    ax.set_xlabel(f"days since {series['start_utc']}")
+    ax.set_ylabel("elevation (deg, no terrain)")
+    ax.set_title(f"{site['name']} ({site['lat']:.3f}°, {site['lon']:.3f}°): geometric Sun/Earth elevation; "
+                 f"dotted = latitude bounds (docs/validation.md §2)", fontsize=9)
+    ax.legend(loc="upper right", fontsize=8)
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
+
+
+def main(argv=None) -> int:
+    import argparse
+    import json
+    import sys
+    import time
+    from pathlib import Path
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    ap = argparse.ArgumentParser(description="Series de az/el del Sol y la Tierra para todos los sitios (T1.1.e)")
+    ap.add_argument("--step-min", type=int, default=config.STEP_MIN, help="paso en minutos (30 por defecto; 10 opcional)")
+    ap.add_argument("--no-plots", action="store_true")
+    args = ap.parse_args(argv)
+    root = Path(__file__).resolve().parents[1]
+    sites = json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8"))
+    ok = True
+    t_all = time.perf_counter()
+    for site in sites:
+        t0 = time.perf_counter()
+        s = site_series(site, args.step_min)
+        path = save_series(s)
+        b = elevation_bounds_deg(site["lat"])
+        inside = {t: bool(np.max(np.abs(s[f"{t}_el"])) <= b[t]) for t in TARGET_NAMES}
+        ok &= all(inside.values())
+        print(f"{site['id']:18s} n={s['n']}  Sol el [{s['sun_el'].min():+6.3f}, {s['sun_el'].max():+6.3f}]° (lím ±{b['sun']:.2f}, "
+              f"{'OK' if inside['sun'] else 'FUERA'})  Tierra el [{s['earth_el'].min():+6.3f}, {s['earth_el'].max():+6.3f}]° "
+              f"(lím ±{b['earth']:.2f}, {'OK' if inside['earth'] else 'FUERA'})  {time.perf_counter() - t0:5.1f} s → {path.name}")
+        if not args.no_plots:
+            fig = root / "docs" / "figures" / f"ephemeris_{site['id']}.png"
+            fig.parent.mkdir(parents=True, exist_ok=True)
+            plot_series(s, site, fig)
+    print(f"Total {time.perf_counter() - t_all:.1f} s; {'todo dentro de los límites' if ok else 'HAY VALORES FUERA DE LÍMITE'}")
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
