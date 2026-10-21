@@ -1589,3 +1589,33 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** «Pin best 3» (T3.2.c) tiende a elegir planes con score 1.00 que empatan en todo, por la saturación del score (T1.4.d). Las insignias lo muestran bien (empate compartido), pero la comparación resultante dice poco. Posible mejora fuera de esta subtarea: desempatar en `bestInRange` por `earth_h_mean` o por margen de Sol.
 - **Siguiente tarea:** T3.3.e.
+
+## 2026-10-21 · T3.3.e · Scrubber global de compareTime
+
+- **Tarea:** T3.3.e — Scrubber global de compareTime ([x]).
+- **Qué se hizo:**
+  - `web/src/components/CompareScrubber.tsx`: reloj relativo «Day N, hh:mm» desde la llegada, compartido por todos los paneles. Deslizador con pasos de 30 min (una muestra), hasta la ventana más larga de la bandeja. Botones −1d, −1h, +1h y +1d, reproducción a 6 h por segundo con pausa y `aria-valuetext`. `data-last-update-ms` guarda el tiempo desde el evento hasta el final del commit que redibuja todos los paneles.
+  - Rendimiento: `HorizonSilhouette`, `TimeRibbon` y `MetricsBox` con `memo`; los trazados del terreno y de las trayectorias se memorizan (solo dependen del tamaño, la escala y los datos). Al mover el reloj solo cambian los marcadores y el cursor.
+  - Si el reloj pasa del final de la ventana de un plan más corto (bandeja con L mezcladas), su silueta muestra «Window over» en lugar de congelar los astros en la última muestra.
+  - Seleccionar un panel (título) fija `selectedPlanId` (ya existía desde T3.3.a; ahora tiene prueba).
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 95 passed
+    tray.test.tsx: moves every panel at once and records the update time (5 paneles, muestra 101 en todos)
+                   selecting a panel sets selectedPlanId
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador integrado a 1920×1080, con el panel visible y 5 planes de 347 px (uno por sitio):
+  ```
+  60 movimientos del deslizador: allPanelsMovedTogether = true
+    evento → DOM actualizado:  mediana 4.3 ms · p95 20.0 ms · máx 30.1 ms
+    commit (data-last-update-ms): mediana 3.8 ms · p95 19.5 ms · máx 28.2 ms
+  20 movimientos hasta el fotograma pintado (doble rAF, incluye ~2 × 16.7 ms de espera):
+    mediana 33.3 ms · máx 36.7 ms          → < 100 ms
+  Reproducción: 70 h → 82 h en 2 s (6 h/s), muestra 164 en los 5 paneles
+  ```
+  Con el panel del navegador oculto, la medida con rAF da ~1 s (el navegador limita los fotogramas en segundo plano). Por eso se repitió con el panel visible. En la captura de los 5 paneles las diferencias se ven sin leer números: la cinta naranja (solo Sol, sin Tierra) de Nobile, Malapert y de Gerlache frente a la verde de Connecting Ridge, y la noche azul de Haworth al principio.
+- **Decisiones tomadas:** velocidad de reproducción de 6 h/s (una ventana de 7 días en 28 s); «Window over» para planes más cortos.
+- **Desviaciones de la spec / cambios en la guía:** ninguno. La transición al modo vivir al seleccionar llega con la Fase 4 (la escena 3D aún no existe).
+- **Problemas abiertos:** ninguno. T3.3 completa.
+- **Siguiente tarea:** T3.4.a.

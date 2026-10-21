@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadPlanData, type PlanData } from "../lib/planData";
 import { sharedElevationScale } from "../lib/scale";
+import { CompareScrubber } from "../components/CompareScrubber";
 import { STRINGS } from "../lib/strings";
 import { bestBadges } from "../lib/why";
 import { useApp } from "../store/appStore";
@@ -46,6 +47,7 @@ export function Tray() {
       {ids.length === 1 && <p className="placeholder">{STRINGS.panel.pinOneMore}</p>}
       {error && <p role="alert">{error}</p>}
       <div className="tray-toolbar">
+        <CompareScrubber />
         <div className="segmented" role="group" aria-label={STRINGS.silhouette.exaggerationLabel}>
           <span className="segmented-label">{STRINGS.silhouette.exaggerationLabel}</span>
           {[null, 10, 20, 40].map((x) => (

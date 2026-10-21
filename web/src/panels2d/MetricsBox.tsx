@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { WindowRow } from "../lib/contract";
 import { STRINGS } from "../lib/strings";
 import { METRICS, whyText, type MetricKey } from "../lib/why";
@@ -8,7 +9,7 @@ interface Props {
 }
 
 /** Metrics box of a plan (spec 8.1): six metrics, "best" badges (star + word, not colour alone) and the why text. */
-export function MetricsBox({ metrics, best }: Props) {
+export const MetricsBox = memo(function MetricsBox({ metrics, best }: Props) {
   return (
     <div className="metrics-box" data-testid="metrics-box">
       <dl className="metrics-list">
@@ -31,4 +32,4 @@ export function MetricsBox({ metrics, best }: Props) {
       </p>
     </div>
   );
-}
+});

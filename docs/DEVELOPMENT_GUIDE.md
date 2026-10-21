@@ -558,7 +558,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.3.a, T3.1.d · **Spec:** 8.1, 5.5 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
 - **Aceptación:** pruebas: insignia en el panel correcto por métrica (incluidos empates); el texto cita las cifras reales del plan.
 
-##### [ ] T3.3.e — Scrubber global de compareTime
+##### [x] T3.3.e — Scrubber global de compareTime
 - **Qué:** reloj relativo (día y hora desde la llegada) que mueve todos los paneles a la vez; seleccionar un panel fija `selectedPlanId`.
 - **Archivos:** `web/src/components/CompareScrubber.tsx`
 - **Depende de:** T3.3.b, T3.3.c, T3.3.d · **Spec:** 8.1, 8.7, 10 (T3.3) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

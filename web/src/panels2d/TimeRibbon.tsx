@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { PlanWindowSeries } from "../lib/planData";
 import { sampleAt } from "../lib/planData";
 import { longestZeroRun, relativeLabel, stateRuns } from "../lib/ribbon";
@@ -17,7 +17,7 @@ const LANE_EARTH = { y: 19, h: 15 };
 const LABEL_Y = 50;
 
 /** Time ribbon of a plan (spec 8.1): Sun / Earth / both / none over the window, longest dark stretch outlined. */
-export function TimeRibbon({ series, compareTime }: Props) {
+export const TimeRibbon = memo(function TimeRibbon({ series, compareTime }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   useEffect(() => {
@@ -77,7 +77,7 @@ export function TimeRibbon({ series, compareTime }: Props) {
             />
           )}
           {/* compareTime cursor */}
-          <line x1={x(k + 0.5)} x2={x(k + 0.5)} y1={0} y2={LANE_EARTH.y + LANE_EARTH.h + 2} stroke={COLORS.text} strokeWidth={1.5} />
+          <line x1={x(Math.min(k + 0.5, series.n))} x2={x(Math.min(k + 0.5, series.n))} y1={0} y2={LANE_EARTH.y + LANE_EARTH.h + 2} stroke={COLORS.text} strokeWidth={1.5} />
           <text x={2} y={LABEL_Y} fill={COLORS.textMuted} fontSize={10}>
             {STRINGS.ribbon.lanes}
           </text>
@@ -88,4 +88,4 @@ export function TimeRibbon({ series, compareTime }: Props) {
       )}
     </div>
   );
-}
+});

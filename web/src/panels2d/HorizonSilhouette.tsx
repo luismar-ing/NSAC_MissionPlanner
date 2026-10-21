@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { PlanData } from "../lib/planData";
 import { sampleAt } from "../lib/planData";
 import { azToX, elToY, exaggerationOf, makeProjection, silhouettePath, trackPath } from "../lib/projection";
@@ -25,7 +25,7 @@ const CARDINALS: [number, string][] = [
  * position at compareTime. SVG only (rule 7: no WebGL in comparison panels). Visible bodies are filled,
  * blocked ones are hollow (shape + fill, not colour alone).
  */
-export function HorizonSilhouette({ data, scale, exaggeration, compareTime }: Props) {
+export const HorizonSilhouette = memo(function HorizonSilhouette({ data, scale, exaggeration, compareTime }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
 
@@ -42,11 +42,21 @@ export function HorizonSilhouette({ data, scale, exaggeration, compareTime }: Pr
   const { w, h } = size;
   const { series, horizon } = data;
   const k = sampleAt(series, compareTime);
-  const p = w > 0 && h > 0 ? makeProjection(w, h, scale, exaggeration) : null;
+  const over = compareTime * 60 >= series.n * series.stepMin; // shared clock past this plan's window
+  const p = useMemo(() => (w > 0 && h > 0 ? makeProjection(w, h, scale, exaggeration) : null), [w, h, scale, exaggeration]);
+  const paths = useMemo(
+    () =>
+      p && {
+        earth: trackPath(p, series.earthAz, series.earthEl, 2),
+        sun: trackPath(p, series.sunAz, series.sunEl, 2),
+        terrain: silhouettePath(p, horizon.elev_deg, horizon.az_step_deg),
+      },
+    [p, series, horizon],
+  );
 
   return (
-    <div ref={ref} className="silhouette" data-testid="silhouette" data-sample={k}>
-      {p && (
+    <div ref={ref} className="silhouette" data-testid="silhouette" data-sample={k} data-over={over}>
+      {p && paths && (
         <svg width={w} height={h} role="img" aria-label={STRINGS.silhouette.aria(data.site.name)}>
           <defs>
             <clipPath id={`clip-${data.plan.id}`}>
@@ -64,10 +74,10 @@ export function HorizonSilhouette({ data, scale, exaggeration, compareTime }: Pr
               </g>
             ))}
             {/* tracks over the whole window */}
-            <path d={trackPath(p, series.earthAz, series.earthEl, 2)} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} />
-            <path d={trackPath(p, series.sunAz, series.sunEl, 2)} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.55} />
+            <path d={paths.earth} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} />
+            <path d={paths.sun} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.55} />
             {/* terrain on top of the tracks: a body behind the terrain is hidden by it, as in reality */}
-            <path d={silhouettePath(p, horizon.elev_deg, horizon.az_step_deg)} fill={COLORS.terrain} stroke={COLORS.textMuted} strokeWidth={1} strokeOpacity={0.6} />
+            <path d={paths.terrain} fill={COLORS.terrain} stroke={COLORS.textMuted} strokeWidth={1} strokeOpacity={0.6} />
             {/* cardinal directions and the actual vertical exaggeration, above the terrain */}
             {CARDINALS.map(([az, label]) => (
               <text key={label} x={Math.min(w - 10, azToX(p, az) + 3)} y={h - 4} fill={COLORS.text} fontSize={11}>
@@ -78,14 +88,22 @@ export function HorizonSilhouette({ data, scale, exaggeration, compareTime }: Pr
               {STRINGS.silhouette.shown(exaggerationOf(p))}
             </text>
             {/* bodies at compareTime */}
-            <Earth x={azToX(p, series.earthAz[k])} y={elToY(p, series.earthEl[k])} visible={series.earthVis[k] === 1} />
-            <Sun x={azToX(p, series.sunAz[k])} y={elToY(p, series.sunEl[k])} visible={series.sunVis[k] === 1} />
+            {over ? (
+              <text x={w / 2} y={h / 2} textAnchor="middle" fill={COLORS.textMuted} fontSize={12}>
+                {STRINGS.scrubber.after}
+              </text>
+            ) : (
+              <>
+                <Earth x={azToX(p, series.earthAz[k])} y={elToY(p, series.earthEl[k])} visible={series.earthVis[k] === 1} />
+                <Sun x={azToX(p, series.sunAz[k])} y={elToY(p, series.sunEl[k])} visible={series.sunVis[k] === 1} />
+              </>
+            )}
           </g>
         </svg>
       )}
     </div>
   );
-}
+});
 
 function Sun({ x, y, visible }: { x: number; y: number; visible: boolean }) {
   const rays = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4);

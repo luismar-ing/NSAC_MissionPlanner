@@ -2,7 +2,7 @@
 /** T3.3.a: tray grid with identical panels sharing one vertical scale. */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { DataStore } from "../src/lib/data";
 import { loadPlanData, sampleAt, sliceWindow } from "../src/lib/planData";
@@ -132,5 +132,34 @@ describe("metrics box (T3.3.d)", () => {
       });
     }
     expect(boxes[0].querySelector('[data-testid="why"]')!.textContent).toContain("38.1");
+  });
+});
+
+describe("compare scrubber (T3.3.e)", () => {
+  it("moves every panel at once and records the update time", async () => {
+    const ids = ["haworth_20270309_7d", "malapert_massif_20271015_7d", "connecting_ridge_20270601_7d", "nobile_rim_1_20270101_7d", "de_gerlache_rim_2_20270801_7d"];
+    for (const id of ids) appStore.getState().pinPlan(id);
+    render(<Tray />);
+    await waitFor(() => expect(screen.getAllByTestId("silhouette")).toHaveLength(5));
+    const slider = screen.getByRole("slider", { name: /time since arrival/i }) as HTMLInputElement;
+    expect(slider.max).toBe(String(7 * 24 - 0.5));
+    fireEvent.change(slider, { target: { value: "50.5" } }); // day 3, 02:30
+    for (const s of screen.getAllByTestId("silhouette")) expect(s.dataset.sample).toBe("101");
+    expect(slider.getAttribute("aria-valuetext")).toBe("Day 3, 02:30");
+    const ms = Number(screen.getByTestId("scrubber").dataset.lastUpdateMs);
+    expect(ms).toBeGreaterThanOrEqual(0);
+    console.log(`scrubber (jsdom, 5 panels): ${ms} ms`);
+    fireEvent.click(screen.getByRole("button", { name: "Forward one day" }));
+    for (const s of screen.getAllByTestId("silhouette")) expect(s.dataset.sample).toBe("149");
+    appStore.getState().setCompareTime(0);
+  });
+
+  it("selecting a panel sets selectedPlanId", async () => {
+    appStore.getState().pinPlan("haworth_20270309_7d");
+    appStore.getState().pinPlan("malapert_massif_20271015_7d");
+    render(<Tray />);
+    const panels = await screen.findAllByTestId("plan-panel");
+    fireEvent.click(panels[1].querySelector(".plan-panel-title")!);
+    expect(appStore.getState().selectedPlanId).toBe("malapert_massif_20271015_7d");
   });
 });

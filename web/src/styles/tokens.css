@@ -464,6 +464,7 @@ button {
 
 .tray-toolbar {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-md);
   align-items: center;
   margin-bottom: var(--space-sm);
@@ -552,4 +553,33 @@ button {
   margin: var(--space-sm) 0 0;
   font-size: var(--font-sm);
   line-height: 1.4;
+}
+
+/* ------------------------------------------------------------------ compare scrubber (T3.3.e) */
+
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-sm) / 2);
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.scrubber input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+  accent-color: var(--color-text);
+}
+
+.scrubber .icon-btn {
+  font-size: var(--font-sm);
+  white-space: nowrap;
+}
+
+.scrubber-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  min-width: 12ch;
+  padding-left: var(--space-sm);
+  text-align: right;
 }

@@ -75,6 +75,14 @@ export const STRINGS = {
       `Time ribbon: Sun on the top lane, Earth on the bottom lane. Longest dark stretch ${h.toFixed(1)} h, starting ${at}.`,
     ariaNoDark: "Time ribbon: Sun on the top lane, Earth on the bottom lane. The Sun is never lost in this window.",
   },
+  scrubber: {
+    label: "Time since arrival (all panels)",
+    play: "Play the comparison clock",
+    pause: "Pause the comparison clock",
+    back: (h: number) => (h === 24 ? "Back one day" : "Back one hour"),
+    forward: (h: number) => (h === 24 ? "Forward one day" : "Forward one hour"),
+    after: "Window over",
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:
