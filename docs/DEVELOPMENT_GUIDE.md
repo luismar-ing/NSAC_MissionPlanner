@@ -134,7 +134,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.2.b · **Spec:** 5.1, 10 (T0.2) · **Decisiones:** D4 · **Est.:** 1.5 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_spice_load.py -v` pasa; la distancia Tierra–Luna calculada está entre ~356 000 y ~407 000 km; la cobertura incluye todo el rango.
 
-##### [ ] T0.2.d — Identificar el producto DEM LOLA del polo sur (verificación)
+##### [x] T0.2.d — Identificar el producto DEM LOLA del polo sur (verificación)
 - **Qué:** en el PDS Geosciences Node, elegir el producto LOLA de polo sur (80°S–90°S) con resolución de decenas de m/píxel. Registrar ID del producto, URL, resolución, proyección (parámetros del label), radio de referencia de las alturas, tamaño y cita. Valorar tamaño frente a tiempo de cómputo (R_max = 100 km).
 - **Archivos:** `data/README.md`
 - **Depende de:** T0.1.a · **Spec:** 5.2, 6 · **Decisiones:** D3 · **Est.:** 2 h

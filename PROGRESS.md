@@ -352,3 +352,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** se añade `pipeline/config.py`.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T0.2.d.
+
+## 2026-10-21 · T0.2.d · Identificar el producto DEM LOLA del polo sur (verificación)
+
+- **Tarea:** T0.2.d — Identificar el producto DEM LOLA del polo sur ([x]).
+- **Qué se hizo:** revisión del listado de productos polares de PGDA (NASA GSFC, producto 90) y de la documentación ODE/PDS; lectura de la cabecera del COG remoto con rasterio (`/vsicurl/`). Elegido `LDEM_80S_40MPP_ADJ.TIF` y registrado en `data/README.md` con proyección, referencia de alturas, tamaño y cita.
+- **Cómo se verificó:**
+  ```
+  === LDEM_80S_40MPP_ADJ.TIF  HTTP 200 716299920 bytes
+  === LDEM_80S_80MPP_ADJ.TIF  HTTP 200 189158392 bytes
+  driver GTiff | size 15200 x 15200 | dtype ('float32',) | nodata nan
+  res (40.0, 40.0) | bounds BoundingBox(left=-304000.0, bottom=-304000.0, right=304000.0, top=304000.0)
+  overviews [2, 4, 8, 16, 32] | blocks [(512, 512)]
+  band1 tags {'actual_range': '{-7296.54248046875,7026.8134765625}', ...}
+  PROJ: +proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +x_0=0 +y_0=0 +R=1737400 +units=m +no_defs=True
+  ```
+  Referencia de alturas: Barker et al. 2023 («elevation above the reference sphere»; «projection radius of 1737.4 km»; «MOON_ME frame of DE421»). La página ODE GDRDEM indica que HEIGHT es relativa a una esfera de referencia (`OFFSET`).
+- **Decisiones tomadas:** DEM de 40 m de PGDA (alternativa de respaldo: el de 80 m). Radio de referencia de las alturas: 1 737 400 m. MOON_ME recomendado para T1.1.b, porque el DEM está en MOON_ME de DE421 y nuestro MOON_ME es `MOON_ME_DE440_ME421`.
+- **Desviaciones de la spec / cambios en la guía:** la spec sugiere el PDS Geosciences Node como fuente; se usa PGDA (archivo del equipo LOLA en NASA GSFC, producto más reciente y con DOI). Motivo en `data/README.md`.
+- **Problemas abiertos:** la página PGDA no declara una licencia explícita, solo pide citar el artículo. Si hiciera falta, se consulta al humano antes de la entrega.
+- **Siguiente tarea:** T0.2.e (descarga de 716 MB).

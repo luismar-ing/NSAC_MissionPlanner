@@ -26,8 +26,18 @@ Notas de la selección:
 
 ## DEM LOLA del polo sur (T0.2.d)
 
-| Producto | URL | Resolución | Proyección | Radio de referencia | Tamaño | SHA-256 | Fecha | Cita |
+Fuente: NASA GSFC Planetary Geodynamics Data Archive (PGDA), producto «A New View of the Lunar South Pole from LOLA», https://pgda.gsfc.nasa.gov/products/90 (DOI de los datos: 10.60903/gsfcpgda-lola-spole). Verificado el 2026-10-21: URL HTTP 200; metadatos leídos de la cabecera del GeoTIFF remoto con rasterio.
+
+| Producto | URL | Resolución | Proyección (de la cabecera) | Referencia de alturas | Tamaño (bytes) | SHA-256 | Fecha | Cita |
 |---|---|---|---|---|---|---|---|---|
+| `LDEM_80S_40MPP_ADJ.TIF` (COG, float32, nodata NaN, 15 200 × 15 200, overviews 2–32) | https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_40MPP_ADJ.TIF | 40 m/píxel, 80°S–90°S (x, y en ±304 000 m) | `+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m` (IAU 30135, «Moon (2015) - Sphere / Ocentric / South Polar»); coordenadas en MOON_ME de DE421 | Altura en m sobre la esfera de referencia de 1 737 400 m (rango −7 296.5 a +7 026.8 m) | 716 299 920 | | | Barker, M. K. et al. 2023, *Planetary Science Journal* 4, 183, doi:10.3847/PSJ/acf3e1 |
+
+Notas de la selección:
+- **Fuente:** la spec sugiere el PDS Geosciences Node. Se usa PGDA, que es el archivo del equipo LOLA en NASA GSFC: tiene el producto polar más reciente («ADJ», ajustado, Barker et al. 2023), con DOI, en GeoTIFF COG legible con rasterio. Los productos GDR polares de PDS (ODE) son anteriores; ODE lista, por ejemplo, `LDEM_80S_20M` con 30 400 × 30 400 píxeles en 16 bits.
+- **Resolución:** 40 m cumple «decenas de metros» (spec 6) y cubre 80°S–90°S, lo que deja ≥ 100 km de margen (R_max, 5.2) alrededor de sitios hasta ~83°S. Alternativas del mismo producto: `LDEM_80S_80MPP_ADJ.TIF` (189 158 392 bytes; respaldo si el cómputo es lento) y `LDEM_80S_20MPP_ADJ.TIF` (2,6 GB; descartado por tamaño).
+- **Referencia de alturas:** el artículo habla de «elevation above the reference sphere» con un radio de proyección de 1737.4 km, y la convención de los LOLA GDR en PDS es HEIGHT relativa a una esfera de referencia (`OFFSET`). Se toma 1 737 400 m, la esfera del CRS. El rango de valores de la cabecera es coherente con ello.
+- **Marco:** MOON_ME de DE421. El marco `MOON_ME` de nuestros kernels es `MOON_ME_DE440_ME421`, alineado con el ME de DE421 (FK `moon_de440_250416.tf`). Por eso conviene usar MOON_ME en T1.1.b.
+- **Uso:** la página no declara una licencia; pide citar Barker et al. 2023 («Data Usage Policy»). Se cita en el README y en la interfaz (regla 12).
 
 ## Texturas (T0.2.f)
 
