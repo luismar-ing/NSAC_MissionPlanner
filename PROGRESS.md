@@ -982,3 +982,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** cierre de la Fase 1 → hito de demo y parada.
+
+## 2026-10-21 · HITO FASE 1 · Núcleo científico del sitio cerrado
+
+- **Estado de la guía:** Fases 0 y 1 completas (16 + 21 subtareas). Total: 37 [x], 71 [ ], 0 [!].
+- **Comprobación del hito** (con `pipeline/out/` borrado antes):
+  ```
+  $ python -m pipeline.ephemeris     → Total 6.5 s; todo dentro de los límites
+  $ python -m pipeline.horizon       → Total 6.0 s para 5 sitio(s)
+  $ python -m pipeline.visibility    → Sanity 5.7: control ≈ 0 % de Sol → 0.00 %; todos los sitios > control → True
+  $ python -m pipeline.windows       → 20 archivos escritos en 0.2 s; validación del contrato: OK
+  $ python -m pipeline.plans         → contrato + comprobaciones cruzadas: OK
+  Cadena completa desde cero: 23 s      (plans.json idéntico byte a byte: git sin cambios)
+  $ python -m pytest pipeline/tests -q → 217 passed (0 skipped)
+  $ python -m pipeline.report_site --site connecting_ridge --arrival 2027-06-01 --window 7 → sun 100 %, dark 0 h, Earth 24 h/día, score 1.0
+  ```
+- **Resultados científicos clave:**
+  - Az/el del Sol y la Tierra validados contra JPL Horizons en 70 comparaciones: peor error **0.0016″** (criterio < 0.05°), con controles negativos (MOON_PA ≈ 100″; sin aberración ≈ 21″).
+  - Sol visible en el año: Connecting Ridge 95.1 %, de Gerlache Rim 2 87.9 %, Haworth 78.6 %, Malapert 76.5 %, Nobile Rim 1 71.1 %; control en el fondo de Shackleton 0.0 %.
+  - Tierra visible: Malapert 77.0 %, Nobile 74.3 %, Haworth 71.6 %, Connecting Ridge 60.1 %, de Gerlache 53.1 %.
+  - Hallazgo documentado: el rango ±1.6° de la spec solo vale en el polo; los límites dependen de la latitud (`docs/validation.md` §2).
+- **Pendiente para el humano:** confirmar la corrección de los límites de 5.7. Decisiones que bloquean parte de la Fase 2: **D8** (escala 3D y despegue, T2.4.a), **D9** (terreno Nivel B, T2.3.d-e), **D10** (características y radio de pendiente, T2.3.a-c). D1 y D11 siguen pendientes.
+- **Siguiente tarea:** Fase 2 (T2.1.a no depende de decisiones pendientes).
