@@ -704,3 +704,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ⚠️ **el rango ±1.6° de la elevación del Sol (spec 5.7 y aceptación de T1.1) solo vale en el polo exacto.** Horizons da hasta |el| = 5.14° en Haworth y 4.82° en Nobile Rim 1, y los 5 sitios lo superan. Explicación: el horizonte local de un sitio a latitud φ está inclinado (90° − |φ|), así que |el| ≤ (90° − |φ|) + ~1.6°; los 5 sitios cumplen ese límite. Criterio adoptado: Sol |el| ≤ colat + 1.6°, Tierra |el| ≤ colat + 7.0° (`docs/validation.md` §2). Corregidas la aceptación de T1.1.c, T1.1.e y T1.5.b en la guía y la referencia a 5.7 en el protocolo de `CLAUDE.md`. El espíritu de 5.7 (fuera de rango = error de marcos o signos) se mantiene.
 - **Problemas abiertos:** avisar al humano de esta corrección de la spec (paso h; también afecta al guion de la demo, que dice que el Sol «apenas roza el horizonte»: sigue siendo cierto, con ±2 a ±5° según el sitio).
 - **Siguiente tarea:** T1.1.b.
+
+## 2026-10-21 · T1.1.b · Observador y marco ENU
+
+- **Tarea:** T1.1.b — Observador y marco ENU ([x]).
+- **Qué se hizo:** `pipeline/ephemeris.py` con `MOON_FRAME = "MOON_ME"`, `observer_position_km` (radio = 1737.4 km + elevación del DEM + h_obs; latitud planetocéntrica y longitud este), `enu_basis` (filas E, N, U en MOON_ME; U radial, N hacia el polo norte a lo largo del meridiano, E × N = U) y `az_el_deg` (azimut N→E en [0, 360) y elevación).
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_enu.py -v
+  test_basis_is_orthonormal_and_right_handed[×5 puntos] PASSED   (|M·Mᵀ − I| < 1e-12, |E×N − U| < 1e-12)
+  test_up_is_radial_and_north_points_to_the_pole[×5] PASSED       (U = r̂, N = proyección del eje polar, E·ẑ = 0)
+  test_known_point_on_the_equator PASSED                          (lat 0, lon 0 → E=ŷ, N=ẑ, U=x̂)
+  test_observer_radius_and_spice_agreement PASSED                 (coincide con spiceypy.latrec, < 1e-9 km)
+  test_az_el_conventions PASSED                                   (N=0°, E=90°, S=180°, O=270°, como Horizons)
+  13 passed in 0.30s
+  ```
+  Puntos de prueba: los sitios reales Malapert Massif (−85.99°) y Connecting Ridge (−89.44°), más puntos generales.
+- **Decisiones tomadas:** **MOON_ME** (spec 5.1 pide documentar la elección): es el marco del DEM LOLA (MOON_ME de DE421) y el que usa Horizons para los sitios («MEAN_ME»). Cenit = radial sobre la esfera de 1737.4 km, igual que Horizons.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T1.1.c.

@@ -200,7 +200,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T0.3.b · **Spec:** 5.1, 5.7, 6, 10 (T1.1) · **Decisiones:** D3, D4 · **Est.:** 2.5 h
 - **Aceptación:** archivos de referencia guardados con su encabezado de consulta; `docs/validation.md` describe interfaz, parámetros, radio de referencia y convención de azimut (y la conversión si no es N→E).
 
-##### [ ] T1.1.b — Observador y marco ENU
+##### [x] T1.1.b — Observador y marco ENU
 - **Qué:** posición del observador en el marco lunar (MOON_ME o MOON_PA: elegir y documentar) desde lat, lon y radio = radio de referencia del DEM + `elevation_m` + h_obs; base ENU en ese punto.
 - **Archivos:** `pipeline/ephemeris.py`, `pipeline/tests/test_enu.py`
 - **Depende de:** T0.2.c, T0.3.b · **Spec:** 5.1 · **Decisiones:** D12 · **Est.:** 2 h
