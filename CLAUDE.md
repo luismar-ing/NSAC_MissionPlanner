@@ -64,7 +64,7 @@ a. **Leer:** `CLAUDE.md`, la última entrada de `PROGRESS.md`, `docs/DECISIONS.m
 b. **Elegir** la primera subtarea `[ ]` (en el orden de la guía) cuyas dependencias estén en `[x]` y que no esté bloqueada por una decisión pendiente (reglas de elegibilidad al inicio de la guía). Si todas están bloqueadas, pregunta solo las decisiones necesarias y detente.
 c. **Releer** las secciones de `docs/SPEC.md` que cita la subtarea.
 d. **Implementar solo esa subtarea.** Marcarla `[~]` mientras dura.
-e. **Verificar** el criterio de aceptación con pruebas o comandos reales y mostrar la salida. Nunca marcar `[x]` sin evidencia. Para lo científico, comparar con los rangos de 5.7 y con JPL Horizons.
+e. **Verificar** el criterio de aceptación con pruebas o comandos reales y mostrar la salida. Nunca marcar `[x]` sin evidencia. Para lo científico, comparar con los rangos de 5.7 (corregidos por latitud en `docs/validation.md` §2) y con JPL Horizons.
 f. **Cerrar:** actualizar el estado en la guía, añadir una entrada a `PROGRESS.md` (plantilla incluida allí) y hacer un commit por subtarea con el formato `T1.2.a: descripción`.
 g. **Seguir** con la siguiente subtarea mientras no haya bloqueo. Al cerrar cada fase, detenerse y dar al humano un resumen y las instrucciones para probar el hito de demo.
 h. **Corregir la guía** si resulta incorrecta o incompleta, y anotar el cambio en `PROGRESS.md`. No desviarse de la spec sin documentar el porqué.

@@ -194,7 +194,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 
 ### T1.1 ephemeris.py: az/el del Sol y la Tierra en ENU (spec 5.1)
 
-##### [ ] T1.1.a — Referencias de JPL Horizons (verificación)
+##### [x] T1.1.a — Referencias de JPL Horizons (verificación)
 - **Qué:** averiguar cómo pedir a Horizons una tabla de observador para un punto de la superficie lunar (coordenadas del sitio sobre el cuerpo 301) con azimut y elevación del Sol y de la Tierra, sin refracción, y qué corrección aplica (aparente o astrométrica) para igualarla a LT+S. Comprobar el radio o la forma de referencia que usa Horizons frente al del DEM y su convención de azimut. Obtener al menos 5 instantes × 2 sitios repartidos por el rango D4 y guardar la salida cruda con los parámetros de la consulta.
 - **Archivos:** `pipeline/tests/reference/horizons_*.txt`, `pipeline/horizons_fetch.py` (opcional), `docs/validation.md`
 - **Depende de:** T0.3.b · **Spec:** 5.1, 5.7, 6, 10 (T1.1) · **Decisiones:** D3, D4 · **Est.:** 2.5 h
@@ -210,7 +210,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Qué:** vectores del Sol y la Tierra respecto al observador con corrección LT+S (spkpos como dice 5.1, o spkcpo para un observador en superficie: documentar), transformación a ENU, azimut 0–360° desde el Norte hacia el Este y elevación, sobre una rejilla temporal.
 - **Archivos:** `pipeline/ephemeris.py`, `pipeline/tests/test_ephemeris.py`
 - **Depende de:** T1.1.b · **Spec:** 5.1, 5.7 · **Decisiones:** — · **Est.:** 3 h
-- **Aceptación:** prueba para un sitio y 30 días a 30 min: la elevación del Sol queda en [−1.6°, +1.6°], la de la Tierra a pocos grados del horizonte y los azimuts en [0, 360).
+- **Aceptación:** prueba para un sitio y 30 días a 30 min: |sun_el| ≤ (90° − |lat|) + 1.6°, |earth_el| ≤ (90° − |lat|) + 7.0° (límites de `docs/validation.md` §2, que corrigen el ±1.6° de 5.7, válido solo en el polo) y azimuts en [0, 360).
 
 ##### [ ] T1.1.d — Comparación contra Horizons
 - **Qué:** prueba que compara contra las referencias de T1.1.a y escribe la tabla de errores (borrador) en `docs/validation.md`. Error medido como separación angular, o en elevación y azimut·cos(el) (documentar).
@@ -222,7 +222,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Qué:** az/el del Sol y la Tierra para el rango D4 con paso de 30 min (parametrizable a 10) para todos los sitios; intermedios en `pipeline/out/`; figura de verificación de las elevaciones a lo largo del año.
 - **Archivos:** `pipeline/ephemeris.py`, `docs/figures/ephemeris_{site}.png`
 - **Depende de:** T1.1.d · **Spec:** 5.1, 5.7 · **Decisiones:** D4 · **Est.:** 2 h
-- **Aceptación:** el comando imprime el tiempo de ejecución y el mínimo y máximo de `sun_el` y `earth_el` por sitio, dentro de los rangos de 5.7; figuras generadas.
+- **Aceptación:** el comando imprime el tiempo de ejecución y el mínimo y máximo de `sun_el` y `earth_el` por sitio, dentro de los límites por latitud de `docs/validation.md` §2; figuras generadas.
 
 ### T1.2 horizon.py: máscara de horizonte (spec 5.2)
 
@@ -317,7 +317,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Aceptación:** `python -m pipeline.validate` pasa; el número de planes es el esperado según D6; la comprobación cruzada confirma lanzamiento derivado y sitio válido en todos.
 
 ##### [ ] T1.5.b — Suite automática de sanity checks (5.7)
-- **Qué:** pruebas sobre las salidas reales (se saltan si no existen): rangos de elevación del Sol y la Tierra, cresta > fondo de cráter, porcentajes en [0, 100].
+- **Qué:** pruebas sobre las salidas reales (se saltan si no existen): límites de elevación del Sol y la Tierra por latitud (`docs/validation.md` §2), cresta > fondo de cráter, porcentajes en [0, 100].
 - **Archivos:** `pipeline/tests/test_sanity.py`
 - **Depende de:** T1.5.a · **Spec:** 5.7, 11 regla 4 · **Decisiones:** — · **Est.:** 1 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_sanity.py -v` pasa sobre los datos reales.

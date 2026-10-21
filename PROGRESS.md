@@ -676,3 +676,31 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 
 - **Qué:** el humano confirmó en el chat los 5 sitios (Connecting Ridge, Haworth, Nobile Rim 1, Malapert Massif y de Gerlache Rim 2) y el método (cota máxima del DEM dentro de la región oficial USGS). Anotado en la fila de D3 de `docs/DECISIONS.md`. También autorizó el push de los commits del hito de la Fase 0.
 - **Siguiente tarea:** T1.1.a.
+
+## 2026-10-21 · T1.1.a · Referencias de JPL Horizons (verificación)
+
+- **Tarea:** T1.1.a — Referencias de JPL Horizons ([x]).
+- **Qué se hizo:**
+  - Documentación de la API de Horizons revisada y una consulta de prueba para comprobar `CENTER='coord@301'` y leer las convenciones de la cabecera y el pie.
+  - `pipeline/horizons_fetch.py`: consulta OBSERVER (QUANTITIES=4, AIRLESS, DEG, CSV) por sitio y objetivo; guarda la respuesta cruda con sus parámetros; `parse` y `--check` para releerlas sin red.
+  - 10 referencias en `pipeline/tests/reference/` (5 sitios × Sol y Tierra × 7 instantes de 2027).
+  - `docs/validation.md` §1 (método y convenciones) y §2 (hallazgo del rango del Sol).
+  - `pipeline/tests/test_horizons_refs.py` (10 pruebas).
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.horizons_fetch
+  connecting_ridge   sun   7 filas  el [ -1.988,  +1.323]°  centro: MEAN_ME (high precision) | Sun (10) {source: DE441}
+  connecting_ridge   earth 7 filas  el [ -6.732,  +5.879]°  ...
+  haworth            sun   7 filas  el [ -2.944,  +5.140]°  ...
+  nobile_rim_1       sun   7 filas  el [ -4.817,  +3.682]°  ...
+  malapert_massif    sun   7 filas  el [ -3.031,  +5.040]°  ...
+  malapert_massif    earth 7 filas  el [ -2.283, +10.244]°  ...
+  de_gerlache_rim_2  sun   7 filas  el [ -2.585,  +2.562]°  ...
+  $ python -m pytest pipeline/tests/test_horizons_refs.py   → 10 passed
+  $ python -m pytest -q                                      → 128 passed
+  ```
+  Convenciones leídas en la propia respuesta: marco del sitio «MEAN_ME (high precision)»; esfera «1737.4, 1737.4, 1737.4 km»; azimut «clockwise from north: North(0) → East(90)»; «Compensated for light-time, the gravitational deflection of light, stellar aberration»; efemérides «DE441».
+- **Decisiones tomadas:** altitud de la consulta = (elevación del DEM + h_obs) / 1000 km, porque Horizons y el DEM usan la misma esfera de 1737.4 km. T1.1.b usará **MOON_ME**, el marco de Horizons y del DEM. Las diferencias DE440 (nuestro) / DE441 (Horizons) se medirán en T1.1.d.
+- **Desviaciones de la spec / cambios en la guía:** ⚠️ **el rango ±1.6° de la elevación del Sol (spec 5.7 y aceptación de T1.1) solo vale en el polo exacto.** Horizons da hasta |el| = 5.14° en Haworth y 4.82° en Nobile Rim 1, y los 5 sitios lo superan. Explicación: el horizonte local de un sitio a latitud φ está inclinado (90° − |φ|), así que |el| ≤ (90° − |φ|) + ~1.6°; los 5 sitios cumplen ese límite. Criterio adoptado: Sol |el| ≤ colat + 1.6°, Tierra |el| ≤ colat + 7.0° (`docs/validation.md` §2). Corregidas la aceptación de T1.1.c, T1.1.e y T1.5.b en la guía y la referencia a 5.7 en el protocolo de `CLAUDE.md`. El espíritu de 5.7 (fuera de rango = error de marcos o signos) se mantiene.
+- **Problemas abiertos:** avisar al humano de esta corrección de la spec (paso h; también afecta al guion de la demo, que dice que el Sol «apenas roza el horizonte»: sigue siendo cierto, con ±2 a ±5° según el sitio).
+- **Siguiente tarea:** T1.1.b.
