@@ -410,7 +410,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T2.1.a, T1.5.a, T2.2.a · **Spec:** 5.8, 7.2 · **Decisiones:** D5 · **Est.:** 3 h
 - **Aceptación:** pruebas: tiempos monótonos; sin saltos (distancia entre muestras consecutivas < umbral documentado); el último punto coincide con la posición SPICE del sitio en `arrival_utc` (< 1 km); `mode` correcto.
 
-##### [ ] T2.2.c — Generación por lotes, tamaño y documentación ILLUSTRATIVE
+##### [x] T2.2.c — Generación por lotes, tamaño y documentación ILLUSTRATIVE
 - **Qué:** trayectorias para todos los `trajectory_id` según D6, compactadas (submuestreo adaptativo o cuantización); modo en el manifiesto; nota en `PROGRESS.md` y `README.md` (exigido por 5.8); texto de la etiqueta para la UI.
 - **Archivos:** `pipeline/trajectory.py`, `README.md`, `PROGRESS.md`, `docs/figures/trajectory_*.png`
 - **Depende de:** T2.2.b · **Spec:** 5.8, 8.7, 14 · **Decisiones:** D6, D13 · **Est.:** 2 h

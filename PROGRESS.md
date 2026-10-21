@@ -1112,3 +1112,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** la primera versión bajaba a 6 331 km durante el despegue (mezcla lineal de dos puntos sobre esferas); corregido y cubierto por la prueba.
 - **Siguiente tarea:** T2.2.c.
+
+## 2026-10-21 · T2.2.c · Generación por lotes, tamaño y documentación ILLUSTRATIVE
+
+- **Tarea:** T2.2.c — Trayectorias por lotes ([x]).
+- **Qué se hizo:** `main` y `plot_examples` en `pipeline/trajectory.py` (`python -m pipeline.trajectory [--plot]`): una trayectoria por `trajectory_id` de `plans.json` (D6: sitio × día de llegada, compartida por las tres L) en `pipeline/out/trajectory/`. Figura `docs/figures/trajectory_examples.png`. Comando en `CLAUDE.md`.
+- **Documentación ILLUSTRATIVE (exigida por 5.8):**
+  - Ninguna trayectoria es real: todas llevan `mode: "ILLUSTRATIVE"` y el manifiesto llevará `trajectory_mode: "ILLUSTRATIVE"` (T2.4.a).
+  - Construcción: despegue desde una plataforma genérica (0°, 0°), órbita de espera de 200 km, inyección a +2 h, arco de Hermite hasta 8 000 km de la Luna real (SPICE) 12 h antes de llegar, y descenso hasta el sitio exactamente en la hora de llegada. Parámetros de diseño, no datos de misión.
+  - Texto de la etiqueta para la interfaz (README): *«ILLUSTRATIVE trajectory — simplified, computed with the real Moon position; not a real mission trajectory.»* Estela punteada (spec 9).
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.trajectory --plot
+  1825 trayectorias (ILLUSTRATIVE) en 14.0 s; tamaño total 8.62 MB (4.7 kB cada una); validadas 25 al azar: OK
+  figura: docs\figures\trajectory_examples.png
+  ```
+  Revisión visual de la figura: 3 trayectorias (enero, mayo y septiembre) salen de la Tierra y terminan en la posición SPICE de la Luna en la llegada, con curvas suaves. Las pruebas de T2.2.b (20 casos) siguen pasando.
+- **Decisiones tomadas:** sin compactación extra. 8.62 MB caben en D13 (< 50 MB), se cargan de una en una bajo demanda (~4.7 kB) y el hosting estático suele servirlas comprimidas (gzip).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** el total se revisará en T2.4.b junto al resto. Si hiciera falta reducirlo, la opción es cuantizar las posiciones de la fase de transferencia a 1 km.
+- **Siguiente tarea:** T2.3.a.

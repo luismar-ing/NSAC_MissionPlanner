@@ -64,7 +64,7 @@ Everything is precomputed offline; the browser only filters and draws.
 
 - Sun, Earth and Moon positions and the Moon's orientation come from NASA/JPL SPICE kernels.
 - Terrain comes from LRO LOLA elevation data.
-- Trajectories are **ILLUSTRATIVE**: simplified curves computed with the real Moon position, not the trajectory of any real mission.
+- Trajectories are **ILLUSTRATIVE**: simplified curves computed with the real Moon position, not the trajectory of any real mission. Launch from a generic pad, 200 km parking orbit, a smooth transfer arc to the Moon and a descent that reaches the site exactly at the arrival time (`pipeline/trajectory.py`). In the app the trail is dashed and labelled: *“ILLUSTRATIVE trajectory — simplified, computed with the real Moon position; not a real mission trajectory.”*
 - Any data marked **SYNTHETIC** is generated for development only and is never presented as real.
 
 ## Data sources & credits

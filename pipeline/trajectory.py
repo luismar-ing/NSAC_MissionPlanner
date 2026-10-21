@@ -192,3 +192,82 @@ def build(site: dict, arrival: datetime, geo: Geometry | None = None) -> dict:
         "phases": {"launch_utc": iso(ph.launch), "injection_utc": iso(ph.injection),
                    "lunar_arrival_utc": iso(ph.lunar_arrival), "landing_utc": iso(ph.landing)},
     }
+
+
+# ---------------------------------------------------------------- generación por lotes (T2.2.c)
+
+
+def main(argv=None) -> int:
+    import argparse
+    import json
+    import sys
+    import time
+    from pathlib import Path
+
+    from pipeline.validate import validate_file
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    ap = argparse.ArgumentParser(description="Trayectorias ILLUSTRATIVE de todos los planes (T2.2.c)")
+    ap.add_argument("--plot", action="store_true", help="figura de verificación con 3 trayectorias")
+    args = ap.parse_args(argv)
+    root = Path(__file__).resolve().parents[1]
+    out = root / "pipeline" / "out" / "trajectory"
+    out.mkdir(parents=True, exist_ok=True)
+    sites = {s["id"]: s for s in json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8"))}
+    plans = json.loads((root / "pipeline" / "plans.json").read_text(encoding="utf-8"))
+    ids = {}
+    for p in plans:  # una trayectoria por trajectory_id (compartida por las tres L)
+        ids.setdefault(p["trajectory_id"], (p["site_id"], p["arrival_utc"]))
+    geo = Geometry()
+    t0 = time.perf_counter()
+    total = 0
+    for tid, (sid, arr) in ids.items():
+        tr = build(sites[sid], datetime.strptime(arr, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc), geo)
+        path = out / f"{tid}.json"
+        path.write_text(json.dumps(tr, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
+        total += path.stat().st_size
+    elapsed = time.perf_counter() - t0
+    sample = list(ids)[:: max(1, len(ids) // 25)]
+    errors = [e for tid in sample for e in validate_file(out / f"{tid}.json", "trajectory")[1]]
+    print(f"{len(ids)} trayectorias ({MODE}) en {elapsed:.1f} s; tamaño total {total / 1e6:.2f} MB "
+          f"({total / len(ids) / 1e3:.1f} kB cada una); validadas {len(sample)} al azar: {'OK' if not errors else errors[:3]}")
+    if args.plot:
+        plot_examples(root, [ids_key for ids_key in list(ids)[:: len(ids) // 3][:3]], out, geo)
+    return 0 if not errors else 1
+
+
+def plot_examples(root, tids, out, geo) -> None:
+    import json
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure(figsize=(14, 5), dpi=110)
+    for i, tid in enumerate(tids):
+        tr = json.loads((out / f"{tid}.json").read_text(encoding="utf-8"))
+        p = np.array(tr["pos_km"]) / 1e3
+        t0 = datetime.strptime(tr["t0_utc"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        moon = np.array([geo.moon_pos(geo.et(t0 + timedelta(seconds=float(t)))) for t in tr["t_s"]]) / 1e3
+        ax = fig.add_subplot(1, 3, i + 1, projection="3d")
+        ax.plot(*p.T, color="#ffb347", lw=1.2, ls="--", label="ILLUSTRATIVE trajectory")
+        ax.plot(*moon.T, color="#9aa4b5", lw=0.8, label="Moon (SPICE)")
+        ax.scatter(0, 0, 0, color="#4aa3ff", s=30, label="Earth")
+        ax.scatter(*moon[-1], color="#e6edf7", s=12)
+        ax.set_title(f"{tid}\n{tr['phases']['launch_utc'][:16]} → {tr['phases']['landing_utc'][:16]}", fontsize=8)
+        ax.set_xlabel("x (10³ km)", fontsize=7); ax.set_ylabel("y", fontsize=7); ax.set_zlabel("z", fontsize=7)
+        ax.tick_params(labelsize=6)
+        if i == 0:
+            ax.legend(fontsize=6, loc="upper left")
+    fig.suptitle("ILLUSTRATIVE trajectories (not a real mission trajectory), J2000 Earth-centred", fontsize=10)
+    fig.tight_layout()
+    path = root / "docs" / "figures" / "trajectory_examples.png"
+    fig.savefig(path)
+    plt.close(fig)
+    print(f"figura: {path.relative_to(root)}")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
