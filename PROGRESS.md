@@ -791,3 +791,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T1.2.a (T1.1 completa).
+
+## 2026-10-21 · T1.2.a · Utilidades de DEM y proyección
+
+- **Tarea:** T1.2.a — Utilidades de DEM y proyección ([x]).
+- **Qué se hizo:** `pipeline/dem.py` con:
+  - `latlon_to_xy` y `xy_to_latlon` (CRS del DEM).
+  - `ray_points_xy`: rayos del horizonte como círculos máximos sobre la esfera de 1 737 400 m con azimut local N→E (`pyproj.Geod`), proyectados después al mapa.
+  - `DemWindow` (lectura de una ventana y muestreo bilineal respecto a centros de píxel, con NaN fuera).
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_dem.py -q
+  37 passed
+  ```
+  - Ida y vuelta lat/lon → x/y → lat/lon < 1 m en 4 puntos (incluidos el borde del DEM y la antimeridiana).
+  - Punto de referencia del label: el polo (lat_0 = −90°) cae en (0, 0); meridiano 0° → +y y 90°E → +x (convención de `sites_map.png`); escala real en el polo (1° ≈ 30.32 km).
+  - Rayos en los 5 sitios: distancia exacta (< 1 m hasta 100 km) y azimut de salida exacto (< 1e-6°); az = 0 aumenta la latitud y az = 90 la longitud.
+  - **Coherencia horizonte ↔ efemérides:** en los 5 sitios × 5 azimuts, el azimut de un rayo coincide con el de `ephemeris.az_el_deg` (< 0.01°). Sol, Tierra y máscara comparten convención.
+  - Bilineal exacto en un plano; en el DEM real, el valor en el punto de Malapert es su `elevation_m`.
+- **Decisiones tomadas:** los rayos se trazan sobre la esfera y no en el plano del mapa: en el polo el «norte del mapa» no es el norte local, y la escala de la estereográfica varía (~0.1–0.3 % a 100 km).
+- **Desviaciones de la spec / cambios en la guía:** ninguno (5.2 pide «convertir coordenadas con cuidado»).
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T1.2.c.

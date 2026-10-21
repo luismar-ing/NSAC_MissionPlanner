@@ -226,7 +226,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 
 ### T1.2 horizon.py: máscara de horizonte (spec 5.2)
 
-##### [ ] T1.2.a — Utilidades de DEM y proyección
+##### [x] T1.2.a — Utilidades de DEM y proyección
 - **Qué:** conversión lat/lon ↔ x/y del DEM con el CRS del label, muestreo bilineal y tamaño de píxel.
 - **Archivos:** `pipeline/dem.py`, `pipeline/tests/test_dem.py`
 - **Depende de:** T0.2.e · **Spec:** 5.2 (notas) · **Decisiones:** — · **Est.:** 2 h
