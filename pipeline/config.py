@@ -31,6 +31,9 @@ HORIZON_AZ_STEP_DEG = 1.0
 HORIZON_R_MAX_KM = 100.0
 SCORE_WEIGHTS = {"w1": 0.4, "w2": 0.3, "w3": 0.3}
 
+# D10: características del sitio (5.10)
+SLOPE_RADIUS_M = 1000.0
+
 
 def timeseries_range() -> tuple[datetime, datetime]:
     """[inicio, fin) de las series del sitio (contrato §2)."""

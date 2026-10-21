@@ -1132,3 +1132,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** el total se revisará en T2.4.b junto al resto. Si hiciera falta reducirlo, la opción es cuantizar las posiciones de la fase de transferencia a 1 km.
 - **Siguiente tarea:** T2.3.a.
+
+## 2026-10-21 · T2.3.a · Pendiente desde el DEM
+
+- **Tarea:** T2.3.a — Pendiente desde el DEM ([x]).
+- **Qué se hizo:** `pipeline/site_features.py` con `polar_scale_factor` (k = 2/(1 + sen|φ|)), `slope_deg_grid` (gradiente central sobre la malla; pendiente real = atan(k·|∇z|)) y `slope_stats` (media y máximo en un círculo de radio real de 1 km, que mide k·1 km en el mapa). `SLOPE_RADIUS_M = 1000` en `config.py` (D10).
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_site_features.py -v
+  test_scale_factor PASSED
+  test_tilted_plane_known_slope[lat −90 y −85 × 2°, 5°, 15°, 30°] PASSED   (media y máx con error < 0.1°)
+  test_cone PASSED                                                          (cono de 20°: máx 20 ± 0.1°)
+  test_radius_scales_with_projection PASSED
+  11 passed
+  ```
+  Pendientes reales en un radio de 1 km alrededor de cada sitio (informativo; se publicarán en T2.3.c):
+  ```
+  connecting_ridge   media  8.58°  máx 20.20°
+  haworth            media  8.12°  máx 19.22°
+  nobile_rim_1       media  7.70°  máx 23.59°
+  malapert_massif    media  7.14°  máx 25.30°
+  de_gerlache_rim_2  media 12.99°  máx 24.17°
+  ```
+- **Decisiones tomadas:** corrección de escala explícita aunque k ≤ 1.002 en los sitios. Los planos de prueba se construyen con el gradiente del mapa = tan(pendiente)/k, así la prueba comprueba la corrección.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** de Gerlache Rim 2 tiene la pendiente media más alta (13°), coherente con estar en la cresta del borde junto al contorno (nota de T0.3.c). La spec no define un umbral de pendiente para aterrizar, así que no se califica a ningún sitio de apto o no apto.
+- **Siguiente tarea:** T2.3.b.

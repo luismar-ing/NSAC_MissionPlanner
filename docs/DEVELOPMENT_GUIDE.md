@@ -418,7 +418,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 
 ### T2.3 site_features.py y terrain_lod.py (spec 5.10, 8.3)
 
-##### [ ] T2.3.a — Pendiente desde el DEM
+##### [x] T2.3.a — Pendiente desde el DEM
 - **Qué:** pendiente media y máxima en el radio de referencia (D10), con el gradiente en la malla proyectada y la corrección de escala.
 - **Archivos:** `pipeline/site_features.py`, `pipeline/tests/test_site_features.py`
 - **Depende de:** T1.2.a, T1.2.b · **Spec:** 5.10, 10 (T2.3) · **Decisiones:** D10 · **Est.:** 2 h
