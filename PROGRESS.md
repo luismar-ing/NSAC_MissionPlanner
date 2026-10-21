@@ -633,3 +633,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** **de Gerlache Rim 2** queda a 1,2 km del contorno y hay terreno algo más alto (1 814,5 m) a menos de 3 km, probablemente fuera de la región. Se revisa en el mapa (T0.3.c). **Nobile Rim 1** sale a 6 799,8 m, cerca del máximo del DEM (7 026,8 m); es una cumbre interior de la región (que linda con Mons Mouton), no un artefacto del contorno, pero conviene confirmarlo en el mapa.
 - **Siguiente tarea:** T0.3.c.
+
+## 2026-10-21 · T0.3.c · Mapa de verificación de los sitios
+
+- **Tarea:** T0.3.c — Mapa de verificación de los sitios ([x]).
+- **Qué se hizo:** `pipeline/plots/sites_map.py` genera `docs/figures/sites_map.png` (sombreado del DEM a ±170 km del polo, mostrado a 320 m, con las regiones USGS en naranja y los sitios en azul, con lat, lon y altura) y `docs/figures/sites_zoom.png` (±12 km por sitio a 40 m, con curvas de nivel y el contorno oficial).
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.plots.sites_map
+  escrito docs\figures\sites_map.png (1354 kB)
+  escrito docs\figures\sites_zoom.png (1490 kB)
+  ```
+  **Revisión visual (agente):**
+  - Malapert Massif: meseta alta del macizo, en el interior de la región. ✓ macizo.
+  - Haworth: terreno elevado del borde, por encima de la curva de 2 200 m, a ~4 km del contorno. ✓ borde.
+  - Nobile Rim 1: cumbre interior rodeada por curvas de ≥ 6 000 m; no es un artefacto del contorno. ✓ terreno alto del borde (zona que linda con Mons Mouton).
+  - Connecting Ridge: terreno alto entre Shackleton (cráter oscuro junto al polo) y de Gerlache. ✓ cresta.
+  - de Gerlache Rim 2: sobre la cresta del borde, junto al contorno este de la región; la cresta sigue subiendo fuera (1 814,5 m a < 3 km). ✓ borde, con esa nota.
+- **Decisiones tomadas:** se mantienen los 5 puntos y el método de T0.3.a.
+- **Desviaciones de la spec / cambios en la guía:** se añade `pipeline/plots/__init__.py`.
+- **Problemas abiertos:** conviene que el humano compare `docs/figures/sites_map.png` con un mapa oficial de las regiones (por ejemplo, el de NASA de octubre de 2024) como segunda revisión. Las pendientes en los puntos se comprueban en T2.3.a.
+- **Siguiente tarea:** **Fase 0 cerrada** → hito de demo y parada (paso g del protocolo). Después, T1.1.a.

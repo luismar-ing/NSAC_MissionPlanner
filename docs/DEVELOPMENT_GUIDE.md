@@ -166,7 +166,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.3.a, T0.2.e, T0.4.b · **Spec:** 6.1, 7.2 · **Decisiones:** D3 · **Est.:** 1.5 h
 - **Aceptación:** `python -m pipeline.make_sites` y luego `python -m pipeline.validate --file pipeline/sites.json` terminan en 0; hay 4 o 5 sitios con `lat`, `lon`, `elevation_m` y `source` no vacíos.
 
-##### [ ] T0.3.c — Mapa de verificación de los sitios
+##### [x] T0.3.c — Mapa de verificación de los sitios
 - **Qué:** sombreado del DEM con los sitios marcados, para revisarlo contra mapas oficiales.
 - **Archivos:** `pipeline/plots/sites_map.py`, `docs/figures/sites_map.png`
 - **Depende de:** T0.3.b · **Spec:** 6.1 · **Decisiones:** — · **Est.:** 1 h
