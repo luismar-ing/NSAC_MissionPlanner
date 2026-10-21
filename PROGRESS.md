@@ -88,3 +88,33 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** D1 (habilidades y horas del equipo) y A2 (otras decisiones) siguen pendientes, pero no bloquean subtareas. D8, D9, D10 y D11 se necesitan antes de las Fases 2, 4 y 7.
 - **Siguiente tarea:** T0.1.a.
+
+## 2026-10-21 · T0.1.a · README.md raíz
+
+- **Tarea:** T0.1.a — README.md raíz ([x]).
+- **Qué se hizo:** `README.md` en inglés: qué es (5 puntos), estructura del repositorio, requisitos, tablas de comandos de Pipeline y Front end (marcados TBD salvo crear el venv), sección "What is real and what is not" (SPICE y LOLA reales, trayectorias ILLUSTRATIVE, datos SYNTHETIC) y "Data sources & credits" provisional (NASA/LRO LOLA, NAIF/SPICE, JPL Horizons).
+- **Cómo se verificó:**
+  ```
+  == Carpetas de 7.1 en git:
+  .claude/commands       1 archivo(s)
+  data                   1 archivo(s)
+  pipeline/tests         1 archivo(s)
+  web/public/data        1 archivo(s)
+  web/src/store          1 archivo(s)
+  web/src/views          1 archivo(s)
+  web/src/components     1 archivo(s)
+  web/src/lib            1 archivo(s)
+  web/src/styles         1 archivo(s)
+  web/src/scene3d        1 archivo(s)
+  web/src/panels2d       1 archivo(s)
+  web/tests              1 archivo(s)
+  docs                   3 archivo(s)
+  == Secciones del README:
+  38:## Pipeline
+  51:## Front end
+  68:## Data sources & credits
+  ```
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** los comandos TBD se completan en T0.1.b, T0.1.c y T0.1.d.
+- **Siguiente tarea:** T0.1.b.

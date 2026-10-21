@@ -68,7 +68,7 @@ Hoy: 2026-10-20. Entrega: **2026-11-13** (24 días). Se ajusta cuando D1 (habili
 
 Las carpetas vacías de 7.1 (con `.gitkeep`), `PROGRESS.md`, `CLAUDE.md` y `.gitignore` se crearon en la sesión de arranque.
 
-##### [ ] T0.1.a — README.md raíz
+##### [x] T0.1.a — README.md raíz
 - **Qué:** README en inglés con: qué es (5 líneas), estructura del repositorio, requisitos (Python 3.11+, Node), cómo ejecutar el pipeline y el front end (comandos marcados "TBD" hasta que existan) y créditos provisionales (NASA/LOLA, NAIF/SPICE, JPL Horizons).
 - **Archivos:** `README.md`
 - **Depende de:** — · **Spec:** 7.1, 10 (T0.1), 11 regla 12 · **Decisiones:** — · **Est.:** 1 h
