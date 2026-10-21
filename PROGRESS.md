@@ -396,3 +396,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** se añade `pipeline/tests/conftest.py`.
 - **Problemas abiertos:** ninguno en esta subtarea. Un valor de referencia que calculé a mano (2 878,1 m) estaba mal; el correcto es 2 877,86 m y la prueba lo detectó.
 - **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga del DEM.
+
+## 2026-10-21 · T1.3.a · Visibilidad del Sol (borde superior) — adelantada
+
+- **Tarea:** T1.3.a — Visibilidad del Sol ([x]). **Adelantable**; hecha mientras se descarga el DEM.
+- **Qué se hizo:** `pipeline/visibility.py` con `horizon_at` (interpolación lineal de la máscara entre bins, con paso circular de 359° a 0°, y error si la máscara no cubre 360°) y `sun_visible` = `(sun_el + 0.265°) > horizon_el[sun_az]` (spec 5.3), que devuelve 0/1 en uint8. Parámetros por defecto tomados de `pipeline/config.py`. Pruebas en `pipeline/tests/test_visibility.py`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_visibility.py -v
+  test_upper_limb_just_above_and_below_mask PASSED
+  test_centre_below_mask_but_limb_above_is_visible PASSED
+  test_azimuth_wraps_between_359_and_0 PASSED
+  test_negative_mask PASSED
+  test_linear_interpolation_between_bins PASSED
+  test_mask_must_cover_360_degrees PASSED
+  6 passed in 0.16s
+  ```
+  Casos límite: el borde a ±1e-6° de la máscara da 1/0, y justo en la máscara da 0 (comparación «>» estricta, como en la spec); azimuts 359.9° y 0.1° interpolan entre los bins 359 y 0; máscara negativa (−0.8°).
+- **Decisiones tomadas:** interpolación lineal entre bins (lo documenta el contrato §6). Tocar exactamente la máscara cuenta como no visible.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T1.3.b (adelantable) o cerrar T0.2.e cuando termine la descarga.

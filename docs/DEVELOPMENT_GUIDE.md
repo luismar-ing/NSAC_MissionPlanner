@@ -258,7 +258,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 
 ### T1.3 visibility.py: banderas Sol y Tierra (spec 5.3, 5.4)
 
-##### [ ] T1.3.a — Visibilidad del Sol (borde superior)
+##### [x] T1.3.a — Visibilidad del Sol (borde superior)
 - **Qué:** `sun_visible = (sun_el + 0.265°) > horizon_el[sun_az]`, con interpolación de la máscara en azimut (lineal entre bins, con paso por 359°→0°; documentar).
 - **Archivos:** `pipeline/visibility.py`, `pipeline/tests/test_visibility.py`
 - **Depende de:** T0.1.b · **Spec:** 5.3 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**
