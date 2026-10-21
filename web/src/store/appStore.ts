@@ -39,6 +39,8 @@ export interface AppState {
   missionPhase: MissionPhase;
   missionTime: number | null; // absolute instant (epoch ms, UTC) of the selected plan's mission clock
   compareTime: number; // relative clock shared by the 2D panels: hours since arrival
+  exaggeration: number | null; // vertical exaggeration of the 2D silhouettes; null = fit the shared range
+  setExaggeration(x: number | null): void;
   notice: string | null; // last user-facing message (e.g. tray full)
   windowIndex: Partial<Record<number, WindowIndex>>; // per window length L, built on demand
   validCount: { valid: number; total: number } | null; // cells meeting the constraints for the current L
@@ -78,6 +80,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     missionPhase: "overview",
     missionTime: null,
     compareTime: 0,
+    exaggeration: null,
+    setExaggeration(x) {
+      set({ exaggeration: x });
+    },
     notice: null,
     windowIndex: {},
     validCount: null,

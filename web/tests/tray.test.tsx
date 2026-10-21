@@ -2,7 +2,7 @@
 /** T3.3.a: tray grid with identical panels sharing one vertical scale. */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { DataStore } from "../src/lib/data";
 import { loadPlanData, sampleAt, sliceWindow } from "../src/lib/planData";
@@ -21,6 +21,13 @@ const fileFetch = (async (url: string) => {
 
 beforeAll(async () => {
   globalThis.fetch = fileFetch;
+  // jsdom has no layout or ResizeObserver: give every element a fixed size
+  globalThis.ResizeObserver = class {
+    observe() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+  Object.defineProperty(HTMLElement.prototype, "clientWidth", { configurable: true, get: () => 340 });
+  Object.defineProperty(HTMLElement.prototype, "clientHeight", { configurable: true, get: () => 220 });
   await appStore.getState().loadCore();
 });
 afterEach(() => {
@@ -62,5 +69,42 @@ describe("tray (spec 8.1)", () => {
       expect(Math.min(...p.horizon.elev_deg, ...p.series.sunEl, ...p.series.earthEl)).toBeGreaterThanOrEqual(s.minDeg);
       expect(Math.max(...p.horizon.elev_deg, ...p.series.sunEl, ...p.series.earthEl)).toBeLessThanOrEqual(s.maxDeg);
     }
+  });
+});
+
+describe("silhouette (T3.3.b)", () => {
+  it("draws SVG only (no WebGL) with the Sun and Earth at compareTime", async () => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    const calls: string[] = [];
+    HTMLCanvasElement.prototype.getContext = function (type: string) {
+      calls.push(type);
+      return null;
+    } as never;
+    for (const id of ["haworth_20270310_7d", "malapert_massif_20271015_7d"]) appStore.getState().pinPlan(id);
+    appStore.getState().setCompareTime(70); // day 3, 22:00 after arrival
+    render(<Tray />);
+    const sil = await screen.findAllByTestId("silhouette");
+    expect(sil).toHaveLength(2);
+    expect(sil[0].dataset.sample).toBe(String(70 * 2)); // 30-min samples
+    await waitFor(() => expect(sil[0].querySelector("svg")).not.toBeNull());
+    expect(screen.getAllByTestId("sun-marker")).toHaveLength(2);
+    expect(screen.getAllByTestId("earth-marker")).toHaveLength(2);
+    expect(document.querySelectorAll("canvas")).toHaveLength(0);
+    expect(calls.filter((c) => c.startsWith("webgl"))).toEqual([]);
+    HTMLCanvasElement.prototype.getContext = getContext;
+    appStore.getState().setCompareTime(0);
+  });
+
+  it("marker fill follows the visibility flag of the sample", async () => {
+    appStore.getState().pinPlan("haworth_20270310_7d");
+    appStore.getState().pinPlan("malapert_massif_20271015_7d");
+    render(<Tray />);
+    const sil = await screen.findAllByTestId("silhouette");
+    const store = new DataStore("/base/", fileFetch as never);
+    const st = appStore.getState();
+    const pd = await loadPlanData(store, st.plansById.get("haworth_20270310_7d")!, st.sites);
+    await waitFor(() => expect(sil[0].querySelector("svg")).not.toBeNull());
+    const sun = sil[0].querySelector('[data-testid="sun-marker"]') as SVGGElement;
+    expect(sun.dataset.visible).toBe(String(pd.series.sunVis[0] === 1));
   });
 });

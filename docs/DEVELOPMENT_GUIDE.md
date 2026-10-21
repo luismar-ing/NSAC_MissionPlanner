@@ -540,7 +540,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.1.c · **Spec:** 8.0, 8.1, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** prueba: todos los paneles reciben la misma escala; revisión visual con 2, 3 y 5 paneles.
 
-##### [ ] T3.3.b — Silueta del horizonte con el Sol y la Tierra
+##### [x] T3.3.b — Silueta del horizonte con el Sol y la Tierra
 - **Qué:** SVG o canvas 2D: relleno del terreno desde `elev_deg`, eje vertical compartido, exageración vertical configurable, Sol y Tierra en `compareTime` y sus trayectorias en la ventana. Función de proyección az/el → px compartida (la reutiliza el panorama).
 - **Archivos:** `web/src/panels2d/HorizonSilhouette.tsx`, `web/src/lib/projection.ts`, `web/tests/projection.test.ts`
 - **Depende de:** T3.3.a · **Spec:** 8.1, 5.3, 5.4, 11 regla 7 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**

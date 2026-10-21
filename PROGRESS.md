@@ -1517,3 +1517,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** los botones de Chrome no encogen en filas flex sin `width: 0` (corregido). Robustez del calendario con la página en segundo plano (corregida).
 - **Siguiente tarea:** T3.3.b.
+
+## 2026-10-21 · T3.3.b · Silueta del horizonte con el Sol y la Tierra
+
+- **Tarea:** T3.3.b — Silueta del horizonte con el Sol y la Tierra ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/projection.ts`: proyección az/el → px compartida (la reutilizará el panorama de T3.4): `makeProjection` (ajuste al rango compartido o exageración vertical fija, con recentrado en cualquier azimut), `azToX`, `elToY`, `exaggerationOf`, `angularSizePx`, `silhouettePath` (máscara rellena hasta el borde inferior) y `trackPath` (trayectoria cortada en el salto 0/360°).
+  - `web/src/panels2d/HorizonSilhouette.tsx`: solo SVG (regla 7). Rejilla cada 5° con el horizonte 0° punteado, trayectorias del Sol y la Tierra en toda la ventana, terreno encima (un astro detrás del terreno queda tapado, como en la realidad), puntos cardinales, la exageración real en la esquina y los marcadores en `compareTime`: relleno si el astro es visible y hueco si está bloqueado (forma además del color).
+  - Estado `exaggeration` en el store y selector «Vertical: Fit / ×10 / ×20 / ×40» en la bandeja. Con exageración, el borde inferior queda anclado al mínimo del rango compartido para que el terreno nunca salga de la vista.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 82 passed
+    projection.test.ts: mapa az 0–360 y el; recentrado; exageración configurable y medida (×10 y ×20);
+                        0.53° y 1.9° a escala angular; trayectorias cortadas en 0/360
+    tray.test.tsx: draws SVG only (no WebGL) with the Sun and Earth at compareTime (muestra 140 = 70 h;
+                   0 canvas y 0 llamadas a getContext("webgl*") en la bandeja)
+                   marker fill follows the visibility flag of the sample
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  Revisión visual en el navegador integrado (800 px de ancho, 3 planes anclados con «Pin best 3»): siluetas de 577×220 px con la misma escala; en Connecting Ridge (llegada 2027-02-06) el Sol recorre ~90° de azimut rasante al horizonte en 7 días y la Tierra sube y baja casi en vertical (libración), como se espera cerca del polo. En la página solo hay un canvas, el 2D del calendario.
+- **Decisiones tomadas:** el botón «Fit» no muestra un número fijo, porque la exageración depende del ancho del panel; cada silueta muestra su valor real («vertical ×N»). Primero se centró la vista exagerada en el rango y a ×20 el terreno salía por abajo; se ancló el borde inferior.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T3.3.c.

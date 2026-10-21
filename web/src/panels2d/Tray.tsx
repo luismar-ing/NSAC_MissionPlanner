@@ -15,6 +15,9 @@ export function Tray() {
   const selectPlan = useApp((s) => s.selectPlan);
   const unpinPlan = useApp((s) => s.unpinPlan);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
+  const exaggeration = useApp((s) => s.exaggeration);
+  const setExaggeration = useApp((s) => s.setExaggeration);
+  const compareTime = useApp((s) => s.compareTime);
   const [loaded, setLoaded] = useState<Record<string, PlanData>>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +43,16 @@ export function Tray() {
     <>
       {ids.length === 1 && <p className="placeholder">{STRINGS.panel.pinOneMore}</p>}
       {error && <p role="alert">{error}</p>}
+      <div className="tray-toolbar">
+        <div className="segmented" role="group" aria-label={STRINGS.silhouette.exaggerationLabel}>
+          <span className="segmented-label">{STRINGS.silhouette.exaggerationLabel}</span>
+          {[null, 10, 20, 40].map((x) => (
+            <button key={String(x)} type="button" aria-pressed={exaggeration === x} className={exaggeration === x ? "on" : ""} onClick={() => setExaggeration(x)}>
+              {x === null ? STRINGS.silhouette.fit : STRINGS.silhouette.times(x)}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="tray-grid" style={{ ["--cols" as string]: Math.max(2, ids.length) }} data-testid="tray-grid">
         {visible.map((p) => (
           <PlanPanel
@@ -48,6 +61,8 @@ export function Tray() {
             scale={scale}
             trajectoryMode={trajectoryMode}
             selected={selectedPlanId === p.plan.id}
+            exaggeration={exaggeration}
+            compareTime={compareTime}
             onSelect={() => selectPlan(p.plan.id)}
             onUnpin={() => unpinPlan(p.plan.id)}
           />

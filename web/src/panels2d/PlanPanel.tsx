@@ -1,12 +1,15 @@
 import type { PlanData } from "../lib/planData";
 import type { ElevationScale } from "../lib/scale";
 import { STRINGS } from "../lib/strings";
+import { HorizonSilhouette } from "./HorizonSilhouette";
 
 interface Props {
   data: PlanData;
   scale: ElevationScale;
   trajectoryMode: "REAL" | "ILLUSTRATIVE";
   selected: boolean;
+  exaggeration: number | null;
+  compareTime: number;
   onSelect(): void;
   onUnpin(): void;
 }
@@ -15,7 +18,7 @@ interface Props {
  * One comparison panel (spec 8.1). Identical format for every plan; the silhouette (T3.3.b), the timeline
  * (T3.3.c) and the metrics box (T3.3.d) fill the reserved slots.
  */
-export function PlanPanel({ data, scale, trajectoryMode, selected, onSelect, onUnpin }: Props) {
+export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration, compareTime, onSelect, onUnpin }: Props) {
   const { plan, site } = data;
   return (
     <article
@@ -40,7 +43,9 @@ export function PlanPanel({ data, scale, trajectoryMode, selected, onSelect, onU
           ×
         </button>
       </header>
-      <div className="plan-slot silhouette-slot" data-slot="silhouette" />
+      <div className="plan-slot silhouette-slot" data-slot="silhouette">
+        <HorizonSilhouette data={data} scale={scale} exaggeration={exaggeration} compareTime={compareTime} />
+      </div>
       <div className="plan-slot ribbon-slot" data-slot="ribbon" />
       <div className="plan-slot metrics-slot" data-slot="metrics" />
     </article>

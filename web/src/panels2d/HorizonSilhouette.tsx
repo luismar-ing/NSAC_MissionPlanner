@@ -1,0 +1,109 @@
+import { useEffect, useRef, useState } from "react";
+import type { PlanData } from "../lib/planData";
+import { sampleAt } from "../lib/planData";
+import { azToX, elToY, exaggerationOf, makeProjection, silhouettePath, trackPath } from "../lib/projection";
+import type { ElevationScale } from "../lib/scale";
+import { STRINGS } from "../lib/strings";
+import { COLORS } from "../styles/tokens";
+
+interface Props {
+  data: PlanData;
+  scale: ElevationScale;
+  exaggeration: number | null; // null = fit the shared range
+  compareTime: number; // hours since arrival (shared clock)
+}
+
+const CARDINALS: [number, string][] = [
+  [0, "N"],
+  [90, "E"],
+  [180, "S"],
+  [270, "W"],
+];
+
+/**
+ * Horizon silhouette of a plan (spec 8.1): terrain mask, Sun and Earth tracks over the window and their
+ * position at compareTime. SVG only (rule 7: no WebGL in comparison panels). Visible bodies are filled,
+ * blocked ones are hollow (shape + fill, not colour alone).
+ */
+export function HorizonSilhouette({ data, scale, exaggeration, compareTime }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const read = () => setSize({ w: Math.floor(el.clientWidth), h: Math.floor(el.clientHeight) });
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const { w, h } = size;
+  const { series, horizon } = data;
+  const k = sampleAt(series, compareTime);
+  const p = w > 0 && h > 0 ? makeProjection(w, h, scale, exaggeration) : null;
+
+  return (
+    <div ref={ref} className="silhouette" data-testid="silhouette" data-sample={k}>
+      {p && (
+        <svg width={w} height={h} role="img" aria-label={STRINGS.silhouette.aria(data.site.name)}>
+          <defs>
+            <clipPath id={`clip-${data.plan.id}`}>
+              <rect width={w} height={h} />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#clip-${data.plan.id})`}>
+            {/* sky grid: horizon line, elevation ticks every 5°, cardinal directions */}
+            {Array.from({ length: Math.floor(p.maxEl / 5) - Math.ceil(p.minEl / 5) + 1 }, (_, i) => (Math.ceil(p.minEl / 5) + i) * 5).map((e) => (
+              <g key={e}>
+                <line x1={0} x2={w} y1={elToY(p, e)} y2={elToY(p, e)} stroke={COLORS.border} strokeWidth={1} strokeDasharray={e === 0 ? "4 3" : undefined} />
+                <text x={4} y={elToY(p, e) - 3} fill={COLORS.textMuted} fontSize={10}>
+                  {e}°
+                </text>
+              </g>
+            ))}
+            {/* tracks over the whole window */}
+            <path d={trackPath(p, series.earthAz, series.earthEl, 2)} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} />
+            <path d={trackPath(p, series.sunAz, series.sunEl, 2)} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.55} />
+            {/* terrain on top of the tracks: a body behind the terrain is hidden by it, as in reality */}
+            <path d={silhouettePath(p, horizon.elev_deg, horizon.az_step_deg)} fill={COLORS.terrain} stroke={COLORS.textMuted} strokeWidth={1} strokeOpacity={0.6} />
+            {/* cardinal directions and the actual vertical exaggeration, above the terrain */}
+            {CARDINALS.map(([az, label]) => (
+              <text key={label} x={Math.min(w - 10, azToX(p, az) + 3)} y={h - 4} fill={COLORS.text} fontSize={11}>
+                {label}
+              </text>
+            ))}
+            <text x={w - 4} y={12} textAnchor="end" fill={COLORS.textMuted} fontSize={10} data-testid="exaggeration">
+              {STRINGS.silhouette.shown(exaggerationOf(p))}
+            </text>
+            {/* bodies at compareTime */}
+            <Earth x={azToX(p, series.earthAz[k])} y={elToY(p, series.earthEl[k])} visible={series.earthVis[k] === 1} />
+            <Sun x={azToX(p, series.sunAz[k])} y={elToY(p, series.sunEl[k])} visible={series.sunVis[k] === 1} />
+          </g>
+        </svg>
+      )}
+    </div>
+  );
+}
+
+function Sun({ x, y, visible }: { x: number; y: number; visible: boolean }) {
+  const rays = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4);
+  return (
+    <g data-testid="sun-marker" data-visible={visible} transform={`translate(${x},${y})`}>
+      {rays.map((a) => (
+        <line key={a} x1={Math.cos(a) * 7} y1={Math.sin(a) * 7} x2={Math.cos(a) * 10} y2={Math.sin(a) * 10} stroke={COLORS.sun} strokeWidth={1.5} />
+      ))}
+      <circle r={5} fill={visible ? COLORS.sun : COLORS.bg} stroke={COLORS.sun} strokeWidth={2} />
+    </g>
+  );
+}
+
+function Earth({ x, y, visible }: { x: number; y: number; visible: boolean }) {
+  return (
+    <g data-testid="earth-marker" data-visible={visible} transform={`translate(${x},${y})`}>
+      <circle r={9} fill="none" stroke={COLORS.earth} strokeWidth={1} strokeOpacity={0.7} />
+      <circle r={5.5} fill={visible ? COLORS.earth : COLORS.bg} stroke={COLORS.earth} strokeWidth={2} />
+    </g>
+  );
+}

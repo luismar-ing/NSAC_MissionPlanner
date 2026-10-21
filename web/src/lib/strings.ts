@@ -58,6 +58,13 @@ export const STRINGS = {
     unpin: (site: string) => `Remove ${site} from the comparison`,
     pinOneMore: "Pin at least one more plan to compare.",
   },
+  silhouette: {
+    aria: (site: string) => `Horizon silhouette at ${site} with the Sun and Earth tracks over the window`,
+    exaggerationLabel: "Vertical",
+    fit: "Fit",
+    shown: (x: number) => `vertical ×${x < 10 ? x.toFixed(1) : Math.round(x)}`,
+    times: (x: number) => `×${x}`,
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:
