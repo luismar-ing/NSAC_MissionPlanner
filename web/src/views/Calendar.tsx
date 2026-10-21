@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { arrivalDate, calendarHeight, cellAt, cellColorIndices, cellRect, makeLayout, monthTicks, type CalendarLayout } from "../lib/calendar";
 import { MODE_DOMAIN, MODE_METRIC, rampLut, type CalendarMode } from "../lib/colorScale";
-import { lookup, type WindowIndex } from "../lib/constraints";
+import { countValid, lookup, validMask, type WindowIndex } from "../lib/constraints";
 import { STRINGS } from "../lib/strings";
 import { useApp } from "../store/appStore";
 import { COLORS, FONT } from "../styles/tokens";
@@ -24,6 +24,8 @@ export function Calendar() {
   const L = useApp((s) => s.selectedWindow);
   const sites = useApp((s) => s.sites);
   const loadWindows = useApp((s) => s.loadWindows);
+  const constraints = useApp((s) => s.constraints);
+  const setValidCount = useApp((s) => s.setValidCount);
   const setWindow = useApp((s) => s.setWindow);
   const windowDays = useApp((s) => s.manifest?.params.window_days ?? [3, 7, 14]);
   const [mode, setMode] = useState<CalendarMode>("combined");
@@ -54,10 +56,16 @@ export function Calendar() {
     [index, width],
   );
   const colors = useMemo(() => (index ? cellColorIndices(index, mode) : null), [index, mode]);
+  const mask = useMemo(() => (index ? validMask(index, constraints) : null), [index, constraints]);
+  const anyConstraint = constraints.minSunPct !== null || constraints.maxDarkH !== null || constraints.minEarthH !== null;
+
+  useEffect(() => {
+    setValidCount(mask ? { valid: countValid(mask), total: mask.length } : null);
+  }, [mask, setValidCount]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !layout || !index || !colors) return;
+    if (!canvas || !layout || !index || !colors || !mask) return;
     const dpr = window.devicePixelRatio || 1;
     const h = calendarHeight(layout);
     canvas.width = Math.round(layout.width * dpr);
@@ -73,8 +81,34 @@ export function Calendar() {
     for (let s = 0; s < layout.nSites; s++) {
       for (let d = 0; d < layout.nDays; d++) {
         const [x, y, w, hh] = cellRect(layout, s, d);
-        ctx.fillStyle = lut[colors[s * layout.nDays + d]];
+        const k = s * layout.nDays + d;
+        const dim = anyConstraint && !mask[k];
+        ctx.globalAlpha = dim ? 0.22 : 1; // spec 8.5: valid cells highlighted, the rest dimmed
+        ctx.fillStyle = lut[colors[k]];
         ctx.fillRect(x, y, w + 0.6, hh); // +0.6 px hides sub-pixel seams between columns
+      }
+      ctx.globalAlpha = 1;
+      if (anyConstraint) {
+        // Pattern as well as colour (spec 9): diagonal hatch over the cells that fail the constraints
+        const [, y0, , hh] = cellRect(layout, s, 0);
+        ctx.save();
+        ctx.beginPath();
+        for (let d = 0; d < layout.nDays; d++) {
+          if (mask[s * layout.nDays + d]) continue;
+          const [x, , w] = cellRect(layout, s, d);
+          ctx.rect(x, y0, w + 0.6, hh);
+        }
+        ctx.clip();
+        ctx.strokeStyle = COLORS.textMuted;
+        ctx.globalAlpha = 0.35;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = layout.labelW - hh; x < layout.width; x += 6) {
+          ctx.moveTo(x, y0 + hh);
+          ctx.lineTo(x + hh, y0);
+        }
+        ctx.stroke();
+        ctx.restore();
       }
       ctx.fillStyle = COLORS.text;
       ctx.font = `${FONT.size.md}px ${FONT.family}`;
@@ -91,7 +125,18 @@ export function Calendar() {
       ctx.fillRect(x, layout.axisH - 6, 1, 6);
       ctx.fillText(t.label, x + 3, layout.axisH - 6);
     }
-  }, [layout, index, colors, mode, sites]);
+    // Spec 8.7: time from the last control change until the canvas is redrawn (< 100 ms). Measured
+    // synchronously (rAF is paused in background tabs); the next-frame time is added when available.
+    if (performance.getEntriesByName("constraint-change").length) {
+      const m = performance.measure("constraint-to-draw", "constraint-change");
+      performance.clearMarks("constraint-change");
+      canvas.dataset.lastUpdateMs = m.duration.toFixed(1);
+      const start = performance.now() - m.duration;
+      requestAnimationFrame(() => {
+        canvas.dataset.lastFrameMs = (performance.now() - start).toFixed(1);
+      });
+    }
+  }, [layout, index, colors, mask, anyConstraint, mode, sites]);
 
   const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!layout) return;

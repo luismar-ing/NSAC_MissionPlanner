@@ -33,6 +33,16 @@ export const STRINGS = {
     earth: (min: number, mean: number) => `Earth ${mean.toFixed(1)} h/day (min ${min.toFixed(1)})`,
     score: (v: number) => `Score ${v.toFixed(2)}`,
   },
+  constraints: {
+    sun: "Minimum sunlight",
+    sunHint: "Share of the window with the Sun's upper limb above the terrain.",
+    dark: "Maximum darkness",
+    darkHint: "Longest continuous stretch without Sun in the window.",
+    earth: "Minimum Earth contact",
+    earthHint: "Worst day: hours with Earth above terrain + 0.5° antenna margin.",
+    off: "off",
+    count: (valid: number, total: number, L: number) => `${valid} of ${total} ${L}-day plans meet the constraints`,
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

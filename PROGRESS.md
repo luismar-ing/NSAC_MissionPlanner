@@ -1446,3 +1446,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** A5 (orientación del calendario).
 - **Problemas abiertos:** el resaltado de celdas válidas y la atenuación son de T3.2.b; la selección, el anclaje y el arrastre, de T3.2.c.
 - **Siguiente tarea:** T3.2.b.
+
+## 2026-10-21 · T3.2.b · Controles de restricciones
+
+- **Tarea:** T3.2.b — Controles de restricciones ([x]).
+- **Qué se hizo:**
+  - `web/src/components/ConstraintControls.tsx`: tres deslizadores nativos (accesibles con teclado, con `aria-valuetext`). X = sol mínimo (0–100 %), Y = oscuridad máxima (0–24·L h) y Z = Tierra mínima (0–24 h/día, paso de 0.5). Cada uno tiene una casilla para activarlo (desactivado = no se evalúa, 5.6), una explicación en una línea y un recuento en vivo («N of M L-day plans meet the constraints», `aria-live`).
+  - `Calendar.tsx`: máscara `validMask` memorizada; las celdas que no cumplen se atenúan (alfa 0.22) y se **rayan en diagonal** (patrón además del color, spec 9).
+  - Medición del control al dibujo (`performance.mark/measure`; `data-last-update-ms` y `data-last-frame-ms` en el canvas).
+  - En el store, `validCount`. Textos y estilos con tokens.
+- **Cómo se verificó:** en el navegador integrado, con el panel visible (oculto, el navegador frena el dibujo y `requestAnimationFrame`), moviendo cada deslizador:
+  ```
+  sun  40→95 %: recuento 1584 → 1110; dibujo 9.5–18.0 ms; siguiente fotograma 13.2–22.9 ms
+  dark 100→12 h (con sol ≥ 95 %): 1110 sin cambios (≥ 95 % de sol en 7 días implica ≤ 8.4 h de oscuridad); dibujo 8.8–11.6 ms
+  earth 4→12 h/día: 501 → 480; dibujo 9.9–12.1 ms
+  máximo: dibujo 18.0 ms, fotograma 22.9 ms  (< 100 ms, spec 8.7) ✓
+  ```
+  Revisión visual: con las tres restricciones activas, las ventanas válidas se ven como bloques claros y el resto atenuado y rayado. Disposición apilada correcta en un panel estrecho (800 px). `npm test` → 66 passed; typecheck → exit 0.
+- **Decisiones tomadas:** valores iniciales al activar un control: 70 % de sol, 48 h de oscuridad (o 24·L si es menor) y 8 h/día de Tierra; son de diseño. La medición es síncrona al dibujar, más el fotograma cuando el navegador lo da.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** la primera medición usaba solo `requestAnimationFrame` y repetía el mismo valor con el panel oculto; corregida.
+- **Siguiente tarea:** T3.2.c.

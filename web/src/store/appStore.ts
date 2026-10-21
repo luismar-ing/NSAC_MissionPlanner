@@ -40,6 +40,8 @@ export interface AppState {
   compareTime: number; // relative clock shared by the 2D panels: hours since arrival
   notice: string | null; // last user-facing message (e.g. tray full)
   windowIndex: Partial<Record<number, WindowIndex>>; // per window length L, built on demand
+  validCount: { valid: number; total: number } | null; // cells meeting the constraints for the current L
+  setValidCount(v: { valid: number; total: number } | null): void;
 
   loadCore(): Promise<void>;
   loadWindows(days: number): Promise<WindowIndex>;
@@ -75,6 +77,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     compareTime: 0,
     notice: null,
     windowIndex: {},
+    validCount: null,
+    setValidCount(v) {
+      set({ validCount: v });
+    },
 
     async loadWindows(days) {
       const cached = get().windowIndex[days];

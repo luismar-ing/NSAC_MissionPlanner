@@ -239,3 +239,53 @@ button {
   color: var(--color-text);
   box-shadow: 0 6px 20px rgb(0 0 0 / 0.45);
 }
+
+/* ------------------------------------------------------------------ constraints (T3.2.b) */
+
+.constraints {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.constraint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.constraint.off .constraint-hint,
+.constraint.off input[type="range"] {
+  opacity: 0.45;
+}
+
+.constraint-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.constraint-value {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.constraint input[type="range"] {
+  width: 100%;
+  accent-color: var(--color-both);
+}
+
+.constraint-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+.constraint-count {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-sm);
+}

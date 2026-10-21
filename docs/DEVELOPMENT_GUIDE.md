@@ -520,7 +520,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.1.c, T3.1.d · **Spec:** 8.5, 9 · **Decisiones:** D7 · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba: cambiar L o el modo cambia la fuente del color; revisión visual con datos sintéticos.
 
-##### [ ] T3.2.b — Controles de restricciones
+##### [x] T3.2.b — Controles de restricciones
 - **Qué:** tres deslizadores (X, Y, Z) con activación individual; resaltado de las celdas válidas y atenuado del resto, con patrón además del color.
 - **Archivos:** `web/src/components/ConstraintControls.tsx`, `web/src/views/Calendar.tsx`
 - **Depende de:** T3.2.a · **Spec:** 5.6, 8.5, 8.7, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

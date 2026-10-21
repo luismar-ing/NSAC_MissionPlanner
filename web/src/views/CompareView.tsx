@@ -1,6 +1,7 @@
 import { SyntheticBanner } from "../components/SyntheticBanner";
 import { STRINGS } from "../lib/strings";
 import { useApp } from "../store/appStore";
+import { ConstraintControls } from "../components/ConstraintControls";
 import { Calendar } from "./Calendar";
 
 /**
@@ -21,7 +22,8 @@ export function CompareView() {
           <h2 id="constraints-title" className="panel-title">
             {STRINGS.constraintsTitle}
           </h2>
-          <p className="placeholder">{STRINGS.constraintsPlaceholder}</p>
+          <p className="visually-hidden">{STRINGS.constraintsPlaceholder}</p>
+          <ConstraintControls />
         </div>
         <div className="panel" aria-labelledby="calendar-title">
           <h2 id="calendar-title" className="panel-title">
