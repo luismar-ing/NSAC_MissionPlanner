@@ -473,3 +473,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, T1.4.b (adelantable).
+
+## 2026-10-21 · T1.4.b · Ventanas deslizantes eficientes (L = 3, 7, 14) — adelantada
+
+- **Tarea:** T1.4.b — Ventanas deslizantes ([x]). **Adelantable**.
+- **Qué se hizo:** en `pipeline/windows.py`, `window_metrics` calcula para cada día de llegada `sun_pct` (suma acumulada), `earth_h_min` y `earth_h_mean` (horas diarias y ventana deslizante por días), y `longest_dark_h` y `longest_comm_gap_h` (rachas globales recortadas a cada ventana, vectorizado ventanas × rachas, de modo que cruzan días). También `zero_runs` y `longest_run_in_windows`. Opción `ndigits=None` para comparar sin redondeo.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_windows.py -v -s
+  test_dark_streak_crosses_days_inside_a_window PASSED   (6 h que cruzan medianoche cuentan enteras en la ventana)
+  test_streak_is_clipped_to_the_window PASSED
+  201 ventanas comparadas con el cálculo ingenuo
+  test_matches_naive_on_200_random_windows PASSED        (|diferencia| < 1e-9 en las 5 métricas, L = 3, 7 y 14)
+  test_rows_are_daily_from_arrival_start PASSED
+  test_rejects_series_too_short PASSED
+  14 passed in 0.17s
+  ```
+- **Decisiones tomadas:** las llegadas empiezan a las 00:00Z de cada día (contrato §1). `earth_h_min` y `earth_h_mean` usan los días UTC completos de la ventana.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** el primer intento comparó solo 159 ventanas (pocas llegadas para L = 14 con 60 días); ahora son 100 días y 201 ventanas.
+- **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, T1.4.c (adelantable).

@@ -290,7 +290,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T0.1.b · **Spec:** 5.5, 7.2 (daily) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** pruebas con series construidas a mano y resultado conocido, incluida una racha que cruza la medianoche UTC.
 
-##### [ ] T1.4.b — Ventanas deslizantes eficientes (L = 3, 7, 14)
+##### [x] T1.4.b — Ventanas deslizantes eficientes (L = 3, 7, 14)
 - **Qué:** métricas de 5.5 con sumas acumuladas y rachas (run-length) que cruzan los límites de la ventana; `earth_h_per_day_min` y `earth_h_per_day_mean`.
 - **Archivos:** `pipeline/windows.py`, `pipeline/tests/test_windows.py`
 - **Depende de:** T1.4.a · **Spec:** 5.5, 10 (T1.4) · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
