@@ -1,6 +1,6 @@
 /** T3.3.b: shared az/el → pixel projection (also used by the panorama, T3.4). */
 import { describe, expect, it } from "vitest";
-import { angularSizePx, azToX, elToY, exaggerationOf, makeProjection, silhouettePath, trackPath } from "../src/lib/projection";
+import { angularSizePx, azToX, centredOn, elToY, exaggerationOf, makeProjection, pxPerDeg, silhouettePath, trackPath } from "../src/lib/projection";
 
 describe("projection", () => {
   const p = makeProjection(360, 160, { minDeg: -4, maxDeg: 12 });
@@ -25,6 +25,21 @@ describe("projection", () => {
     expect(q.minEl).toBe(-4); // the bottom (terrain) stays anchored to the shared range
     expect(q.maxEl).toBeCloseTo(4, 9);
   });
+  it("a narrower field of view centred on any azimuth (panorama zoom)", () => {
+    const q = makeProjection(600, 200, { minDeg: -3, maxDeg: 12 }, null, centredOn(10, 60), 60);
+    expect(q.startAz).toBe(340);
+    expect(pxPerDeg(q)).toBe(10);
+    expect(azToX(q, 10)).toBe(300); // centre
+    expect(azToX(q, 340)).toBe(0);
+    expect(azToX(q, 40)).toBe(600);
+    // the silhouette covers exactly the field of view, wrapping through 0°
+    const mask = Array.from({ length: 720 }, (_, i) => (i === 20 ? 6 : 0)); // 0.5° bins; bin 20 = az 10°
+    const d = silhouettePath(q, mask, 0.5);
+    expect(d.startsWith("M0.0,200 L0.0,")).toBe(true);
+    expect(d).toContain("300.0,80.0"); // 6° at az 10 → y = (12 − 6)/15·200
+    expect(d.endsWith("L600.0,200 Z")).toBe(true);
+    expect(exaggerationOf(makeProjection(600, 200, { minDeg: -3, maxDeg: 12 }, 4, 0, 60))).toBeCloseTo(4, 9);
+  });
   it("angular sizes use the horizontal scale (Sun 0.53°, Earth 1.9°)", () => {
     const wide = makeProjection(3600, 400, { minDeg: -3, maxDeg: 12 });
     expect(angularSizePx(wide, 0.53)).toBeCloseTo(5.3, 9);
@@ -33,7 +48,7 @@ describe("projection", () => {
   it("silhouette and tracks are well-formed paths; tracks break at the 0/360 wrap", () => {
     const mask = Array.from({ length: 360 }, (_, i) => (i === 90 ? 5 : 0));
     const d = silhouettePath(p, mask);
-    expect(d.startsWith("M0,160 L0.0,")).toBe(true);
+    expect(d.startsWith("M0.0,160 L0.0,")).toBe(true);
     expect(d).toContain("90.0,70.0"); // 5° at az 90 → y = (12 − 5)/16·160 = 70
     const t = trackPath(p, [350, 355, 2, 8], [1, 1, 1, 1]);
     expect(t.match(/M/g)).toHaveLength(2);

@@ -566,7 +566,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 
 ### T3.4 Panorama 2D Nivel A y panel del sitio (spec 8.4, 8.6)
 
-##### [ ] T3.4.a — Panorama del horizonte 360° (Nivel A)
+##### [x] T3.4.a — Panorama del horizonte 360° (Nivel A)
 - **Qué:** X = azimut 0–360° con recentrado en cualquier rumbo; Y = elevación de −3° a 12° con exageración; relleno del terreno; disco del Sol de 0.53° y de la Tierra de 1.9° a escala angular; trayectorias del día o de la ventana; lectura de fecha y hora UTC, az/el del Sol y la Tierra y estado (iluminado, enlace).
 - **Archivos:** `web/src/views/Panorama.tsx`, `web/tests/panorama.test.ts`
 - **Depende de:** T3.3.b · **Spec:** 8.4 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**

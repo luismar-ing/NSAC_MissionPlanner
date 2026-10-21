@@ -1619,3 +1619,31 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno. La transición al modo vivir al seleccionar llega con la Fase 4 (la escena 3D aún no existe).
 - **Problemas abiertos:** ninguno. T3.3 completa.
 - **Siguiente tarea:** T3.4.a.
+
+## 2026-10-21 · T3.4.a · Panorama del horizonte 360° (Nivel A)
+
+- **Tarea:** T3.4.a — Panorama del horizonte 360° (Nivel A) ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/projection.ts`: la proyección compartida admite un campo de visión (`fov`: 360°, 120° o 60°) y `centredOn(az, fov)`. La silueta pone los puntos en el azimut real de cada celda de la máscara, así que funciona con cualquier azimut inicial, incluido el paso por 0°. Las siluetas de la bandeja siguen igual (fov 360 por defecto).
+  - `web/src/views/Panorama.tsx`: X = azimut, centrado en N, E, S, W, el Sol o la Tierra; Y de −3° a 12° (se extiende hacia abajo solo si el terreno baja más), con «Fit», ×10 o ×20. Relleno del terreno, trayectorias del día UTC o de toda la ventana, discos del Sol (0.53°) y de la Tierra (1.9°) a la escala angular horizontal, rellenos si son visibles y huecos si están tapados, más un anillo discontinuo de referencia (no a escala, indicado en la imagen). Siempre se muestran la fecha y hora UTC, el az/el de los dos astros y el estado («Sunlit» / «In shadow», «Earth link» / «No Earth link») con icono y texto.
+  - `web/src/views/SiteSection.tsx` (archivo extra): sección «At the site» bajo la bandeja, que carga el plan seleccionado y monta el panorama en `missionTime`. Ahí se montarán también el control de tiempo (T3.4.b) y el panel del sitio (T3.4.c). En la Fase 4 el modo vivir reutiliza las mismas piezas.
+  - Corrección de un fallo de T3.2.a y T3.3.b/c, descubierto aquí: el canvas del calendario y los SVG de siluetas y cintas se dimensionan con el ancho medido de su contenedor, y ese ancho mantenía el contenedor ancho. Al encoger la ventana (1920 → 774 px) la página quedaba con 1840 px y scroll horizontal. Ahora llevan `max-width: 100%` y se redibujan al ancho nuevo.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 103 passed
+    panorama.test.tsx: Sun 0.53° and Earth 1.9° in px follow the horizontal scale of every field of view
+                         (1800 px a 60° → Sol 15.9 px, Tierra 57 px de diámetro)
+                       the rendered discs have those radii
+                       elevation range −3° to 12°, extended down only if the terrain is lower
+                       time → sample of the window, flagged outside it
+                       always shows UTC time, az/el of both bodies and the light / link status from the data
+                       recentres on the Sun: the Sun disc moves to the middle
+                       draws no canvas (SVG only)
+    projection.test.ts: a narrower field of view centred on any azimuth (cruce por 0°)
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador: Haworth, 2027-03-18 00:00 UTC. El Sol está a az 81.4°, el −0.39°, detrás de una loma de ~2° → «In shadow». La Tierra está a az 22.4°, el +5.61° → «Earth link». Con 60° centrado en el Sol, el disco queda en el centro. Tras encoger la ventana, `scrollWidth` 759 ≤ `innerWidth` 774 y el calendario se redibuja a 709 px.
+- **Decisiones tomadas:** los discos usan la escala horizontal, así que son círculos aunque haya exageración vertical. A 360° el Sol mide menos de 3 px, por eso el anillo de referencia y los campos de 120° y 60°. El panorama se ve, de momento, en la vista de comparación para el plan seleccionado.
+- **Desviaciones de la spec / cambios en la guía:** la prueba es `panorama.test.tsx` (necesita jsdom), no `.ts`. Archivo extra `SiteSection.tsx`. La corrección del ancho va en este commit porque se encontró aquí y es de 4 líneas de CSS.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T3.4.b.

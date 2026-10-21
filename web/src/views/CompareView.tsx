@@ -4,6 +4,7 @@ import { useApp } from "../store/appStore";
 import { ConstraintControls } from "../components/ConstraintControls";
 import { Tray } from "../panels2d/Tray";
 import { Calendar } from "./Calendar";
+import { SiteSection } from "./SiteSection";
 
 /**
  * Compare mode layout (spec 8.0): constraints and compact calendar on top, comparison tray below.
@@ -39,6 +40,12 @@ export function CompareView() {
           {STRINGS.trayTitle}
         </h2>
         <Tray />
+      </section>
+      <section className="panel site-area" aria-labelledby="site-title">
+        <h2 id="site-title" className="panel-title">
+          {STRINGS.site.title}
+        </h2>
+        <SiteSection />
       </section>
     </>
   );

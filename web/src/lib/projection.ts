@@ -8,6 +8,7 @@ export interface Projection {
   width: number;
   height: number;
   startAz: number; // azimuth at the left edge (0 = North at the left)
+  fov: number; // horizontal field of view (deg); 360 = full panorama
   minEl: number; // elevation at the bottom edge (deg)
   maxEl: number; // elevation at the top edge (deg)
 }
@@ -23,19 +24,31 @@ export function makeProjection(
   range: { minDeg: number; maxDeg: number },
   exaggeration: number | null = null,
   startAz = 0,
+  fov = 360,
 ): Projection {
-  if (exaggeration === null) return { width, height, startAz, minEl: range.minDeg, maxEl: range.maxDeg };
-  const span = height / (exaggeration * (width / 360)); // degrees shown vertically
-  return { width, height, startAz, minEl: range.minDeg, maxEl: range.minDeg + span };
+  if (exaggeration === null) return { width, height, startAz, fov, minEl: range.minDeg, maxEl: range.maxDeg };
+  const span = height / (exaggeration * (width / fov)); // degrees shown vertically
+  return { width, height, startAz, fov, minEl: range.minDeg, maxEl: range.minDeg + span };
+}
+
+/** Start azimuth that centres a field of view on an azimuth. */
+export function centredOn(az: number, fov: number): number {
+  return (((az - fov / 2) % 360) + 360) % 360;
+}
+
+/** Horizontal pixels per degree. */
+export function pxPerDeg(p: Projection): number {
+  return p.width / p.fov;
 }
 
 /** Actual vertical exaggeration of a projection (for the label "Vertical ×N"). */
 export function exaggerationOf(p: Projection): number {
-  return p.height / (p.maxEl - p.minEl) / (p.width / 360);
+  return p.height / (p.maxEl - p.minEl) / pxPerDeg(p);
 }
 
+/** x of an azimuth; outside the field of view it falls beyond the right edge (clipped by the SVG). */
 export function azToX(p: Projection, az: number): number {
-  return ((((az - p.startAz) % 360) + 360) % 360) * (p.width / 360);
+  return ((((az - p.startAz) % 360) + 360) % 360) * pxPerDeg(p);
 }
 
 export function elToY(p: Projection, el: number): number {
@@ -44,28 +57,33 @@ export function elToY(p: Projection, el: number): number {
 
 /** Pixel size of an angular diameter (horizontal scale), e.g. the 0.53° Sun disc. */
 export function angularSizePx(p: Projection, deg: number): number {
-  return deg * (p.width / 360);
+  return deg * pxPerDeg(p);
 }
 
-/** SVG path of the terrain silhouette (filled down to the bottom edge) from a 360-bin mask. */
+/**
+ * SVG path of the terrain silhouette (filled down to the bottom edge) from a mask of bins of `azStep`
+ * degrees (bin i at azimuth i·azStep). Points sit at the bins' own azimuths, so any start azimuth works.
+ */
 export function silhouettePath(p: Projection, elevDeg: number[], azStep = 360 / elevDeg.length): string {
-  const pts: string[] = [];
   const n = elevDeg.length;
-  // walk the panel from left to right, wrapping around the mask
-  for (let i = 0; i <= n; i++) {
-    const az = p.startAz + i * azStep;
-    const bin = Math.round(((((az % 360) + 360) % 360) / azStep)) % n;
-    const x = i * azStep * (p.width / 360);
-    pts.push(`${x.toFixed(1)},${elToY(p, elevDeg[bin]).toFixed(1)}`);
+  const k = pxPerDeg(p);
+  const first = Math.floor(p.startAz / azStep);
+  const last = Math.ceil((p.startAz + p.fov) / azStep);
+  const xs: string[] = [];
+  const pts: string[] = [];
+  for (let b = first; b <= last; b++) {
+    const x = ((b * azStep - p.startAz) * k).toFixed(1);
+    xs.push(x);
+    pts.push(`${x},${elToY(p, elevDeg[((b % n) + n) % n]).toFixed(1)}`);
   }
-  return `M0,${p.height} L${pts.join(" L")} L${p.width},${p.height} Z`;
+  return `M${xs[0]},${p.height} L${pts.join(" L")} L${xs[xs.length - 1]},${p.height} Z`;
 }
 
-/** SVG path of a sky track, broken where it wraps around the left/right edge. */
-export function trackPath(p: Projection, az: ArrayLike<number>, el: ArrayLike<number>, stride = 1): string {
+/** SVG path of a sky track (samples [from, to)), broken where it wraps around the left/right edge. */
+export function trackPath(p: Projection, az: ArrayLike<number>, el: ArrayLike<number>, stride = 1, from = 0, to = az.length): string {
   let d = "";
   let prevX: number | null = null;
-  for (let i = 0; i < az.length; i += stride) {
+  for (let i = from; i < to; i += stride) {
     const x = azToX(p, az[i]);
     const y = elToY(p, el[i]);
     const jump = prevX === null || Math.abs(x - prevX) > p.width / 2;
