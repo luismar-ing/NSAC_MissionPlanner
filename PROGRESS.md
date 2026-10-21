@@ -1373,3 +1373,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** el problema de T3.1.a (peticiones duplicadas en desarrollo) queda resuelto.
 - **Siguiente tarea:** T3.1.c.
+
+## 2026-10-21 · T3.1.c · Tokens visuales, disposición base y textos en inglés
+
+- **Tarea:** T3.1.c — Tokens, disposición y textos ([x]).
+- **Qué se hizo:**
+  - `web/src/styles/tokens.ts`: **fuente única** de colores (los 7 de la spec 9 tal cual, más tonos de UI derivados), espaciado, tipografía para proyector y duraciones de transición (200/400 ms). `applyTokens()` los publica como variables CSS al arrancar; la escena 3D usará las mismas constantes.
+  - `tokens.css`: estilos base sin un solo color hexadecimal, foco visible, `prefers-reduced-motion` y disposición responsive.
+  - `web/src/lib/strings.ts`: todos los textos en inglés (D2), centralizados para poder traducirlos.
+  - `web/src/views/CompareView.tsx`: modo comparar (spec 8.0) con restricciones, calendario y bandeja como huecos para T3.2 y T3.3. Cabecera con insignia de datos y pie con créditos.
+  - `web/tests/tokens.test.ts`.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test           → Tests 55 passed
+    keeps the seven spec colours | no hex colour appears outside styles/tokens.ts | exposes every colour as a CSS custom property | UI strings are centralised and in English
+  $ grep -rnE "#[0-9a-fA-F]{3,8}" web/src (sin styles/tokens.ts) → ningún resultado
+  $ npm --prefix web run typecheck  → exit 0
+  ```
+  Captura a 1920×1080 en el navegador integrado, revisada: tema oscuro tipo centro de control; cabecera «PolePlanner — Lunar south pole landing planner» con la insignia «REAL data · 2c2f11dad7»; fila de «Mission constraints» y «Arrival calendar (365 arrival days × 5 sites)»; «Comparison tray» con su estado vacío; pie con los créditos de NASA/LOLA, NAIF/SPICE, Horizons y USGS y la nota ILLUSTRATIVE.
+- **Decisiones tomadas:** los tonos derivados (borde, texto atenuado, foco, peligro…) son de diseño. Si el humano quiere ajustar la paleta, solo se toca `tokens.ts`.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** la revisión visual definitiva con el humano es T5.2.e.
+- **Siguiente tarea:** T3.1.d.

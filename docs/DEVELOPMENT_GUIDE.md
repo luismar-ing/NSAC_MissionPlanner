@@ -500,7 +500,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.1.a · **Spec:** 8 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** pruebas: un sexto plan anclado se rechaza; seleccionar un plan actualiza sitio y ventana; `compareTime` y `missionTime` son independientes.
 
-##### [ ] T3.1.c — Tokens visuales, disposición base y textos en inglés
+##### [x] T3.1.c — Tokens visuales, disposición base y textos en inglés
 - **Qué:** tokens de la sección 9 en un único módulo (variables CSS y constantes TS compartidas por 2D y 3D); disposición del modo comparar (cabecera, controles, calendario, bandeja); textos de la interfaz en inglés centralizados en un módulo (preparado para traducción, sin traducir).
 - **Archivos:** `web/src/styles/tokens.ts`, `web/src/styles/tokens.css`, `web/src/lib/strings.ts`, `web/src/views/CompareView.tsx`
 - **Depende de:** T3.1.b · **Spec:** 8.0, 9 · **Decisiones:** D2 · **Est.:** 2 h · **Adelantable**
