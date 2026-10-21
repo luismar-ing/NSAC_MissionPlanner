@@ -148,16 +148,80 @@ def fetch_feature_sources(path, accessed: str) -> dict:
     return data
 
 
-if __name__ == "__main__":
+# ---------------------------------------------------------------- site_features/{site}.json (T2.3.c)
+
+DEM_CITATION = "LOLA DEM LDEM_80S_40MPP_ADJ (Barker et al. 2023, doi:10.3847/PSJ/acf3e1)"
+
+
+def site_features(site: dict, region: str, region_doi: str, nearby: list[dict]) -> dict:
+    """Atributos de 5.10 con su fuente o método (contrato §12). Las métricas de ventana van en windows/daily."""
+    from pipeline.dem import DemWindow, latlon_to_xy
+
+    x, y = latlon_to_xy(site["lat"], site["lon"])
+    st = slope_stats(DemWindow.read(x, y, config.SLOPE_RADIUS_M * 1.6), x, y, site["lat"])
+    point = f"highest DEM pixel inside the USGS region (McClernan 2024, {region_doi}); {DEM_CITATION}"
+    slope_method = (f"Central-difference gradient of the 40 m DEM within a {config.SLOPE_RADIUS_M / 1000:.0f} km radius "
+                    f"({st['n_pixels']} pixels), corrected for the polar stereographic scale factor (k = {st['scale_factor']:.5f})")
+
+    def attr(key, label, value, unit, source, method):
+        return {"key": key, "label": label, "value": value, "unit": unit, "status": "available", "source": source, "method": method}
+
+    return {
+        "site_id": site["id"],
+        "attributes": [
+            attr("region", "Artemis III candidate region", region, None, f"USGS (McClernan 2024, {region_doi})",
+                 "Official region polygon; the site is a representative point inside it, not a real mission landing site"),
+            attr("lat", "Latitude", site["lat"], "deg", point, "Planetocentric latitude"),
+            attr("lon", "Longitude", site["lon"], "deg", point, "East longitude, -180 to 180"),
+            attr("elevation_m", "Elevation", site["elevation_m"], "m", DEM_CITATION, "Height above the 1737.4 km reference sphere"),
+            attr("slope_mean_deg", "Mean slope", round(st["slope_mean_deg"], 2), "deg", DEM_CITATION, slope_method),
+            attr("slope_max_deg", "Max slope", round(st["slope_max_deg"], 2), "deg", DEM_CITATION, slope_method),
+            attr("slope_radius_m", "Slope reference radius", config.SLOPE_RADIUS_M, "m", "PolePlanner parameter (decision D10)",
+                 "Radius of the circle used for the slope statistics"),
+        ],
+        "nearby_features": nearby,
+    }
+
+
+def main(argv=None) -> int:
+    import argparse
+    import json
     import sys
     from datetime import datetime, timezone
     from pathlib import Path
 
+    from pipeline.validate import validate_file
+
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    out = Path(__file__).with_name("feature_sources.json")
-    d = fetch_feature_sources(out, datetime.now(timezone.utc).strftime("%Y-%m-%d"))
-    print(f"{d['n_features_moon']} rasgos de la Luna en el nomenclátor; sistemas {d['coordinate_systems']}")
-    for sid, feats in d["features_by_site"].items():
-        print(f"{sid:18s} " + "; ".join(f"{f['name']} ({f['type']}, {f['distance_km']:.1f} km)" for f in feats))
-    print(f"escrito {out.name}")
+    ap = argparse.ArgumentParser(description="Características de los sitios (T2.3.b/c)")
+    ap.add_argument("--fetch-gazetteer", action="store_true", help="vuelve a consultar el nomenclátor IAU/USGS")
+    args = ap.parse_args(argv)
+    root = Path(__file__).resolve().parents[1]
+    src = Path(__file__).with_name("feature_sources.json")
+    if args.fetch_gazetteer:
+        d = fetch_feature_sources(src, datetime.now(timezone.utc).strftime("%Y-%m-%d"))
+        print(f"{d['n_features_moon']} rasgos de la Luna; sistemas {d['coordinate_systems']}")
+        for sid, feats in d["features_by_site"].items():
+            print(f"{sid:18s} " + "; ".join(f"{f['name']} ({f['type']}, {f['distance_km']:.1f} km)" for f in feats))
+        return 0
+    sources = json.loads(src.read_text(encoding="utf-8"))
+    cfg = {s["id"]: s for s in json.loads((root / "pipeline" / "sites_source.json").read_text(encoding="utf-8"))["sites"]}
+    out = root / "pipeline" / "out" / "site_features"
+    out.mkdir(parents=True, exist_ok=True)
+    errors = []
+    for site in json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8")):
+        c = cfg[site["id"]]
+        feats = site_features(site, c["region"], c["doi"], sources["features_by_site"][site["id"]])
+        path = out / f"{site['id']}.json"
+        path.write_text(json.dumps(feats, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        errs = validate_file(path)[1]
+        errors += errs
+        a = {x["key"]: x["value"] for x in feats["attributes"]}
+        print(f"{site['id']:18s} {len(feats['attributes'])} atributos, {len(feats['nearby_features'])} rasgos | "
+              f"pendiente {a['slope_mean_deg']}° / {a['slope_max_deg']}° | {'OK' if not errs else errs}")
+    return 0 if not errors else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

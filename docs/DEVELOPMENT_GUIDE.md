@@ -430,7 +430,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T0.3.b · **Spec:** 5.10, 11 regla 1 · **Decisiones:** D10 · **Est.:** 2 h
 - **Aceptación:** cada rasgo con cita y fecha de consulta; prueba de distancia con un caso conocido sobre la esfera.
 
-##### [ ] T2.3.c — site_features/{site}.json
+##### [x] T2.3.c — site_features/{site}.json
 - **Qué:** coordenadas, elevación, pendientes, resumen de métricas, horas de Sol y Tierra por día y rasgos cercanos, cada uno con su fuente o método.
 - **Archivos:** `pipeline/site_features.py`
 - **Depende de:** T2.3.a, T2.3.b, T1.4.d · **Spec:** 5.10, 8.6, 7.2 · **Decisiones:** D10 · **Est.:** 1.5 h

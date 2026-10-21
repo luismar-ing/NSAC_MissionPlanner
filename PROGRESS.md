@@ -1179,3 +1179,22 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** las distancias son al centro de cada rasgo, no a su borde (se indicará en el tooltip de la interfaz).
 - **Siguiente tarea:** T2.3.c.
+
+## 2026-10-21 · T2.3.c · site_features/{site}.json
+
+- **Tarea:** T2.3.c — `site_features/{site}.json` ([x]).
+- **Qué se hizo:** en `pipeline/site_features.py`, `site_features` y `main`. `python -m pipeline.site_features` escribe `pipeline/out/site_features/{id}.json`; `--fetch-gazetteer` reconsulta el nomenclátor (T2.3.b). Atributos, todos `available` con fuente y método: `region` (USGS), `lat`, `lon`, `elevation_m`, `slope_mean_deg`, `slope_max_deg` y `slope_radius_m`. Rasgos cercanos de `feature_sources.json`. Comando en `CLAUDE.md`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.site_features
+  connecting_ridge   7 atributos, 8 rasgos | pendiente 8.58° / 20.2° | OK
+  haworth            7 atributos, 3 rasgos | pendiente 8.12° / 19.22° | OK
+  nobile_rim_1       7 atributos, 8 rasgos | pendiente 7.7° / 23.59° | OK
+  malapert_massif    7 atributos, 5 rasgos | pendiente 7.14° / 25.3° | OK
+  de_gerlache_rim_2  7 atributos, 7 rasgos | pendiente 12.99° / 24.17° | OK
+  ```
+  (OK = `validate_file` sin errores; el contrato exige `source` no vacío en los atributos `available`). Ejemplo: `nearby[0]` de Malapert = Mons Malapert, massif, 7.93 km, «IAU/USGS Gazetteer…, Feature ID 16338 (Mons, montes), accessed 2026-10-21».
+- **Decisiones tomadas:** las métricas de ventana y las horas por día (5.10) no se repiten aquí: el panel del sitio (T3.4.c) las lee de `windows/` y `daily/` (contrato §12). Se añade el atributo `region`, que aclara que el sitio es un punto representativo y no un lugar real de aterrizaje.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T2.3.d.

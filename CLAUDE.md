@@ -30,6 +30,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Validar datos | `.venv/Scripts/python -m pipeline.validate <dir>` o `--file <archivo>` | disponible |
 | Efemérides de los sitios (1 año) / de escena | `.venv/Scripts/python -m pipeline.ephemeris` / `... --scene` (→ `pipeline/out/`) | disponible |
 | Trayectorias ILLUSTRATIVE | `.venv/Scripts/python -m pipeline.trajectory [--plot]` (→ `pipeline/out/trajectory/`) | disponible |
+| Características de los sitios | `.venv/Scripts/python -m pipeline.site_features` (`--fetch-gazetteer` para reconsultar el nomenclátor) | disponible |
 | Datos SYNTHETIC | `python -m pipeline.synthetic` | por definir (TS.1.a) |
 | Correr el pipeline | `python -m pipeline.build_all` | por definir (T2.4.a) |
 | Tests pipeline | `.venv/Scripts/python -m pytest` (config en `pyproject.toml`) | disponible |
