@@ -1,38 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SyntheticBanner } from "./components/SyntheticBanner";
-import { DataError, DataStore, type Core } from "./lib/data";
+import { appStore, useApp } from "./store/appStore";
 
 export const APP_TITLE = "PolePlanner";
 
-type State = { status: "loading" } | { status: "error"; error: DataError | Error } | { status: "ready"; core: Core };
-
-// Provisional shell (T3.1.a): loads and validates the dataset. The real layout arrives in T3.1.c.
+// Provisional shell: loads the dataset through the global store. The real layout arrives in T3.1.c.
 export function App() {
-  const [state, setState] = useState<State>({ status: "loading" });
+  const load = useApp((s) => s.load);
+  const manifest = useApp((s) => s.manifest);
+  const nSites = useApp((s) => s.sites.length);
+  const nPlans = useApp((s) => s.plans.length);
 
   useEffect(() => {
-    DataStore.forPage()
-      .loadCore()
-      .then((core) => setState({ status: "ready", core }))
-      .catch((error: Error) => setState({ status: "error", error }));
+    void appStore.getState().loadCore(); // idempotent: StrictMode's double effect does not load twice
   }, []);
 
   return (
     <main>
       <h1>{APP_TITLE}</h1>
-      {state.status === "loading" && <p aria-busy="true">Loading mission data…</p>}
-      {state.status === "error" && (
-        <p role="alert">
-          Could not load the mission data: {state.error.message}
-        </p>
-      )}
-      {state.status === "ready" && (
+      {(load.status === "idle" || load.status === "loading") && <p aria-busy="true">Loading mission data…</p>}
+      {load.status === "error" && <p role="alert">Could not load the mission data: {load.message}</p>}
+      {load.status === "ready" && manifest && (
         <>
-          <SyntheticBanner manifest={state.core.manifest} />
+          <SyntheticBanner manifest={manifest} />
           <p data-testid="data-summary">
-            {state.core.sites.length} sites, {state.core.plans.length} mission plans, arrivals{" "}
-            {state.core.manifest.date_range.arrival_start} to {state.core.manifest.date_range.arrival_end} (
-            {state.core.manifest.data_status} data, version {state.core.manifest.data_version}).
+            {nSites} sites, {nPlans} mission plans, arrivals {manifest.date_range.arrival_start} to{" "}
+            {manifest.date_range.arrival_end} ({manifest.data_status} data, version {manifest.data_version}).
           </p>
         </>
       )}

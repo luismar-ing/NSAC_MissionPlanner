@@ -494,7 +494,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T0.4.c, T2.4.b · **Spec:** 7, 7.2, 10 (T3.1), 11 regla 1 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
 - **Aceptación:** pruebas Vitest con fetch simulado: archivo inválido → error tipado; manifiesto SYNTHETIC (fixtures del contrato) → aviso activo; manifiesto REAL de `web/public/data` → sin aviso; `npm --prefix web run typecheck` sin errores; revisión en dev de que carga los datos reales.
 
-##### [ ] T3.1.b — Estado global (Zustand)
+##### [x] T3.1.b — Estado global (Zustand)
 - **Qué:** `plans`, `comparePlans` (máx. 5), `selectedPlanId`, `selectedSite`, `selectedWindow`, `constraints`, `missionPhase`, `missionTime`, `compareTime` y sus acciones.
 - **Archivos:** `web/src/store/*.ts`, `web/tests/store.test.ts`
 - **Depende de:** T3.1.a · **Spec:** 8 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

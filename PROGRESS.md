@@ -1349,3 +1349,27 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - En desarrollo cada archivo se pide dos veces porque React StrictMode monta el efecto dos veces y crea dos `DataStore`. Se resuelve en T3.1.b con un único store en el estado global; en producción no ocurre.
   - Durante la revisión apareció `web/public/data/manifest.json` regenerado sobre un commit posterior (solo cambiaban `data_version` y `generated_utc`; los datos eran idénticos). No se identificó qué ejecución lo produjo. Se restauró la versión con commit.
 - **Siguiente tarea:** T3.1.b.
+
+## 2026-10-21 · T3.1.b · Estado global (Zustand)
+
+- **Tarea:** T3.1.b — Estado global ([x]).
+- **Qué se hizo:**
+  - `web/src/store/appStore.ts`: store vanilla de zustand (`createAppStore`) con el estado de la spec 8 (`plans`, `comparePlans` hasta 5, `selectedPlanId`, `selectedSite`, `selectedWindow`, `constraints` {X, Y, Z} opcionales, `missionPhase`, `missionTime` en ms UTC, `compareTime` en horas desde la llegada), estado de carga y `notice` para mensajes al usuario.
+  - Acciones: `loadCore` idempotente, `selectPlan` (fija sitio, ventana y reloj de misión), `pinPlan` (máximo 5, con aviso), `unpinPlan`, `setConstraints`, `setWindow`, `setMissionPhase`, `setMissionTime`, `setCompareTime` (limitado a 14 días).
+  - Un único `appStore` con un único `DataStore` y el hook `useApp`. `App.tsx` usa el store. Dependencia `zustand` 5.0.15 (exacta).
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 51 passed (6 nuevas en store.test.ts)
+    loads the core data once
+    selecting a plan updates site, window and mission clock
+    the tray holds at most 5 plans; a sixth is rejected with a notice
+    compareTime and missionTime are independent clocks
+    constraints are optional and patchable
+    window length must be one of the manifest values
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador: una sola petición por archivo (manifest, sites, plans), frente a dos antes (StrictMode); el resumen de los datos REAL se muestra correctamente.
+- **Decisiones tomadas:** `selectedWindow` es la L del calendario (3, 7, 14). `compareTime` se mide en horas desde la llegada (spec 8.1: «día y hora desde la llegada»). `missionTime` es un instante absoluto (ms UTC).
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** el problema de T3.1.a (peticiones duplicadas en desarrollo) queda resuelto.
+- **Siguiente tarea:** T3.1.c.
