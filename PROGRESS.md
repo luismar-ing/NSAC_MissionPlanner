@@ -560,3 +560,20 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** el servidor clásico de Blue Marble (Visible Earth, NEO) ya no publica listados; por eso se usa SVS 3615.
 - **Siguiente tarea:** T0.3.a (sitios); ver el bloqueo en la siguiente entrada.
+
+## 2026-10-21 · T0.3.a · Fuentes oficiales de los sitios — BLOQUEADA
+
+- **Tarea:** T0.3.a — Fuentes oficiales de los sitios ([!]).
+- **Qué se hizo (investigación):**
+  - Los comunicados de NASA (13 regiones en 2022, 9 en octubre de 2024) y SVS 5013 nombran regiones de ~15 × 15 km, pero **no dan coordenadas ni contornos**.
+  - Las 9 regiones de 2024: Peak near Cabeus B, Haworth, Malapert Massif, Mons Mouton Plateau, Mons Mouton, Nobile Rim 1, Nobile Rim 2, de Gerlache Rim 2, Slater Plain. Las 13 de 2022 (SVS 5013) incluyen además Connecting Ridge, Connecting Ridge Extended, de Gerlache Rim 1, Peak Near Shackleton, Leibnitz Beta Plateau, Amundsen Rim, Faustini Rim A y de Gerlache-Kocher Massif.
+  - **Fuente oficial con geometría:** USGS, «Down Selected Artemis III Candidate Landing Site Navigational Grids» (ScienceBase, item `671a6fa8d34efed5620f89f8`, licencia CC0 según Astropedia), con shapefiles de las 9 regiones de 2024 (LGRS 1 km / 100 m / 10 m, proyecciones LPS/LTM). Astropedia enlaza un segundo item más amplio (`67168797d34ebf903f48b6fc`, LGRS en formato ACC), que podría incluir las regiones de 2022; no se ha podido comprobar.
+  - Alternativa verificada para rasgos con nombre (no para puntos de aterrizaje): el nomenclátor IAU/USGS (planetarynames.wr.usgs.gov) responde HTTP 200 para Malapert, Haworth, Nobile, de Gerlache y Shackleton. Servirá en T2.3.b.
+- **Bloqueo:** `sciencebase.gov` responde con un desafío anti-bots de Cloudflare (HTTP 403, `__cf_chl_*`) a cualquier petición automática. No se sortea (está prohibido); hace falta la descarga manual.
+- **Acción del humano:**
+  1. Abrir en el navegador https://www.sciencebase.gov/catalog/item/671a6fa8d34efed5620f89f8 y descargar los archivos adjuntos (zip o shapefiles).
+  2. Si es posible, hacer lo mismo con https://www.sciencebase.gov/catalog/item/67168797d34ebf903f48b6fc (por si incluye Connecting Ridge / Shackleton, de 2022).
+  3. Dejar los archivos tal cual en `data/regions/` y avisar en el chat. El agente registra URLs y SHA-256 en `data/README.md`.
+- **Método propuesto una vez descargados (para confirmar con el humano):** por región, el punto del DEM LOLA de máxima elevación dentro del polígono oficial (los nombres de D3 son bordes, macizos y crestas), documentado en `docs/sites.md`. Nombres concretos propuestos para D3: Connecting Ridge (borde de Shackleton; lista de 2022), Haworth, Nobile Rim 1, Malapert Massif y de Gerlache Rim 2 (2024). Si el item de 2022 no tiene Connecting Ridge, se sustituye por otra región de 2024 (por ejemplo Mons Mouton) o se baja a 4 sitios.
+- **Problemas abiertos:** T0.3.b y T0.3.c dependen de esta subtarea, y con ellas el cierre de la Fase 0 y casi toda la Fase 1 (T1.1.a, T1.1.b, T1.2.e y T1.3.d necesitan los sitios).
+- **Siguiente tarea:** tras el desbloqueo, T0.3.a → T0.3.b → T0.3.c. Elegibles mientras tanto: la Pista S (TS.1.a–c) y las adelantables de las Fases 1 y 3.
