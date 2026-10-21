@@ -941,3 +941,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** 1.15 MB entra en el presupuesto de series (< 15 MB). Si la carga inicial (< 3 s) lo pidiera, el front end podría generar los planes a partir de `sites` y `date_range`, que son deterministas.
 - **Siguiente tarea:** T1.5.b.
+
+## 2026-10-21 · T1.5.b · Suite automática de sanity checks (5.7)
+
+- **Tarea:** T1.5.b — Sanity checks ([x]).
+- **Qué se hizo:** `pipeline/tests/test_sanity.py` sobre las salidas reales de `pipeline/out/` (se omite si faltan):
+  - Elevación del Sol y la Tierra dentro de los límites por latitud (`docs/validation.md` §2).
+  - La Tierra oscila en una franja de azimut < 40°.
+  - Máscaras finitas y de pocos grados (|el| < 10°).
+  - Control en el fondo de Shackleton < 1 % de Sol, y cada sitio supera al control en más de 50 puntos.
+  - Banderas 0/1; porcentajes, horas y score en rango; 365 filas por L.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_sanity.py -v
+  test_sun_and_earth_elevation_within_latitude_bounds[×5] PASSED
+  test_horizon_mask_is_plausible[×5] PASSED
+  test_ridges_have_more_sun_than_the_crater_floor PASSED
+  test_flags_and_percentages_in_range[×5] PASSED
+  16 passed in 0.22s
+  ```
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** los límites del Sol y la Tierra son los corregidos por latitud de T1.1.a, en lugar del ±1.6° literal.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T1.5.c.

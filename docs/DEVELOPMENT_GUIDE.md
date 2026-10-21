@@ -316,7 +316,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.4.d · **Spec:** 5.8, 7.2 · **Decisiones:** D5, D6, D7 · **Est.:** 1.5 h
 - **Aceptación:** `python -m pipeline.validate` pasa; el número de planes es el esperado según D6; la comprobación cruzada confirma lanzamiento derivado y sitio válido en todos.
 
-##### [ ] T1.5.b — Suite automática de sanity checks (5.7)
+##### [x] T1.5.b — Suite automática de sanity checks (5.7)
 - **Qué:** pruebas sobre las salidas reales (se saltan si no existen): límites de elevación del Sol y la Tierra por latitud (`docs/validation.md` §2), cresta > fondo de cráter, porcentajes en [0, 100].
 - **Archivos:** `pipeline/tests/test_sanity.py`
 - **Depende de:** T1.5.a · **Spec:** 5.7, 11 regla 4 · **Decisiones:** — · **Est.:** 1 h
