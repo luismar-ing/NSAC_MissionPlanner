@@ -284,7 +284,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 
 ### T1.4 windows.py: métricas por ventana (spec 5.5, 5.6)
 
-##### [ ] T1.4.a — Agregados diarios
+##### [x] T1.4.a — Agregados diarios
 - **Qué:** por día UTC: `sun_pct`, `earth_h`, `longest_dark_h`, `longest_comm_gap_h`.
 - **Archivos:** `pipeline/windows.py`, `pipeline/tests/test_windows.py`
 - **Depende de:** T0.1.b · **Spec:** 5.5, 7.2 (daily) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

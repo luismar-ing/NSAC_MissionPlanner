@@ -453,3 +453,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno. El criterio activo se escribirá en `manifest.params.sun_criterion`.
 - **Problemas abiertos:** primera versión de la prueba de pendiente mal planteada (una recta por el centro siempre da 0.5); corregida con una recta desplazada y su solución exacta.
 - **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, T1.4.a (adelantable).
+
+## 2026-10-21 · T1.4.a · Agregados diarios — adelantada
+
+- **Tarea:** T1.4.a — Agregados diarios ([x]). **Adelantable**.
+- **Qué se hizo:** `pipeline/windows.py` con `longest_run` (racha más larga, vectorizada), `samples_per_day` y `daily_aggregates`, que por día UTC calcula `sun_pct`, `earth_h`, `longest_dark_h` y `longest_comm_gap_h` en el formato del contrato §8. Exige series que empiecen a las 00:00Z, con días completos y un paso que divida 1440 min.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_windows.py -v
+  test_longest_run PASSED
+  test_full_sun_and_link PASSED
+  test_known_day PASSED                 (Sol 06-18 → 50 %, oscuridad máx 6 h; sin Tierra 02:00-05:30 → 20.5 h, hueco 3.5 h)
+  test_dark_streak_crossing_midnight_is_cut_per_day PASSED   (22:00→04:00 da 2 h y 4 h)
+  test_step_10_min PASSED
+  test_rejects_bad_series[start|partial|step] PASSED
+  8 passed in 0.16s
+  ```
+- **Decisiones tomadas:** las rachas diarias se cortan en la medianoche UTC (contrato §8). Las de ventana (T1.4.b) sí cruzan días.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, T1.4.b (adelantable).
