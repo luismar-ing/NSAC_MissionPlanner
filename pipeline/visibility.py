@@ -56,3 +56,35 @@ def earth_partial(earth_az_deg: np.ndarray, earth_el_deg: np.ndarray, elev_deg: 
     mask = horizon_at(earth_az_deg, elev_deg, az_step_deg)
     no_link = el <= mask + antenna_margin_deg
     return (no_link & (el + earth_radius_deg > mask)).astype(np.uint8)
+
+
+def sun_disk_fraction(sun_az_deg: np.ndarray, sun_el_deg: np.ndarray, elev_deg: np.ndarray,
+                      az_step_deg: float = config.HORIZON_AZ_STEP_DEG,
+                      sun_radius_deg: float = config.SUN_RADIUS_DEG, columns: int = 41) -> np.ndarray:
+    """Spec 5.3 (rigor extra): fracción del disco solar por encima de la máscara, en [0, 1].
+
+    El disco se integra por columnas verticales: en cada desplazamiento horizontal x ∈ [−r, r]
+    la cuerda va de el − √(r² − x²) a el + √(r² − x²), y se cuenta la parte por encima de la
+    máscara en el azimut az + x / cos(el). Así una máscara inclinada dentro del disco cuenta.
+    Con una máscara plana coincide con la fórmula del segmento circular (prueba).
+    """
+    az = np.asarray(sun_az_deg, dtype=float)[..., None]
+    el = np.asarray(sun_el_deg, dtype=float)[..., None]
+    r = sun_radius_deg
+    # Regla del punto medio en x (evita las columnas de cuerda nula en ±r)
+    x = (np.arange(columns) + 0.5) / columns * 2 * r - r
+    half = np.sqrt(r**2 - x**2)
+    mask = horizon_at(az + x / np.cos(np.radians(el)), elev_deg, az_step_deg)
+    visible = np.clip(el + half - np.maximum(el - half, mask), 0.0, None)
+    return (visible * (2 * r / columns)).sum(axis=-1) / (np.pi * r**2) * _area_correction(columns)
+
+
+def _area_correction(columns: int) -> float:
+    """Normaliza el error de la regla del punto medio para que un disco libre dé exactamente 1."""
+    x = (np.arange(columns) + 0.5) / columns * 2 - 1
+    return np.pi / (2 * np.sqrt(1 - x**2) * (2 / columns)).sum()
+
+
+def sun_day_from_fraction(fraction: np.ndarray, threshold: float = config.SUN_FRACTION_THRESHOLD) -> np.ndarray:
+    """Spec 5.3: «día» si la fracción visible supera el umbral (0.5 por defecto)  → 0/1 (uint8)."""
+    return (np.asarray(fraction) > threshold).astype(np.uint8)

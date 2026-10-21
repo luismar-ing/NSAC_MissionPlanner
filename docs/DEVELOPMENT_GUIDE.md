@@ -270,7 +270,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.3.a · **Spec:** 5.4 · **Decisiones:** D12 · **Est.:** 1 h · **Adelantable**
 - **Aceptación:** pruebas con elevación = máscara + margen ± ε y con distintos márgenes.
 
-##### [ ] T1.3.c — (Recortable) Fracción visible del disco solar
+##### [x] T1.3.c — (Recortable) Fracción visible del disco solar
 - **Qué:** fracción 0–1 del disco sobre la máscara; umbral 0.5 como "día" (parámetro). El criterio por defecto sigue siendo el del borde superior; el criterio usado se escribe en el manifiesto y se muestra en la interfaz.
 - **Archivos:** `pipeline/visibility.py`, `pipeline/tests/test_visibility.py`
 - **Depende de:** T1.3.a · **Spec:** 5.3 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

@@ -3,7 +3,14 @@
 import numpy as np
 import pytest
 
-from pipeline.visibility import earth_partial, earth_visible, horizon_at, sun_visible
+from pipeline.visibility import (
+    earth_partial,
+    earth_visible,
+    horizon_at,
+    sun_day_from_fraction,
+    sun_disk_fraction,
+    sun_visible,
+)
 
 R_SUN = 0.265
 EPS = 1e-6
@@ -95,3 +102,47 @@ def test_partial_visibility_when_only_the_limb_clears_the_mask():
     assert vis.tolist() == [1, 0, 0, 0]
     assert part.tolist() == [0, 1, 1, 0]  # nunca parcial y visible a la vez
     assert not np.any(vis & part)
+
+
+# ---------------------------------------------------------------- fracción del disco (T1.3.c)
+
+
+
+def segment_fraction(h, r=R_SUN):
+    """Fracción exacta del disco por encima de una recta horizontal a distancia h bajo el centro."""
+    c = -np.clip(h, -r, r)  # recta en y = c respecto al centro
+    return (r**2 * np.arccos(c / r) - c * np.sqrt(r**2 - c**2)) / (np.pi * r**2)
+
+
+@pytest.mark.parametrize("offset,expected", [(+R_SUN + 0.01, 1.0), (0.0, 0.5), (-R_SUN - 0.01, 0.0)])
+def test_fraction_0_half_1_on_flat_mask(offset, expected):
+    mask = flat_mask(1.0)
+    f = sun_disk_fraction(np.array([120.0]), np.array([1.0 + offset]), mask)[0]
+    assert f == pytest.approx(expected, abs=1e-3)
+
+
+def test_fraction_matches_circular_segment_formula():
+    mask = flat_mask(0.5)
+    h = np.linspace(-R_SUN, R_SUN, 21)
+    f = sun_disk_fraction(np.full(h.size, 33.0), 0.5 + h, mask)
+    assert np.max(np.abs(f - segment_fraction(h))) < 2e-3
+    print(f"\nError máximo frente al segmento circular: {np.max(np.abs(f - segment_fraction(h))):.2e}")
+
+
+def test_fraction_sees_a_sloped_mask_within_the_disk():
+    # Máscara con pendiente de 10° por grado de azimut que vale +0.1° en el centro del disco:
+    # recta y = 0.1 + 10·x. Su distancia al centro es 0.1/√101 y el centro queda por debajo.
+    mask = np.zeros(360)
+    mask[100], mask[101] = -4.9, 5.1
+    f = sun_disk_fraction(np.array([100.5]), np.array([0.0]), mask)[0]
+    exact = segment_fraction(-0.1 / np.sqrt(101))
+    flat_model = segment_fraction(-0.1)  # lo que daría suponer la máscara horizontal en el centro
+    print(f"\nPendiente: fracción {f:.4f}, exacta {exact:.4f}, modelo plano {flat_model:.4f}")
+    assert f == pytest.approx(exact, abs=1e-2)
+    assert abs(f - flat_model) > 0.1
+
+
+def test_day_threshold_is_a_parameter():
+    f = np.array([0.49, 0.5, 0.51])
+    assert sun_day_from_fraction(f).tolist() == [0, 0, 1]
+    assert sun_day_from_fraction(f, threshold=0.3).tolist() == [1, 1, 1]

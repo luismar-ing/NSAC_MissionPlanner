@@ -435,3 +435,21 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** el contrato v1 no tiene un campo para la bandera parcial (`timeseries` solo lleva `earth_vis`). Si la interfaz la necesita, se añadirá `earth_partial` como campo opcional (cambio menor del contrato, 1.1.0).
 - **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, la siguiente adelantable (T1.3.c).
+
+## 2026-10-21 · T1.3.c · Fracción visible del disco solar — adelantada
+
+- **Tarea:** T1.3.c — Fracción visible del disco solar ([x]). **Adelantable**, recortable.
+- **Qué se hizo:** en `pipeline/visibility.py`, `sun_disk_fraction`: integra el disco (r = 0.265°) por 41 columnas verticales, evaluando la máscara en el azimut de cada columna, así cuenta una máscara inclinada dentro del disco. `sun_day_from_fraction` aplica el umbral (0.5 por defecto). En `config.py`: `SUN_CRITERION = "upper_limb"` (sigue siendo el criterio por defecto de 5.3) y `SUN_FRACTION_THRESHOLD = 0.5`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_visibility.py -v -s
+  test_fraction_0_half_1_on_flat_mask[0.275-1.0] / [0.0-0.5] / [-0.275-0.0] PASSED
+  Error máximo frente al segmento circular: 7.04e-04
+  Pendiente: fracción 0.4763, exacta 0.4761, modelo plano 0.2656
+  test_day_threshold_is_a_parameter PASSED
+  19 passed in 0.17s
+  ```
+- **Decisiones tomadas:** la integración por columnas en lugar de la fórmula del segmento con la máscara del centro: con relieves abruptos la diferencia es grande (0.476 frente a 0.266 en la prueba).
+- **Desviaciones de la spec / cambios en la guía:** ninguno. El criterio activo se escribirá en `manifest.params.sun_criterion`.
+- **Problemas abiertos:** primera versión de la prueba de pendiente mal planteada (una recta por el centro siempre da 0.5); corregida con una recta desplazada y su solución exacta.
+- **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, T1.4.a (adelantable).
