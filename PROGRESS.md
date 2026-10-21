@@ -1284,3 +1284,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** cada regeneración añade ~16 MB al historial de git. Si llegara a ser un problema, se movería a Git LFS o a un artefacto de release.
 - **Siguiente tarea:** cierre de la Fase 2 → hito de demo.
+
+## 2026-10-21 · HITO FASE 2 · Datos de la escena y del viaje cerrados
+
+- **Estado de la guía:** Fases 0, 1 y 2 completas (16 + 21 + 13 subtareas). Total: 50 [x], 58 [ ], 0 [!].
+- **Comprobación del hito:**
+  ```
+  $ python -m pytest -q                            → 273 passed
+  $ python -m pipeline.validate web/public/data    → OK: web/public/data cumple el contrato 1.0.0
+  $ python -m pipeline.build_all                   → 1895 archivos, 15.69 MB; validación del contrato: OK (31.7 s)
+    regenerar sobre el commit siguiente solo cambia manifest.json (data_version y generated_utc): datos idénticos
+  $ npm --prefix web test                          → Tests 37 passed
+  ```
+  Figuras: `docs/figures/trajectory_examples.png` y `docs/figures/polar_context.png`.
+- **Resultados clave de la Fase 2:**
+  - Escena (J2000, cada hora, 2026-12-28 → 2028-01-15): cuaterniones verificados contra SPICE; fase lunar frente a Horizons con un error ≤ 0.134 puntos; dirección del Sol 0.000000°; posición de la Luna ≤ 0.07 km. **Interpolación cúbica de posiciones obligatoria** (la lineal da 5 km de error).
+  - 1 825 trayectorias ILLUSTRATIVE (14 s), continuas, que aterrizan en el sitio a la hora (< 1 km).
+  - Características: pendientes (7–13° de media en 1 km) y rasgos IAU cercanos con Feature ID.
+  - Terreno: 3 niveles por sitio + contexto polar de 2 km (1.15 MB).
+  - Build reproducible byte a byte; 15.97 MB de datos (6.2 MB con gzip), dentro de D13.
+- **Siguiente tarea:** Fase 3. T3.1.a depende de la Pista S (TS.1.c); con los datos reales ya disponibles se propone omitir esa pista (pendiente de confirmación del humano).
