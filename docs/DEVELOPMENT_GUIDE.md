@@ -74,7 +74,7 @@ Las carpetas vacías de 7.1 (con `.gitkeep`), `PROGRESS.md`, `CLAUDE.md` y `.git
 - **Depende de:** — · **Spec:** 7.1, 10 (T0.1), 11 regla 12 · **Decisiones:** — · **Est.:** 1 h
 - **Aceptación:** `git ls-files` muestra todas las carpetas de 7.1; README tiene las secciones "Pipeline", "Front end" y "Data sources & credits".
 
-##### [ ] T0.1.b — Entorno Python del pipeline con versiones fijadas
+##### [x] T0.1.b — Entorno Python del pipeline con versiones fijadas
 - **Qué:** dependencias directas (numpy, spiceypy, rasterio o similar, pyproj, pandas, pydantic, matplotlib, pytest) y lista fijada con `==`; paquete `pipeline` importable desde la raíz; configuración de pytest; prueba de humo que importa todo. Comprobar que hay wheels para la versión de Python instalada en Windows (3.13); si rasterio falla, documentar la alternativa.
 - **Archivos:** `pipeline/requirements.in`, `pipeline/requirements.txt`, `pipeline/__init__.py`, `pyproject.toml` (solo configuración de pytest), `pipeline/tests/test_smoke.py`
 - **Depende de:** T0.1.a · **Spec:** 11 (pila, regla 5) · **Decisiones:** — · **Est.:** 1.5 h

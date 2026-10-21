@@ -1,0 +1,5 @@
+# Solo configuración de herramientas. Las dependencias del pipeline están en pipeline/requirements.txt.
+[tool.pytest.ini_options]
+testpaths = ["pipeline/tests"]
+pythonpath = ["."]
+addopts = "-ra"

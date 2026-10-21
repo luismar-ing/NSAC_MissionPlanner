@@ -118,3 +118,19 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** los comandos TBD se completan en T0.1.b, T0.1.c y T0.1.d.
 - **Siguiente tarea:** T0.1.b.
+
+## 2026-10-21 · T0.1.b · Entorno Python del pipeline con versiones fijadas
+
+- **Tarea:** T0.1.b — Entorno Python del pipeline con versiones fijadas ([x]).
+- **Qué se hizo:** `pipeline/requirements.in` (dependencias directas), `pipeline/requirements.txt` (todas fijadas con `==`, de `pip freeze`), `pipeline/__init__.py`, `pyproject.toml` en la raíz solo con la configuración de pytest (`testpaths`, `pythonpath = ["."]`), `pipeline/tests/test_smoke.py` (importa las 8 dependencias y comprueba CSPICE). Venv local en `.venv/` (ignorado por git).
+- **Cómo se verificó:** venv nuevo en el scratchpad, instalación desde `requirements.txt` y pytest:
+  ```
+  pip exit: 0
+  .........                                                                [100%]
+  9 passed in 1.34s
+  ```
+  Versiones clave: numpy 2.5.4, spiceypy 8.3.0, rasterio 1.5.2, pyproj 3.8.0, pandas 3.0.6, pydantic 2.14.1, matplotlib 3.11.2, pytest 9.1.1. Todas instalaron desde wheels en Python 3.13 / Windows (no hizo falta alternativa a rasterio).
+- **Decisiones tomadas:** pytest se ejecuta desde la raíz con `pythonpath = ["."]`, así los tests importan `pipeline.*`.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** `requirements.txt` se congeló en Windows; incluye `colorama` (dependencia de Windows de click/pytest), que es inofensiva en Linux.
+- **Siguiente tarea:** T0.1.c.

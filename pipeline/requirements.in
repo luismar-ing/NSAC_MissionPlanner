@@ -1,0 +1,9 @@
+# Dependencias directas del pipeline (spec 11). Las versiones fijadas están en requirements.txt.
+numpy
+spiceypy
+rasterio
+pyproj
+pandas
+pydantic
+matplotlib
+pytest
