@@ -424,7 +424,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T1.2.a, T1.2.b · **Spec:** 5.10, 10 (T2.3) · **Decisiones:** D10 · **Est.:** 2 h
 - **Aceptación:** pruebas en DEM sintético: plano inclinado de pendiente conocida (error < 0.1°) y cono.
 
-##### [ ] T2.3.b — Rasgos cercanos con fuente oficial (verificación)
+##### [x] T2.3.b — Rasgos cercanos con fuente oficial (verificación)
 - **Qué:** identificar el listado oficial de nomenclatura lunar (verificar cuál es la fuente oficial vigente) y extraer nombre y coordenadas de cráteres y crestas cercanos a cada sitio; distancia sobre la esfera. Sin dato verificado, se omite.
 - **Archivos:** `pipeline/site_features.py`, `pipeline/feature_sources.json`, `data/README.md`
 - **Depende de:** T0.3.b · **Spec:** 5.10, 11 regla 1 · **Decisiones:** D10 · **Est.:** 2 h

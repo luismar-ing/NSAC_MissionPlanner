@@ -1158,3 +1158,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** de Gerlache Rim 2 tiene la pendiente media más alta (13°), coherente con estar en la cresta del borde junto al contorno (nota de T0.3.c). La spec no define un umbral de pendiente para aterrizar, así que no se califica a ningún sitio de apto o no apto.
 - **Siguiente tarea:** T2.3.b.
+
+## 2026-10-21 · T2.3.b · Rasgos cercanos con fuente oficial (verificación)
+
+- **Tarea:** T2.3.b — Rasgos cercanos ([x]).
+- **Qué se hizo:** en `pipeline/site_features.py`, `great_circle_km` (haversine en la esfera de 1737.4 km), `parse_gazetteer` (tabla del nomenclátor IAU/USGS), `nearby_features` (rasgos **aprobados** a ≤ 50 km, máximo 8, ordenados por distancia; tipos IAU traducidos a los del contrato) y `fetch_feature_sources` (`python -m pipeline.site_features` → `pipeline/feature_sources.json`, versionado, con fuente, URL, fecha y Feature ID de cada rasgo). Parámetros `NEARBY_RADIUS_KM` y `NEARBY_MAX` en `config.py`. Contrato §12 aclarado (distancia al centro del rasgo) y fuente registrada en `data/README.md`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.site_features
+  9202 rasgos de la Luna en el nomenclátor; sistemas ['Planetographic, +East, -180 - 180']
+  connecting_ridge   Spudis (crater, 14.2 km); Marvin (20.0); Shackleton (20.2); Henson (26.5); Haynes (31.6); Sverdrup (34.9); de Gerlache (37.1); Brill (41.8)
+  haworth            Haworth (crater, 43.8 km); Mons Malapert (massif, 44.8 km); Lhamu (crater, 45.7 km)
+  nobile_rim_1       Masina (12.3); Dawa (13.8); Jaci (14.4); Mons Mouton (massif, 24.3); Floss (32.9); Stose (36.1); Nobile (41.7); Scott M (42.0)
+  malapert_massif    Mons Malapert (massif, 7.9 km); Lhamu (8.1); Malapert (37.2); Whitaker (40.1); Haworth (46.0)
+  de_gerlache_rim_2  de Gerlache (crater, 16.1 km); Marvin (20.1); Bay (22.1); Brill (23.0); Spudis (28.9); Cartwright (34.8); Henson (44.9)
+  $ python -m pytest pipeline/tests/test_site_features.py → 14 passed
+  ```
+  Casos conocidos: (0°, 0°)–(0°, 90°) = π·R/2; desde el polo, 1° = R·π/180 sea cual sea la longitud. Coherencia: Malapert Massif a 7.9 km de «Mons Malapert»; Connecting Ridge a 20 km del centro de Shackleton (D = 21 km), es decir, fuera del cráter, en la cresta.
+- **Decisiones tomadas:** solo rasgos con estado «Approved». Los «Satellite Feature» de la IAU (cráteres con letra, p. ej. «Scott M») se tipan como `crater`. Las coordenadas planetográficas +Este de la IAU equivalen a planetocéntricas en la Luna esférica.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** las distancias son al centro de cada rasgo, no a su borde (se indicará en el tooltip de la interfaz).
+- **Siguiente tarea:** T2.3.c.

@@ -33,6 +33,8 @@ SCORE_WEIGHTS = {"w1": 0.4, "w2": 0.3, "w3": 0.3}
 
 # D10: características del sitio (5.10)
 SLOPE_RADIUS_M = 1000.0
+NEARBY_RADIUS_KM = 50.0  # rasgos con nombre oficial a esta distancia o menos
+NEARBY_MAX = 8
 
 
 def timeseries_range() -> tuple[datetime, datetime]:

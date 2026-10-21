@@ -1,0 +1,272 @@
+{
+ "source": "IAU/USGS Gazetteer of Planetary Nomenclature",
+ "url": "https://planetarynames.wr.usgs.gov/SearchResults?Target=16_Moon",
+ "accessed": "2026-10-21",
+ "n_features_moon": 9202,
+ "coordinate_systems": [
+  "Planetographic, +East, -180 - 180"
+ ],
+ "radius_km": 50.0,
+ "max_per_site": 8,
+ "note": "Planetographic +East coordinates; on the spherical Moon they equal planetocentric.",
+ "features_by_site": {
+  "connecting_ridge": [
+   {
+    "name": "Spudis",
+    "type": "crater",
+    "lat": -89.51,
+    "lon": -84.61,
+    "distance_km": 14.22,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16007 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Marvin",
+    "type": "crater",
+    "lat": -89.13,
+    "lon": -87.78,
+    "distance_km": 20.01,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16008 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Shackleton",
+    "type": "crater",
+    "lat": -89.67,
+    "lon": 129.78,
+    "distance_km": 20.2,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 5450 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Henson",
+    "type": "crater",
+    "lat": -88.57,
+    "lon": -130.63,
+    "distance_km": 26.53,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16004 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Haynes",
+    "type": "crater",
+    "lat": -88.75,
+    "lon": 167.39,
+    "distance_km": 31.56,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16418 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Sverdrup",
+    "type": "crater",
+    "lat": -88.32,
+    "lon": -153.39,
+    "distance_km": 34.94,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 5782 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "de Gerlache",
+    "type": "crater",
+    "lat": -88.48,
+    "lon": -88.34,
+    "distance_km": 37.15,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 1439 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Brill",
+    "type": "crater",
+    "lat": -88.27,
+    "lon": -93.41,
+    "distance_km": 41.84,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16195 (Crater, craters), accessed 2026-10-21"
+   }
+  ],
+  "haworth": [
+   {
+    "name": "Haworth",
+    "type": "crater",
+    "lat": -87.45,
+    "lon": -5.17,
+    "distance_km": 43.84,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 14502 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Mons Malapert",
+    "type": "massif",
+    "lat": -85.98,
+    "lon": -1.67,
+    "distance_km": 44.82,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16338 (Mons, montes), accessed 2026-10-21"
+   },
+   {
+    "name": "Lhamu",
+    "type": "crater",
+    "lat": -85.92,
+    "lon": -1.62,
+    "distance_km": 45.73,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16317 (Crater, craters), accessed 2026-10-21"
+   }
+  ],
+  "nobile_rim_1": [
+   {
+    "name": "Masina",
+    "type": "crater",
+    "lat": -85.42,
+    "lon": 32.15,
+    "distance_km": 12.35,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16269 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Dawa",
+    "type": "crater",
+    "lat": -85.45,
+    "lon": 31.66,
+    "distance_km": 13.81,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16270 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Jaci",
+    "type": "crater",
+    "lat": -85.42,
+    "lon": 31.23,
+    "distance_km": 14.4,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16268 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Mons Mouton",
+    "type": "massif",
+    "lat": -84.6,
+    "lon": 31.0,
+    "distance_km": 24.34,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16070 (Mons, montes), accessed 2026-10-21"
+   },
+   {
+    "name": "Floss",
+    "type": "crater",
+    "lat": -84.28,
+    "lon": 42.27,
+    "distance_km": 32.86,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16251 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Stose",
+    "type": "crater",
+    "lat": -86.38,
+    "lon": 32.13,
+    "distance_km": 36.14,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16011 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Nobile",
+    "type": "crater",
+    "lat": -85.28,
+    "lon": 53.27,
+    "distance_km": 41.71,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 4321 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Scott M",
+    "type": "crater",
+    "lat": -83.86,
+    "lon": 34.74,
+    "distance_km": 41.96,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 13016 (Satellite Feature), accessed 2026-10-21"
+   }
+  ],
+  "malapert_massif": [
+   {
+    "name": "Mons Malapert",
+    "type": "massif",
+    "lat": -85.98,
+    "lon": -1.67,
+    "distance_km": 7.93,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16338 (Mons, montes), accessed 2026-10-21"
+   },
+   {
+    "name": "Lhamu",
+    "type": "crater",
+    "lat": -85.92,
+    "lon": -1.62,
+    "distance_km": 8.14,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16317 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Malapert",
+    "type": "crater",
+    "lat": -85.0,
+    "lon": 11.4,
+    "distance_km": 37.23,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 3603 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Whitaker",
+    "type": "crater",
+    "lat": -84.67,
+    "lon": 0.69,
+    "distance_km": 40.11,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16395 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Haworth",
+    "type": "crater",
+    "lat": -87.45,
+    "lon": -5.17,
+    "distance_km": 45.98,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 14502 (Crater, craters), accessed 2026-10-21"
+   }
+  ],
+  "de_gerlache_rim_2": [
+   {
+    "name": "de Gerlache",
+    "type": "crater",
+    "lat": -88.48,
+    "lon": -88.34,
+    "distance_km": 16.08,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 1439 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Marvin",
+    "type": "crater",
+    "lat": -89.13,
+    "lon": -87.78,
+    "distance_km": 20.13,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16008 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Bay",
+    "type": "crater",
+    "lat": -88.76,
+    "lon": -36.85,
+    "distance_km": 22.13,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16417 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Brill",
+    "type": "crater",
+    "lat": -88.27,
+    "lon": -93.41,
+    "distance_km": 23.02,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16195 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Spudis",
+    "type": "crater",
+    "lat": -89.51,
+    "lon": -84.61,
+    "distance_km": 28.92,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16007 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Cartwright",
+    "type": "crater",
+    "lat": -87.65,
+    "lon": -46.95,
+    "distance_km": 34.82,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16416 (Crater, craters), accessed 2026-10-21"
+   },
+   {
+    "name": "Henson",
+    "type": "crater",
+    "lat": -88.57,
+    "lon": -130.63,
+    "distance_km": 44.85,
+    "source": "IAU/USGS Gazetteer of Planetary Nomenclature, Feature ID 16004 (Crater, craters), accessed 2026-10-21"
+   }
+  ]
+ }
+}

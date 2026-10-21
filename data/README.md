@@ -68,3 +68,4 @@ El humano descargó también los zips de las demás regiones y el XML de metadat
 
 | Uso | Fuente | URL | Licencia | Fecha |
 |---|---|---|---|---|
+| Rasgos con nombre cerca de los sitios (T2.3.b) y centro de Shackleton para el control (T1.3.d) | IAU/USGS Gazetteer of Planetary Nomenclature (9 202 rasgos de la Luna; coordenadas «Planetographic, +East») | https://planetarynames.wr.usgs.gov/SearchResults?Target=16_Moon | Datos públicos de USGS/IAU; se cita el Feature ID de cada rasgo | 2026-10-21 (extracto versionado en `pipeline/feature_sources.json`) |

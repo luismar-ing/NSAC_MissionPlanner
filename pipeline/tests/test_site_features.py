@@ -52,3 +52,41 @@ def test_radius_scales_with_projection():
     a = slope_stats(DemWindow(z, tr), 0.0, 0.0, -90.0, radius_m=1000.0)["n_pixels"]
     b = slope_stats(DemWindow(z, tr), 0.0, 0.0, -80.0, radius_m=1000.0)["n_pixels"]
     assert b > a  # en el mapa el círculo real de 1 km ocupa k² veces más píxeles
+
+
+# ---------------------------------------------------------------- rasgos cercanos (T2.3.b)
+
+import json  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+from pipeline.site_features import great_circle_km, nearby_features, parse_gazetteer  # noqa: E402,I001
+
+
+def test_great_circle_known_cases():
+    r = 1737.4
+    assert great_circle_km(0, 0, 0, 90) == pytest.approx(np.pi * r / 2, rel=1e-12)
+    assert great_circle_km(-90, 0, -89, 123) == pytest.approx(np.radians(1) * r, rel=1e-9)  # desde el polo, la longitud no importa
+    assert great_circle_km(-85, 10, -85, 10) == pytest.approx(0.0, abs=1e-9)
+
+
+def test_parse_and_filter():
+    html = """<table><tr><th>Feature ID</th><th>Feature Name</th><th>Clean Feature Name</th><th>Target</th><th>Diameter</th>
+    <th>Center Latitude</th><th>Center Longitude</th><th>Coordinate System</th><th>Feature Type</th><th>Approval Status</th></tr>
+    <tr><td>1</td><td>Near</td><td>Near</td><td>Moon</td><td>5</td><td>-85.1</td><td>0</td><td>P</td><td>Crater, craters</td><td>Approved</td></tr>
+    <tr><td>2</td><td>Far</td><td>Far</td><td>Moon</td><td>5</td><td>-80</td><td>0</td><td>P</td><td>Crater, craters</td><td>Approved</td></tr>
+    <tr><td>3</td><td>Hill</td><td>Hill</td><td>Moon</td><td>9</td><td>-85.2</td><td>0</td><td>P</td><td>Mons, montes</td><td>Approved</td></tr>
+    <tr><td>4</td><td>Draft</td><td>Draft</td><td>Moon</td><td>9</td><td>-85.0</td><td>0</td><td>P</td><td>Crater, craters</td><td>Dropped</td></tr></table>"""
+    feats = parse_gazetteer(html)
+    assert [f["feature_id"] for f in feats] == [1, 2, 3, 4]
+    near = nearby_features({"lat": -85.0, "lon": 0.0}, feats, radius_km=50, max_n=8)
+    assert [n["name"] for n in near] == ["Near", "Hill"]  # ordenados, dentro de 50 km, solo aprobados
+    assert near[1]["type"] == "massif" and near[0]["distance_km"] == pytest.approx(np.radians(0.1) * 1737.4, abs=0.01)
+
+
+def test_feature_sources_file():
+    d = json.loads((Path(__file__).resolve().parents[1] / "feature_sources.json").read_text(encoding="utf-8"))
+    assert d["coordinate_systems"] == ["Planetographic, +East, -180 - 180"]
+    for feats in d["features_by_site"].values():
+        assert all(f["source"].startswith("IAU/USGS Gazetteer") and "Feature ID" in f["source"] for f in feats)
+        assert all(f["distance_km"] <= d["radius_km"] for f in feats)
+        assert [f["distance_km"] for f in feats] == sorted(f["distance_km"] for f in feats)

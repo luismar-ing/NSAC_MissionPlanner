@@ -240,7 +240,7 @@ Atributos de 5.10 con su fuente. Las métricas de ventana (sun_pct, horas por d�
 | `attributes[].status` | `"available"` \| `"not available"` | Regla 1 y 5.10: nunca se rellena un valor sin fuente. |
 | `attributes[].source` | string \| null | Obligatorio y no vacío si `available`. |
 | `attributes[].method` | string \| null | Cómo se calculó (para el tooltip de 8.6). |
-| `nearby_features[]` | objeto[] | Puede estar vacío. Cada rasgo: `name`, `type` (`"crater"`, `"ridge"`, `"massif"`, `"other"`), `lat`, `lon`, `distance_km` ≥ 0 y `source` no vacío. |
+| `nearby_features[]` | objeto[] | Puede estar vacío. Cada rasgo: `name`, `type` (`"crater"`, `"ridge"`, `"massif"`, `"other"`), `lat`, `lon` (centro oficial), `distance_km` ≥ 0 (distancia sobre la esfera del sitio al **centro** del rasgo) y `source` no vacío. Fuente en PolePlanner: nomenclátor IAU/USGS, rasgos aprobados a ≤ 50 km, máximo 8 (T2.3.b). |
 
 ## 13. `terrain/{site}/lod{n}.json` + `lod{n}.bin`
 
