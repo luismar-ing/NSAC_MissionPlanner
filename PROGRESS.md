@@ -1540,3 +1540,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T3.3.c.
+
+## 2026-10-21 · T3.3.c · Cinta de tiempo
+
+- **Tarea:** T3.3.c — Cinta de tiempo ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/ribbon.ts` (archivo extra respecto a la guía, para probar la lógica sin DOM): `stateRuns` (rachas Sol / Tierra / ambos / ninguno), `longestZeroRun` (racha más larga sin Sol; en empate gana la primera) y `relativeLabel` («Day 2, 03:30» desde la llegada).
+  - `web/src/panels2d/TimeRibbon.tsx`: SVG con dos carriles, Sol arriba y Tierra abajo. Un carril encendido toma el color del estado (naranja = solo Sol, azul = solo Tierra, verde = ambos) y «ninguno» deja los dos carriles en el color de oscuridad, así que el estado se lee por posición además de por color (spec 9). Líneas de cambio de día, la racha de oscuridad más larga con contorno discontinuo y su duración en texto, cursor de `compareTime` y `aria-label` con la duración y el inicio de la racha.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/ribbon.test.ts --reporter=verbose
+  ribbon: 5475 windows checked, max |Δ longest_dark_h| = 0 h
+   ✓ groups samples into Sun / Earth / both / none runs
+   ✓ finds the longest zero run, including one touching the end; first wins ties
+   ✓ labels samples relative to arrival
+   ✓ matches windows/{site}_{L}d.json for all plans
+  $ npm --prefix web test   → Tests 86 passed
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  La racha resaltada coincide con `longest_dark_h` en las 5 475 ventanas (5 sitios × 3 duraciones × 365 llegadas). En el navegador: Haworth 2027-03-09 (7 d) muestra «Longest dark: 89.5 h» (el JSON da 89.5) al principio de la ventana, con solo Tierra en azul durante la noche, y luego ambos en verde. Los tres planes de «Pin best 3» tienen Sol y Tierra todo el tiempo y muestran «No dark stretch».
+- **Decisiones tomadas:** dos carriles en lugar de una franja de cuatro colores, para que el estado no dependa solo del color.
+- **Desviaciones de la spec / cambios en la guía:** archivo extra `web/src/lib/ribbon.ts`.
+- **Problemas abiertos:** «Pin best 3» elige planes casi idénticos (todo verde), por la saturación del score (T1.4.d). Lo trata el desempate de T3.3.d.
+- **Siguiente tarea:** T3.3.d.

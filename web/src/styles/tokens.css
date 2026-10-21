@@ -487,3 +487,14 @@ button {
 .silhouette svg {
   display: block;
 }
+
+/* ------------------------------------------------------------------ time ribbon (T3.3.c) */
+
+.ribbon {
+  width: 100%;
+  height: 100%;
+}
+
+.ribbon svg {
+  display: block;
+}

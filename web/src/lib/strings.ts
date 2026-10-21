@@ -65,6 +65,14 @@ export const STRINGS = {
     shown: (x: number) => `vertical ×${x < 10 ? x.toFixed(1) : Math.round(x)}`,
     times: (x: number) => `×${x}`,
   },
+  ribbon: {
+    lanes: "Top: Sun · Bottom: Earth · green = both",
+    longest: (h: number) => `Longest dark: ${h.toFixed(1)} h`,
+    noDark: "No dark stretch",
+    aria: (h: number, at: string) =>
+      `Time ribbon: Sun on the top lane, Earth on the bottom lane. Longest dark stretch ${h.toFixed(1)} h, starting ${at}.`,
+    ariaNoDark: "Time ribbon: Sun on the top lane, Earth on the bottom lane. The Sun is never lost in this window.",
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

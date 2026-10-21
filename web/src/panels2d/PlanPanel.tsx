@@ -2,6 +2,7 @@ import type { PlanData } from "../lib/planData";
 import type { ElevationScale } from "../lib/scale";
 import { STRINGS } from "../lib/strings";
 import { HorizonSilhouette } from "./HorizonSilhouette";
+import { TimeRibbon } from "./TimeRibbon";
 
 interface Props {
   data: PlanData;
@@ -46,7 +47,9 @@ export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration,
       <div className="plan-slot silhouette-slot" data-slot="silhouette">
         <HorizonSilhouette data={data} scale={scale} exaggeration={exaggeration} compareTime={compareTime} />
       </div>
-      <div className="plan-slot ribbon-slot" data-slot="ribbon" />
+      <div className="plan-slot ribbon-slot" data-slot="ribbon">
+        <TimeRibbon series={data.series} compareTime={compareTime} />
+      </div>
       <div className="plan-slot metrics-slot" data-slot="metrics" />
     </article>
   );

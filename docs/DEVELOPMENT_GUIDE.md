@@ -546,7 +546,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.3.a · **Spec:** 8.1, 5.3, 5.4, 11 regla 7 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba unitaria de la proyección; prueba de que no se crea ningún contexto WebGL; revisión visual.
 
-##### [ ] T3.3.c — Cinta de tiempo
+##### [x] T3.3.c — Cinta de tiempo
 - **Qué:** estados Sol / Tierra / ambos / ninguno con color y patrón; la racha de oscuridad más larga resaltada.
 - **Archivos:** `web/src/panels2d/TimeRibbon.tsx`, `web/tests/ribbon.test.ts`
 - **Depende de:** T3.3.a · **Spec:** 8.1, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
