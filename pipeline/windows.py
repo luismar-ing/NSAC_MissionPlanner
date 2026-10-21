@@ -156,3 +156,62 @@ def meets_constraints(row: dict, min_sun_pct: float | None = None, max_dark_h: f
     return ((min_sun_pct is None or row["sun_pct"] >= min_sun_pct)
             and (max_dark_h is None or row["longest_dark_h"] <= max_dark_h)
             and (min_earth_h is None or row["earth_h_min"] >= min_earth_h))
+
+
+# ---------------------------------------------------------------- ejecución con datos reales (T1.4.d)
+
+
+def main(argv=None) -> int:
+    """Daily y windows de todos los sitios (formato del contrato §8-§9) en pipeline/out/."""
+    import json
+    import sys
+    import time
+    from pathlib import Path
+
+    from pipeline import config
+    from pipeline.validate import validate_file
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    t0 = time.perf_counter()
+    root = Path(__file__).resolve().parents[1]
+    out = root / "pipeline" / "out"
+    sites = json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8"))
+    start, _ = config.timeseries_range()
+    n_arrivals = (config.ARRIVAL_END - config.ARRIVAL_START).days + 1
+    flags = {s["id"]: np.load(out / f"flags_{s['id']}.npz") for s in sites}
+
+    (out / "daily").mkdir(parents=True, exist_ok=True)
+    (out / "windows").mkdir(parents=True, exist_ok=True)
+    written = []
+    for s in sites:
+        f = flags[s["id"]]
+        daily = {"site_id": s["id"], "days": daily_aggregates(start, config.STEP_MIN, f["sun_vis"], f["earth_vis"])}
+        p = out / "daily" / f"{s['id']}.json"
+        p.write_text(json.dumps(daily, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
+        written.append(p)
+    for L in config.WINDOW_DAYS:
+        rows_by_site = {s["id"]: window_metrics(start, config.STEP_MIN, flags[s["id"]]["sun_vis"],
+                                                flags[s["id"]]["earth_vis"], n_arrivals, L) for s in sites}
+        add_scores(rows_by_site, config.SCORE_WEIGHTS)
+        for sid, rows in rows_by_site.items():
+            p = out / "windows" / f"{sid}_{L}d.json"
+            p.write_text(json.dumps({"site_id": sid, "window_days": L, "rows": rows}, separators=(",", ":")) + "\n",
+                         encoding="utf-8", newline="\n")
+            written.append(p)
+            best = max(rows, key=lambda r: r["score"])
+            print(f"L={L:2d} {sid:18s} sun_pct medio {np.mean([r['sun_pct'] for r in rows]):6.2f} %  "
+                  f"oscuridad máx {max(r['longest_dark_h'] for r in rows):6.1f} h  "
+                  f"Tierra h/día media {np.mean([r['earth_h_mean'] for r in rows]):5.2f}  "
+                  f"mejor llegada {best['start'][:10]} (score {best['score']:.3f})")
+    elapsed = time.perf_counter() - t0
+    errors = [e for p in written for e in validate_file(p)[1]]
+    print(f"{len(written)} archivos escritos en {elapsed:.1f} s; validación del contrato: "
+          f"{'OK' if not errors else str(len(errors)) + ' errores'}")
+    for e in errors[:10]:
+        print("  -", e)
+    return 0 if not errors and elapsed < 60 else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -302,7 +302,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.4.b · **Spec:** 5.6 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**
 - **Aceptación:** pruebas: score en [0, 1]; subir `sun_pct` con lo demás fijo no baja el score; un control desactivado no filtra.
 
-##### [ ] T1.4.d — Ejecución con datos reales y rendimiento
+##### [x] T1.4.d — Ejecución con datos reales y rendimiento
 - **Qué:** daily y windows para todos los sitios y L.
 - **Archivos:** `pipeline/windows.py`
 - **Depende de:** T1.4.c, T1.3.d · **Spec:** 5.5, 10 (T1.4) · **Decisiones:** D4 · **Est.:** 1 h

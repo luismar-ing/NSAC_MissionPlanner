@@ -904,3 +904,22 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. El % de Sol es geométrico (máscara de 100 km a 40 m), sin sombras de relieve más allá de R_max ni del propio módulo.
 - **Siguiente tarea:** T1.4.d.
+
+## 2026-10-21 · T1.4.d · Ejecución con datos reales y rendimiento
+
+- **Tarea:** T1.4.d — Ejecución con datos reales ([x]).
+- **Qué se hizo:** `main` en `pipeline/windows.py` (`python -m pipeline.windows`): daily de los 5 sitios (379 días) y windows para L = 3, 7 y 14 (365 llegadas), con el score normalizado sobre todos los sitios para cada L. Formato del contrato §8-§9 en `pipeline/out/daily/` y `pipeline/out/windows/`, validado con `pipeline.validate`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.windows
+  L= 3 connecting_ridge   sun_pct medio  94.94 %  oscuridad máx   72.0 h  Tierra h/día media 14.17
+  L= 7 haworth            sun_pct medio  78.15 %  oscuridad máx  168.0 h  Tierra h/día media 17.12
+  L=14 malapert_massif    sun_pct medio  75.73 %  oscuridad máx  325.0 h  Tierra h/día media 18.55
+  ... (15 líneas, una por sitio y L)
+  20 archivos escritos en 0.2 s; validación del contrato: OK      (exit 0; objetivo < 1 min)
+  ```
+  Comprobación del score: los 1 190 valores de score = 1.0 son todos ventanas «perfectas» (100 % de Sol, 0 h de oscuridad, Tierra 24 h/día). L=3: 667 de 1 825; L=7: 413; L=14: 110. Mínimo de score 0.000 / 0.201 / 0.269 y mediana ~0.80. El sun_pct medio coincide con el de T1.3.d (p. ej. Connecting Ridge 94.94 % frente a 95.12 % anual).
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ⚠️ **el score de 5.6 se satura**: hasta el 37 % de las ventanas de 3 días empatan a 1.0 (todas las métricas en su mejor valor posible). Es correcto según la spec, pero el calendario (T3.2) y la insignia «best» (T3.3.d) necesitarán un desempate (por ejemplo, el menor `longest_comm_gap_h`) o mostrar «perfect window». Anotado para la Fase 3; no se cambia la fórmula sin consultar.
+- **Siguiente tarea:** T1.5.a.
