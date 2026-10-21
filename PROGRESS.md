@@ -1004,3 +1004,9 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - Hallazgo documentado: el rango ±1.6° de la spec solo vale en el polo; los límites dependen de la latitud (`docs/validation.md` §2).
 - **Pendiente para el humano:** confirmar la corrección de los límites de 5.7. Decisiones que bloquean parte de la Fase 2: **D8** (escala 3D y despegue, T2.4.a), **D9** (terreno Nivel B, T2.3.d-e), **D10** (características y radio de pendiente, T2.3.a-c). D1 y D11 siguen pendientes.
 - **Siguiente tarea:** Fase 2 (T2.1.a no depende de decisiones pendientes).
+
+## 2026-10-21 · DECISIONES · D8, D9, D10 y corrección de 5.7 confirmadas
+
+- **Qué:** el humano aceptó en el chat los valores por defecto de **D8** (escala 3D: cuerpos exagerados, distancias comprimidas y direcciones exactas; despegue mínimo), **D9** (MVP con panorama 2D y terreno simplificado; Nivel B solo como extra) y **D10** (lista completa de 5.10; radio de pendiente de 1 km), y la **corrección de los límites de 5.7** por latitud (A3 en `docs/DECISIONS.md`). También autorizó el push.
+- **Pendientes:** D1 (equipo) y D11 (requisitos de entrega); no bloquean la Fase 2.
+- **Siguiente tarea:** T2.1.a.
