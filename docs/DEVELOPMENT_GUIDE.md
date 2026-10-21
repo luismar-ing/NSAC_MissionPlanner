@@ -80,7 +80,7 @@ Las carpetas vacías de 7.1 (con `.gitkeep`), `PROGRESS.md`, `CLAUDE.md` y `.git
 - **Depende de:** T0.1.a · **Spec:** 11 (pila, regla 5) · **Decisiones:** — · **Est.:** 1.5 h
 - **Aceptación:** en un venv nuevo, `python -m pip install -r pipeline/requirements.txt` termina sin error y `python -m pytest -q` muestra la prueba de humo pasada.
 
-##### [ ] T0.1.c — Esqueleto del front end (Vite + React + TypeScript + Vitest)
+##### [x] T0.1.c — Esqueleto del front end (Vite + React + TypeScript + Vitest)
 - **Qué:** proyecto Vite React-TS en `web/` con versiones exactas (sin `^`) y `package-lock.json`; scripts `dev`, `build`, `test`, `typecheck`; página provisional "PolePlanner" en inglés; prueba trivial.
 - **Archivos:** `web/package.json`, `web/package-lock.json`, `web/tsconfig*.json`, `web/vite.config.ts`, `web/index.html`, `web/src/main.tsx`, `web/src/App.tsx`, `web/tests/smoke.test.ts`
 - **Depende de:** T0.1.a · **Spec:** 7, 11 (pila) · **Decisiones:** D2 · **Est.:** 1.5 h

@@ -31,11 +31,11 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Datos SYNTHETIC | `python -m pipeline.synthetic` | por definir (TS.1.a) |
 | Correr el pipeline | `python -m pipeline.build_all` | por definir (T2.4.a) |
 | Tests pipeline | `.venv/Scripts/python -m pytest` (config en `pyproject.toml`) | disponible |
-| Instalar front end | `npm --prefix web ci` | por definir (T0.1.c) |
-| Servidor de desarrollo | `npm --prefix web run dev` | por definir (T0.1.c) |
-| Tests front end | `npm --prefix web test` | por definir (T0.1.c) |
-| Tipos | `npm --prefix web run typecheck` | por definir (T0.1.c) |
-| Build | `npm --prefix web run build` | por definir (T0.1.c) |
+| Instalar front end | `npm --prefix web ci` | disponible |
+| Servidor de desarrollo | `npm --prefix web run dev` | disponible |
+| Tests front end | `npm --prefix web test` | disponible |
+| Tipos | `npm --prefix web run typecheck` | disponible |
+| Build | `npm --prefix web run build` | disponible |
 
 Cuando una tarea cree o cambie un comando, actualiza esta tabla (T0.1.d la deja definitiva).
 

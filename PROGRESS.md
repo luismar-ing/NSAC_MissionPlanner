@@ -134,3 +134,30 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** `requirements.txt` se congeló en Windows; incluye `colorama` (dependencia de Windows de click/pytest), que es inofensiva en Linux.
 - **Siguiente tarea:** T0.1.c.
+
+## 2026-10-21 · T0.1.c · Esqueleto del front end (Vite + React + TypeScript + Vitest)
+
+- **Tarea:** T0.1.c — Esqueleto del front end ([x]).
+- **Qué se hizo:** `web/` escrito a mano (la carpeta ya tenía subcarpetas, y `npm create vite` habría pedido confirmación interactiva): `package.json` con scripts `dev`, `typecheck`, `build` (typecheck + vite build), `preview` y `test` (vitest run); `.npmrc` con `save-exact=true`; `package-lock.json`; `tsconfig.json` estricto; `vite.config.ts` con la configuración de Vitest; `index.html` (`lang="en"`), `src/main.tsx`, `src/App.tsx` (página provisional "PolePlanner" en inglés) y `tests/smoke.test.ts`.
+  Versiones exactas: react 19.3.1, react-dom 19.3.1, vite 8.3.5, @vitejs/plugin-react 6.1.2, vitest 5.0.5, typescript 7.0.2, @types/react 19.3.0, @types/react-dom 19.3.0.
+- **Cómo se verificó:** con `web/node_modules` borrado antes:
+  ```
+  ci exit: 0
+  typecheck exit: 0
+   Test Files  1 passed (1)
+        Tests  1 passed (1)
+  test exit: 0
+  dist/index.html                  0.32 kB │ gzip:  0.23 kB
+  dist/assets/index-D35HH_bC.js  219.73 kB │ gzip: 68.68 kB
+  ✓ built in 154ms
+  build exit: 0
+  ```
+  Servidor de desarrollo (`npm --prefix web run dev -- --port 5199`):
+  ```
+  HTTP 200
+  <title>PolePlanner</title>
+  ```
+- **Decisiones tomadas:** D2 aplicada (interfaz en inglés). Zustand, D3, three.js y zod se instalarán en las subtareas que los usen (T0.4.c, T3.1, T3.2, T4.1), para no añadir dependencias sin uso.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** git avisa de conversión LF→CRLF en Windows (`core.autocrlf`); no afecta al funcionamiento.
+- **Siguiente tarea:** T0.1.d.
