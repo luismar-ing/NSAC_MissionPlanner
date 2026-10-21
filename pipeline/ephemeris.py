@@ -158,6 +158,80 @@ def plot_series(series: dict, site: dict, path) -> None:
     plt.close(fig)
 
 
+# ---------------------------------------------------------------- efemérides de escena (T2.1.a)
+
+SCENE_FRAME = "J2000"  # marco común con centro en la Tierra (ejes ecuatoriales inerciales)
+EARTH_FRAME = "IAU_EARTH"  # rotación de la Tierra del modelo IAU de pck00011.tpc (suficiente para la escena)
+SCENE_ABCORR = "NONE"  # estados geométricos: la aberración (~20″) es invisible en la escena
+
+
+def matrix_to_quat_xyzw(m: np.ndarray) -> np.ndarray:
+    """Matriz de rotación → cuaternión [x, y, z, w] (orden three.js) con q·v·q⁻¹ = m·v.
+
+    spiceypy.m2q devuelve [w, x, y, z] con esa misma convención (comprobado en T2.1.a/b).
+    """
+    import spiceypy as sp
+
+    w, x, y, z = sp.m2q(np.asarray(m, dtype=float))
+    return np.array([x, y, z, w])
+
+
+def make_continuous(quats: np.ndarray) -> np.ndarray:
+    """Invierte el signo donde haga falta para que muestras consecutivas tengan producto escalar ≥ 0
+    (q y −q son la misma rotación; así slerp no da la vuelta larga)."""
+    q = np.array(quats, dtype=float)
+    for i in range(1, len(q)):
+        if np.dot(q[i], q[i - 1]) < 0:
+            q[i] = -q[i]
+    return q
+
+
+def scene_ephemeris(step_min: int = config.SCENE_STEP_MIN) -> dict:
+    """scene/ephemeris.json (contrato §10) en el rango de escena del contrato §2."""
+    import spiceypy as sp
+
+    from pipeline.spice_utils import load_kernels
+
+    load_kernels()
+    start, end = config.scene_range()
+    ets = et_grid(start, end, step_min)
+    moon, sun, mq, eq = [], [], [], []
+    for et in ets:
+        m_pos, _ = sp.spkpos("MOON", float(et), SCENE_FRAME, SCENE_ABCORR, "EARTH")
+        s_pos, _ = sp.spkpos("SUN", float(et), SCENE_FRAME, SCENE_ABCORR, "EARTH")
+        moon.append(m_pos)
+        sun.append(np.asarray(s_pos) / np.linalg.norm(s_pos))
+        mq.append(matrix_to_quat_xyzw(sp.pxform(MOON_FRAME, SCENE_FRAME, float(et))))
+        eq.append(matrix_to_quat_xyzw(sp.pxform(EARTH_FRAME, SCENE_FRAME, float(et))))
+    mq, eq = make_continuous(np.array(mq)), make_continuous(np.array(eq))
+
+    def unit_rows(a, nd):
+        a = np.round(np.asarray(a, dtype=float), nd)
+        return (a / np.linalg.norm(a, axis=1)[:, None]).round(nd).tolist()
+
+    return {
+        "frame": SCENE_FRAME,
+        "start_utc": start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "step_min": step_min,
+        "n": int(len(ets)),
+        "moon_pos_km": np.round(np.array(moon), 1).tolist(),
+        "sun_dir": unit_rows(sun, 9),
+        "moon_frame": MOON_FRAME,
+        "moon_quat": unit_rows(mq, 9),
+        "earth_frame": EARTH_FRAME,
+        "earth_quat": unit_rows(eq, 9),
+    }
+
+
+def write_scene(path: Path | None = None) -> Path:
+    import json
+
+    path = path or OUT_DIR / "scene" / "ephemeris.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(scene_ephemeris(), separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
+    return path
+
+
 def main(argv=None) -> int:
     import argparse
     import json
@@ -170,8 +244,14 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Series de az/el del Sol y la Tierra para todos los sitios (T1.1.e)")
     ap.add_argument("--step-min", type=int, default=config.STEP_MIN, help="paso en minutos (30 por defecto; 10 opcional)")
     ap.add_argument("--no-plots", action="store_true")
+    ap.add_argument("--scene", action="store_true", help="solo scene/ephemeris.json (T2.1.a)")
     args = ap.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
+    if args.scene:
+        t0 = time.perf_counter()
+        path = write_scene()
+        print(f"escrito {path.relative_to(root)} ({path.stat().st_size / 1e6:.2f} MB) en {time.perf_counter() - t0:.1f} s")
+        return 0
     sites = json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8"))
     ok = True
     t_all = time.perf_counter()

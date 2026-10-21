@@ -177,7 +177,7 @@ Muestreo grueso para la escena 3D (spec 5.8, 7.2).
 
 | Campo | Tipo | Regla |
 |---|---|---|
-| `frame` | string | Marco común con centro en la Tierra. Igual a `params.scene_frame`. Propuesta: `"J2000"` (ejes ecuatoriales inerciales); se confirma en T2.1.a. |
+| `frame` | string | Marco común con centro en la Tierra. Igual a `params.scene_frame`. Valor: `"J2000"` (ejes ecuatoriales inerciales; confirmado en T2.1.a). Estados geométricos (sin corrección de luz). |
 | `start_utc` | instante | Igual a `date_range.scene_start_utc`. |
 | `step_min` | int | 60 por defecto. |
 | `n` | int | Número de muestras; `start_utc + n · step_min = scene_end_utc`. |
@@ -185,7 +185,7 @@ Muestreo grueso para la escena 3D (spec 5.8, 7.2).
 | `sun_dir` | `[x,y,z][]` | Longitud `n`. Vector unitario de la Tierra al Sol, en `frame` (norma 1 ± 1e-6). |
 | `moon_frame` | string | Igual a `params.moon_frame`. |
 | `moon_quat` | `[x,y,z,w][]` | Longitud `n`. Rotación de vectores de `moon_frame` a `frame`. Norma 1 ± 1e-6. |
-| `earth_frame` | string | Marco fijo a la Tierra usado (se decide en T2.1.a, según el kernel disponible o la fórmula documentada). |
+| `earth_frame` | string | Marco fijo a la Tierra usado. Valor: `"IAU_EARTH"` (modelo IAU de `pck00011.tpc`; decidido en T2.1.a). |
 | `earth_quat` | `[x,y,z,w][]` | Longitud `n`. Rotación de vectores de `earth_frame` a `frame`. Norma 1 ± 1e-6. |
 
 **Cuaterniones:** orden `[x, y, z, w]` (el de three.js). SPICE (`m2q`) devuelve `[w, x, y, z]`: el pipeline reordena. Un vector `v` en el marco origen se lleva a `frame` con `q · v · q⁻¹`. Entre muestras se interpola con slerp (T2.1.b).

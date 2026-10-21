@@ -28,7 +28,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Instalar pipeline | `.venv/Scripts/python -m pip install -r pipeline/requirements.txt` (Git Bash/Linux: `.venv/bin/python` fuera de Windows) | disponible |
 | Descargar datos | `.venv/Scripts/python -m pipeline.fetch_data` (`--kernels`, `--dem`, `--textures`) | disponible |
 | Validar datos | `.venv/Scripts/python -m pipeline.validate <dir>` o `--file <archivo>` | disponible |
-| Efemérides de los sitios (1 año) | `.venv/Scripts/python -m pipeline.ephemeris` (→ `pipeline/out/`, `docs/figures/`) | disponible |
+| Efemérides de los sitios (1 año) / de escena | `.venv/Scripts/python -m pipeline.ephemeris` / `... --scene` (→ `pipeline/out/`) | disponible |
 | Datos SYNTHETIC | `python -m pipeline.synthetic` | por definir (TS.1.a) |
 | Correr el pipeline | `python -m pipeline.build_all` | por definir (T2.4.a) |
 | Tests pipeline | `.venv/Scripts/python -m pytest` (config en `pyproject.toml`) | disponible |

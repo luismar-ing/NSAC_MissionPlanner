@@ -1010,3 +1010,31 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Qué:** el humano aceptó en el chat los valores por defecto de **D8** (escala 3D: cuerpos exagerados, distancias comprimidas y direcciones exactas; despegue mínimo), **D9** (MVP con panorama 2D y terreno simplificado; Nivel B solo como extra) y **D10** (lista completa de 5.10; radio de pendiente de 1 km), y la **corrección de los límites de 5.7** por latitud (A3 en `docs/DECISIONS.md`). También autorizó el push.
 - **Pendientes:** D1 (equipo) y D11 (requisitos de entrega); no bloquean la Fase 2.
 - **Siguiente tarea:** T2.1.a.
+
+## 2026-10-21 · T2.1.a · Efemérides de escena
+
+- **Tarea:** T2.1.a — Efemérides de escena ([x]).
+- **Qué se hizo:** en `pipeline/ephemeris.py`, `scene_ephemeris` y `write_scene` (`python -m pipeline.ephemeris --scene` → `pipeline/out/scene/ephemeris.json`): cada 60 min en el rango de escena del contrato §2 (2026-12-28 → 2028-01-15), con:
+  - posición de la Luna respecto a la Tierra en J2000 (km);
+  - dirección unitaria Tierra → Sol;
+  - cuaternión MOON_ME → J2000;
+  - cuaternión IAU_EARTH → J2000.
+  Cuaterniones en orden `[x, y, z, w]` y con el signo forzado a ser continuo (`make_continuous`) para slerp. Contrato §10 actualizado (`frame` = J2000 y `earth_frame` = IAU_EARTH, ya confirmados). Comando en `CLAUDE.md`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.ephemeris --scene
+  escrito pipeline\out\scene\ephemeris.json (1.58 MB) en 0.8 s
+  $ python -m pipeline.validate --file pipeline/out/scene/ephemeris.json
+  OK: pipeline/out/scene/ephemeris.json cumple el contrato 1.0.0
+  n 9192 | start 2026-12-28T00:00:00Z | step 60 | marcos J2000 MOON_ME IAU_EARTH
+  distancia Tierra-Luna min/max (km): 357283 406607
+  min producto escalar entre cuaterniones consecutivos (Luna): 0.999989
+  ```
+  Convención de `m2q` comprobada numéricamente antes de escribir: `‖M·v − q·v·q⁻¹‖ = 1.1e-16` reordenando `[w,x,y,z]` → `[x,y,z,w]`, frente a 0.59 con el conjugado.
+- **Decisiones tomadas:**
+  - Escena en J2000 centrado en la Tierra.
+  - Estados **geométricos** (sin LT+S). Frente a los aparentes del sitio, la diferencia es de ~20″ de aberración y 1.3 s de tiempo de luz, invisible en 3D. La ciencia del sitio sigue usando LT+S.
+  - Rotación de la Tierra con IAU_EARTH (pck00011), como se previó en T0.2.a.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** 1.58 MB solo para la escena; se revisará el presupuesto en T2.4.b (series < 15 MB).
+- **Siguiente tarea:** T2.1.b.

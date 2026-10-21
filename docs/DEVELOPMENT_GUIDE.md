@@ -377,7 +377,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 
 ### T2.1 ephemeris.py en modo escena (spec 5.8, 7.2)
 
-##### [ ] T2.1.a — Efemérides de escena
+##### [x] T2.1.a — Efemérides de escena
 - **Qué:** muestreo cada 60 min (parámetro) de la posición de la Luna y la dirección del Sol en un marco común con centro en la Tierra (elegir y documentar), cuaternión de orientación lunar (marco lunar → marco común) y rotación de la Tierra (SPICE si hay kernel adecuado; si no, fórmula documentada). Rango: D4 más el margen de tránsito.
 - **Archivos:** `pipeline/ephemeris.py`, `pipeline/out/scene/ephemeris.json`
 - **Depende de:** T1.1.e · **Spec:** 5.8, 7.2 · **Decisiones:** D4 · **Est.:** 3 h
