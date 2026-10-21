@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from pipeline.visibility import horizon_at, sun_visible
+from pipeline.visibility import earth_partial, earth_visible, horizon_at, sun_visible
 
 R_SUN = 0.265
 EPS = 1e-6
@@ -55,3 +55,43 @@ def test_linear_interpolation_between_bins():
 def test_mask_must_cover_360_degrees():
     with pytest.raises(ValueError):
         horizon_at(np.array([0.0]), np.zeros(359))
+
+
+# ---------------------------------------------------------------- Tierra (T1.3.b, spec 5.4)
+
+
+MARGIN = 0.5
+R_EARTH = 0.95
+
+
+def test_earth_needs_mask_plus_antenna_margin():
+    mask = flat_mask(1.0)
+    el = 1.0 + MARGIN
+    got = earth_visible(np.full(3, 90.0), np.array([el + EPS, el, el - EPS]), mask)
+    assert got.tolist() == [1, 0, 0]
+    # Centro sobre la máscara pero dentro del margen: sin enlace
+    assert earth_visible(np.array([90.0]), np.array([1.3]), mask).tolist() == [0]
+
+
+@pytest.mark.parametrize("margin", [0.0, 0.5, 1.0, 2.0])
+def test_antenna_margin_is_a_parameter(margin):
+    mask = flat_mask(0.0)
+    got = earth_visible(np.array([0.0, 0.0]), np.array([margin + EPS, margin - EPS]), mask, antenna_margin_deg=margin)
+    assert got.tolist() == [1, 0]
+
+
+def test_earth_uses_interpolated_mask_across_north():
+    mask = np.zeros(360)
+    mask[359], mask[0] = 2.0, 4.0
+    el = 3.8 + MARGIN  # máscara interpolada en 359.9° = 3.8°
+    assert earth_visible(np.array([359.9, 359.9]), np.array([el + EPS, el - EPS]), mask).tolist() == [1, 0]
+
+
+def test_partial_visibility_when_only_the_limb_clears_the_mask():
+    mask = flat_mask(1.0)
+    els = np.array([1.6, 1.2, 1.0 - R_EARTH + EPS, 1.0 - R_EARTH - EPS])
+    vis = earth_visible(np.full(4, 0.0), els, mask)
+    part = earth_partial(np.full(4, 0.0), els, mask)
+    assert vis.tolist() == [1, 0, 0, 0]
+    assert part.tolist() == [0, 1, 1, 0]  # nunca parcial y visible a la vez
+    assert not np.any(vis & part)

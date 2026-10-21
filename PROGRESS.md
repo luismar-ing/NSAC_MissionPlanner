@@ -417,3 +417,21 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T1.3.b (adelantable) o cerrar T0.2.e cuando termine la descarga.
+
+## 2026-10-21 · T1.3.b · Visibilidad de la Tierra con margen de antena — adelantada
+
+- **Tarea:** T1.3.b — Visibilidad de la Tierra con margen de antena ([x]). **Adelantable**.
+- **Qué se hizo:** en `pipeline/visibility.py`, `earth_visible` = `earth_el > horizon_el[earth_az] + margen_antena` (centro de la Tierra, margen 0.5° por defecto, D12) y la bandera opcional `earth_partial`. `EARTH_RADIUS_DEG = 0.95` añadido a `pipeline/config.py` (spec 5.4).
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_visibility.py -v
+  test_earth_needs_mask_plus_antenna_margin PASSED
+  test_antenna_margin_is_a_parameter[0.0] / [0.5] / [1.0] / [2.0] PASSED
+  test_earth_uses_interpolated_mask_across_north PASSED
+  test_partial_visibility_when_only_the_limb_clears_the_mask PASSED
+  13 passed in 0.14s   (incluye las 6 de T1.3.a)
+  ```
+- **Decisiones tomadas:** **visibilidad parcial** = sin enlace por el criterio del centro pero con el borde superior de la Tierra (el + 0.95°) sobre la máscara, **sin margen**. Es solo informativa y nunca cuenta como enlace. La spec la deja abierta («cuando solo el borde supera la máscara»). Se mostrará en la interfaz con ese texto.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** el contrato v1 no tiene un campo para la bandera parcial (`timeseries` solo lleva `earth_vis`). Si la interfaz la necesita, se añadirá `earth_partial` como campo opcional (cambio menor del contrato, 1.1.0).
+- **Siguiente tarea:** cerrar T0.2.e cuando termine la descarga; mientras, la siguiente adelantable (T1.3.c).

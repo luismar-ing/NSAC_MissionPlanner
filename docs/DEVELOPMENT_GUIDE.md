@@ -264,7 +264,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T0.1.b · **Spec:** 5.3 · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**
 - **Aceptación:** pruebas de casos límite: borde justo encima y debajo de la máscara (±1e-6°), azimut 359.9° y 0.1°, máscara negativa.
 
-##### [ ] T1.3.b — Visibilidad de la Tierra con margen de antena
+##### [x] T1.3.b — Visibilidad de la Tierra con margen de antena
 - **Qué:** `earth_visible = earth_el > horizon_el[earth_az] + margen_antena` (centro de la Tierra); margen como parámetro; bandera opcional de visibilidad parcial (borde).
 - **Archivos:** `pipeline/visibility.py`, `pipeline/tests/test_visibility.py`
 - **Depende de:** T1.3.a · **Spec:** 5.4 · **Decisiones:** D12 · **Est.:** 1 h · **Adelantable**

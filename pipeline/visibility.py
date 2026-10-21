@@ -32,3 +32,27 @@ def sun_visible(sun_az_deg: np.ndarray, sun_el_deg: np.ndarray, elev_deg: np.nda
     """
     mask = horizon_at(sun_az_deg, elev_deg, az_step_deg)
     return ((np.asarray(sun_el_deg, dtype=float) + sun_radius_deg) > mask).astype(np.uint8)
+
+
+def earth_visible(earth_az_deg: np.ndarray, earth_el_deg: np.ndarray, elev_deg: np.ndarray,
+                  az_step_deg: float = config.HORIZON_AZ_STEP_DEG,
+                  antenna_margin_deg: float = config.ANTENNA_MARGIN_DEG) -> np.ndarray:
+    """Spec 5.4: enlace directo si el centro de la Tierra supera la máscara más el margen de antena.
+
+    earth_visible = earth_el > horizon_el[earth_az] + margen_antena   → array de 0/1 (uint8)
+    """
+    mask = horizon_at(earth_az_deg, elev_deg, az_step_deg)
+    return (np.asarray(earth_el_deg, dtype=float) > mask + antenna_margin_deg).astype(np.uint8)
+
+
+def earth_partial(earth_az_deg: np.ndarray, earth_el_deg: np.ndarray, elev_deg: np.ndarray,
+                  az_step_deg: float = config.HORIZON_AZ_STEP_DEG,
+                  antenna_margin_deg: float = config.ANTENNA_MARGIN_DEG,
+                  earth_radius_deg: float = config.EARTH_RADIUS_DEG) -> np.ndarray:
+    """Spec 5.4 (opcional): visibilidad parcial = sin enlace por el criterio del centro, pero con el
+    borde superior de la Tierra sobre la máscara (sin margen). Solo informativo: no cuenta como enlace.
+    """
+    el = np.asarray(earth_el_deg, dtype=float)
+    mask = horizon_at(earth_az_deg, elev_deg, az_step_deg)
+    no_link = el <= mask + antenna_margin_deg
+    return (no_link & (el + earth_radius_deg > mask)).astype(np.uint8)

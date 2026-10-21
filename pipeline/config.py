@@ -24,6 +24,7 @@ STEP_MIN = 30
 SCENE_STEP_MIN = 60
 WINDOW_DAYS = (3, 7, 14)
 SUN_RADIUS_DEG = 0.265
+EARTH_RADIUS_DEG = 0.95  # spec 5.4: radio angular aproximado de la Tierra vista desde la Luna
 HORIZON_AZ_STEP_DEG = 1.0
 HORIZON_R_MAX_KM = 100.0
 SCORE_WEIGHTS = {"w1": 0.4, "w2": 0.3, "w3": 0.3}
