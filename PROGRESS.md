@@ -275,3 +275,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** corrección en T0.4.b (commit 04e28de): `.gitattributes` con `* text=auto eol=lf`. Un clon limpio en Windows extraía las fixtures con CRLF y fallaba `test_committed_fixtures_are_up_to_date`; tras el cambio pasan las 58 pruebas del pipeline en un clon limpio.
 - **Problemas abiertos:** diferencia menor e inevitable: en JSON/JS, `3.0` y `3` son el mismo número, así que zod no distingue un entero escrito como float (pydantic estricto sí). No afecta a datos generados por el pipeline.
 - **Siguiente tarea:** T0.2.a.
+
+## 2026-10-21 · T0.2.a · Identificar los kernels SPICE (verificación)
+
+- **Tarea:** T0.2.a — Identificar los kernels SPICE ([x]).
+- **Qué se hizo:** listados reales del servidor de NAIF (`generic_kernels/`, `lsk/`, `spk/planets/`, `pck/`, `fk/satellites/`, `fk/planets/`) y lectura de `aa_summaries.txt`, `aa_checksums.txt` y los `.cmt`. Tabla en `data/README.md` con 5 kernels: `de440s.bsp`, `naif0012.tls`, `pck00011.tpc`, `moon_pa_de440_200625.bpc` y `moon_de440_250416.tf`. Alternativa ITRF93 para la Tierra documentada, sin descargar.
+- **Cómo se verificó:** `curl -I` sobre cada URL:
+  ```
+  spk/planets/de440s.bsp                 HTTP 200  32726016 bytes
+  lsk/naif0012.tls                       HTTP 200  5257 bytes
+  pck/pck00011.tpc                       HTTP 200  131226 bytes
+  pck/moon_pa_de440_200625.bpc           HTTP 200  12863488 bytes
+  fk/satellites/moon_de440_250416.tf     HTTP 200  19478 bytes
+  pck/earth_1962_260806_2126_combined.bpc  HTTP 200  31318016 bytes   (alternativa, no se descarga)
+  fk/planets/earth_assoc_itrf93.tf       HTTP 200  7522 bytes        (alternativa, no se descarga)
+  ```
+  Coberturas publicadas: de440s 1849-12-26 a 2150-01-22 (aa_summaries); moon_pa_de440 1549-12-31 a 2650-01-25 (.cmt). Ambas cubren D4 (2027) y su margen. MD5 publicado de de440s: `3917ee56769db332790c751e2168843d`. `cmp naif0012.tls latest_leapseconds.tls` → idénticos.
+  FK (`moon_de440_250416.tf`): `MOON_PA → MOON_PA_DE440 (PCK 31008)`, `MOON_ME → MOON_ME_DE440_ME421 (FIXED 31009)`.
+- **Decisiones tomadas:** `de440s.bsp` en lugar de `de440.bsp` (mismo modelo DE440, 33 MB frente a 120 MB). Serie DE440 y no DE442, para mantener la coherencia con la orientación lunar publicada. IAU_EARTH (`pck00011.tpc`) para la rotación de la Tierra en la escena, salvo que T2.1.a pida más.
+- **Desviaciones de la spec / cambios en la guía:** ninguno (la spec sugiere DE440 «por ejemplo»).
+- **Problemas abiertos:** leer `AACLEARANCE_STATEMENT.pdf` de NAIF y resumir las condiciones de uso antes de la entrega (regla 12; se hará en T5.3.b). Total a descargar en T0.2.b: ~45.7 MB.
+- **Siguiente tarea:** T0.2.b.

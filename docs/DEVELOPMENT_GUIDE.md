@@ -116,7 +116,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 
 ### T0.2 Datos externos: SPICE, DEM y texturas (spec 6, 10)
 
-##### [ ] T0.2.a — Identificar los kernels SPICE (verificación)
+##### [x] T0.2.a — Identificar los kernels SPICE (verificación)
 - **Qué:** en el servidor de NAIF, identificar los kernels exactos: SPK planetario (la spec sugiere DE440), LSK, PCK de texto, PCK binario de orientación lunar y FK lunar (para MOON_ME o MOON_PA), y lo necesario para la orientación de la Tierra en la escena (T2.1). Registrar nombre exacto, URL, tamaño, cobertura declarada y condiciones de uso. No escribir ningún nombre que no se haya visto en el servidor.
 - **Archivos:** `data/README.md`
 - **Depende de:** T0.1.a · **Spec:** 5.1, 6 · **Decisiones:** D4 · **Est.:** 2 h
