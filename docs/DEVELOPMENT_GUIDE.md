@@ -389,7 +389,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T2.1.a · **Spec:** 5.9, 7.2 · **Decisiones:** — · **Est.:** 1.5 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_scene.py -v` pasa: error < 0.1 km en las muestras y < 1 km interpolado (tolerancia documentada).
 
-##### [ ] T2.1.c — Fase lunar y dirección del Sol frente a una referencia
+##### [x] T2.1.c — Fase lunar y dirección del Sol frente a una referencia
 - **Qué:** en al menos 3 fechas, comparar la fracción iluminada de la Luna y la dirección del Sol con una referencia (Horizons, mismas cantidades).
 - **Archivos:** `pipeline/tests/reference/`, `pipeline/tests/test_scene.py`, `docs/validation.md`
 - **Depende de:** T2.1.a, T1.1.a · **Spec:** 10 (T2.1) · **Decisiones:** — · **Est.:** 2 h

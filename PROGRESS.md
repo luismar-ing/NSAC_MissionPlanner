@@ -1061,3 +1061,26 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** contrato §10 ampliado con la regla de interpolación (no cambia el formato).
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T2.1.c.
+
+## 2026-10-21 · T2.1.c · Fase lunar y dirección del Sol frente a una referencia
+
+- **Tarea:** T2.1.c — Fase lunar y dirección del Sol ([x]).
+- **Qué se hizo:**
+  - `pipeline/horizons_fetch.py --scene`: 3 referencias de Horizons desde el geocentro en 5 fechas que coinciden con muestras de la escena. Son la fase de la Luna (Illu% y S-T-O) y los vectores ICRF sin corrección del Sol y de la Luna; se guardan crudas en `pipeline/tests/reference/horizons_scene_*.txt`.
+  - En `pipeline/tests/test_scene.py`, la comparación, que escribe la tabla de `docs/validation.md` §4.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_scene.py -v -s
+  Peor: iluminada 0.134 puntos; dirección del Sol 0.000000°; posición de la Luna 0.07 km
+  5 passed
+  | 2027-01-15T06:00:00Z | 43.734 | 43.599 | 0.134 | 97.200 | 97.355 | 0.000000 | 0.06 |
+  | 2027-04-20T03:00:00Z | 99.082 | 99.077 | 0.005 | 10.992 | 11.025 | 0.000000 | 0.07 |
+  | 2027-07-04T12:00:00Z |  0.249 |  0.247 | 0.002 | 174.282 | 174.300 | 0.000000 | 0.04 |
+  | 2027-09-30T18:00:00Z |  0.732 |  0.727 | 0.005 | 170.190 | 170.219 | 0.000000 | 0.05 |
+  | 2027-12-24T23:00:00Z |  8.408 |  8.373 | 0.036 | 146.283 | 146.361 | 0.000000 | 0.04 |
+  ```
+  Criterios: < 0.5 puntos de fracción iluminada ✓ y < 0.1° en la dirección del Sol ✓. Las fechas cubren creciente, casi llena, casi nueva y menguante.
+- **Decisiones tomadas:** la escena ilumina la Luna con `sun_dir` (Tierra → Sol); la diferencia con la geometría vista desde la Luna (≤ 0.15°) explica los ~0.1 puntos de fracción y está documentada en `docs/validation.md` §4.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. T2.1 completa.
+- **Siguiente tarea:** T2.2.a (no aplica por D5) → T2.2.b.

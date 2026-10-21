@@ -85,12 +85,66 @@ def header_value(text: str, key: str) -> str:
     return ""
 
 
+# ---------------------------------------------------------------- referencias de la escena (T2.1.c)
+
+# Instantes que coinciden con muestras horarias de scene/ephemeris.json
+SCENE_TIMES = ["2027-01-15 06:00", "2027-04-20 03:00", "2027-07-04 12:00", "2027-09-30 18:00", "2027-12-24 23:00"]
+SCENE_QUERIES = {
+    "moon_phase": {"COMMAND": "'301'", "EPHEM_TYPE": "'OBSERVER'", "QUANTITIES": "'10,24'", "EXTRA_PREC": "'YES'"},
+    "sun_vec": {"COMMAND": "'10'", "EPHEM_TYPE": "'VECTORS'", "REF_PLANE": "'FRAME'", "REF_SYSTEM": "'ICRF'",
+                "VEC_CORR": "'NONE'", "VEC_TABLE": "'1'", "OUT_UNITS": "'KM-S'"},
+    "moon_vec": {"COMMAND": "'301'", "EPHEM_TYPE": "'VECTORS'", "REF_PLANE": "'FRAME'", "REF_SYSTEM": "'ICRF'",
+                 "VEC_CORR": "'NONE'", "VEC_TABLE": "'1'", "OUT_UNITS": "'KM-S'"},
+}
+
+
+def scene_ref_path(kind: str) -> Path:
+    return REF_DIR / f"horizons_scene_{kind}.txt"
+
+
+def fetch_scene(kind: str) -> str:
+    params = {"format": "text", "OBJ_DATA": "'NO'", "MAKE_EPHEM": "'YES'", "CENTER": "'500@399'", "TIME_TYPE": "'UT'",
+              "TLIST": " ".join(f"'{t}'" for t in SCENE_TIMES), "TLIST_TYPE": "'CAL'", "CSV_FORMAT": "'YES'",
+              **SCENE_QUERIES[kind]}
+    url = API + "?" + urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "PolePlanner/1.0"}), timeout=60) as r:
+        text = r.read().decode("utf-8")
+    header = ["# PolePlanner T2.1.c: respuesta cruda de JPL Horizons (geocentro)",
+              f"# fetched_utc: {datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ}",
+              f"# kind: {kind}", f"# params: {json.dumps(params, ensure_ascii=False)}", ""]
+    return "\n".join(header) + text
+
+
+def parse_scene(text: str, kind: str) -> list[dict]:
+    body = text.split("$$SOE", 1)[1].split("$$EOE", 1)[0]
+    rows = []
+    for line in body.strip().splitlines():
+        c = [x.strip() for x in line.split(",")]
+        if kind == "moon_phase":
+            t = datetime.strptime(c[0], "%Y-%b-%d %H:%M:%S.%f")
+            rows.append({"utc": t.strftime("%Y-%m-%dT%H:%M:%SZ"), "illu_pct": float(c[3]), "sto_deg": float(c[4])})
+        else:
+            t = datetime.strptime(c[1].replace("A.D. ", ""), "%Y-%b-%d %H:%M:%S.%f")
+            rows.append({"utc": t.strftime("%Y-%m-%dT%H:%M:%SZ"), "xyz_km": [float(c[2]), float(c[3]), float(c[4])]})
+    return rows
+
+
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="no consulta la API; resume las referencias guardadas")
+    ap.add_argument("--scene", action="store_true", help="referencias de la escena desde el geocentro (T2.1.c)")
     args = ap.parse_args(argv)
+    if args.scene:
+        REF_DIR.mkdir(parents=True, exist_ok=True)
+        for kind in SCENE_QUERIES:
+            path = scene_ref_path(kind)
+            if not args.check:
+                path.write_text(fetch_scene(kind), encoding="utf-8", newline="\n")
+            rows = parse_scene(path.read_text(encoding="utf-8"), kind)
+            print(f"{kind:11s} {len(rows)} filas  primera: {rows[0]}")
+        return 0
     sites = json.loads((ROOT / "pipeline" / "sites.json").read_text(encoding="utf-8"))
     REF_DIR.mkdir(parents=True, exist_ok=True)
     for site in sites:

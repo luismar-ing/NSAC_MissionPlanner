@@ -135,3 +135,20 @@ Control negativo: con MOON_PA en lugar de MOON_ME el error sube a ~100″, y sin
 | de_gerlache_rim_2 | earth | 2027-10-17T08:30:00Z | 63.420600 / +6.892315 | 63.420600 / +6.892315 | -0.0016 | +0.0001 | 0.0016 |
 | de_gerlache_rim_2 | earth | 2027-12-24T23:00:00Z | 73.450722 / -5.884755 | 73.450722 / -5.884755 | -0.0008 | -0.0001 | 0.0008 |
 <!-- vs_horizons:end -->
+
+## 4. Escena: fase lunar y dirección del Sol (T2.1.c)
+
+<!-- vs_scene:start (generado por pipeline/tests/test_scene.py; no editar a mano) -->
+Referencia: Horizons desde el geocentro (`500@399`): Luna OBSERVER, cantidades 10 (Illu%) y 24 (S-T-O); vectores ICRF, sin corrección, del Sol y de la Luna. Respuestas en `pipeline/tests/reference/horizons_scene_*.txt`.
+La fase de la escena usa la luz en la dirección `sun_dir` (Tierra → Sol) y la Tierra en `−moon_pos`; esa aproximación difiere ≤ 0.15° (paralaje Tierra–Luna) de la geometría vista desde la Luna.
+
+**Resultado:** peor diferencia de fracción iluminada **0.134 puntos** (criterio < 0.5); dirección del Sol **0.000000°** (criterio < 0.1°); posición de la Luna **0.07 km**.
+
+| Instante (UTC) | Iluminada Horizons (%) | Iluminada escena (%) | Δ (puntos) | Fase S-T-O Horizons (°) | Fase escena (°) | Δ dirección del Sol (°) | Δ posición de la Luna (km) |
+|---|---|---|---|---|---|---|---|
+| 2027-01-15T06:00:00Z | 43.734 | 43.599 | 0.134 | 97.200 | 97.355 | 0.000000 | 0.06 |
+| 2027-04-20T03:00:00Z | 99.082 | 99.077 | 0.005 | 10.992 | 11.025 | 0.000000 | 0.07 |
+| 2027-07-04T12:00:00Z | 0.249 | 0.247 | 0.002 | 174.282 | 174.300 | 0.000000 | 0.04 |
+| 2027-09-30T18:00:00Z | 0.732 | 0.727 | 0.005 | 170.190 | 170.219 | 0.000000 | 0.05 |
+| 2027-12-24T23:00:00Z | 8.408 | 8.373 | 0.036 | 146.283 | 146.361 | 0.000000 | 0.04 |
+<!-- vs_scene:end -->

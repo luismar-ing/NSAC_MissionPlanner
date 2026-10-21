@@ -109,3 +109,67 @@ def test_earth_quaternion_matches_spice(scene):
     m = np.array(sp.pxform(scene["earth_frame"], "J2000", et_of(scene, k)))
     v = np.array([0.2, 0.9, -0.4])
     assert np.linalg.norm(qrot(scene["earth_quat"][k], v) - m @ v) < 1e-8
+
+
+# ---------------------------------------------------------------- T2.1.c: fase lunar y dirección del Sol
+
+import re  # noqa: E402
+
+from pipeline.horizons_fetch import parse_scene, scene_ref_path  # noqa: E402
+
+DOC = ROOT / "docs" / "validation.md"
+
+
+def sample_index(scene, utc):
+    from datetime import datetime
+
+    t0 = datetime.strptime(scene["start_utc"], "%Y-%m-%dT%H:%M:%SZ")
+    t = datetime.strptime(utc, "%Y-%m-%dT%H:%M:%SZ")
+    k, rem = divmod((t - t0).total_seconds(), scene["step_min"] * 60)
+    assert rem == 0, "las fechas de referencia deben coincidir con muestras de la escena"
+    return int(k)
+
+
+def angle_deg(a, b):
+    a, b = np.asarray(a, float), np.asarray(b, float)
+    return float(np.degrees(np.arctan2(np.linalg.norm(np.cross(a, b)), np.dot(a, b))))
+
+
+def test_phase_and_sun_direction_vs_horizons(scene):
+    phase = parse_scene(scene_ref_path("moon_phase").read_text(encoding="utf-8"), "moon_phase")
+    sun = {r["utc"]: r["xyz_km"] for r in parse_scene(scene_ref_path("sun_vec").read_text(encoding="utf-8"), "sun_vec")}
+    moon = {r["utc"]: r["xyz_km"] for r in parse_scene(scene_ref_path("moon_vec").read_text(encoding="utf-8"), "moon_vec")}
+    lines = ["| Instante (UTC) | Iluminada Horizons (%) | Iluminada escena (%) | Δ (puntos) | Fase S-T-O Horizons (°) | Fase escena (°) | Δ dirección del Sol (°) | Δ posición de la Luna (km) |",
+             "|---|---|---|---|---|---|---|---|"]
+    worst = {"illu": 0.0, "sun": 0.0, "moon": 0.0}
+    for r in phase:
+        k = sample_index(scene, r["utc"])
+        moon_pos = np.asarray(scene["moon_pos_km"][k])
+        sun_dir = np.asarray(scene["sun_dir"][k])
+        phi = angle_deg(sun_dir, -moon_pos)  # lo que ve el usuario: luz en dirección sun_dir, Tierra en −moon_pos
+        illu = 100 * (1 + np.cos(np.radians(phi))) / 2
+        d_illu = abs(illu - r["illu_pct"])
+        d_sun = angle_deg(sun_dir, sun[r["utc"]])
+        d_moon = float(np.linalg.norm(moon_pos - np.asarray(moon[r["utc"]])))
+        worst = {"illu": max(worst["illu"], d_illu), "sun": max(worst["sun"], d_sun), "moon": max(worst["moon"], d_moon)}
+        lines.append(f"| {r['utc']} | {r['illu_pct']:.3f} | {illu:.3f} | {d_illu:.3f} | {r['sto_deg']:.3f} | {phi:.3f} | {d_sun:.6f} | {d_moon:.2f} |")
+    print(f"\nPeor: iluminada {worst['illu']:.3f} puntos; dirección del Sol {worst['sun']:.6f}°; posición de la Luna {worst['moon']:.2f} km")
+    assert worst["illu"] < 0.5 and worst["sun"] < 0.1 and worst["moon"] < 1.0
+
+    block = "\n".join([
+        "<!-- vs_scene:start (generado por pipeline/tests/test_scene.py; no editar a mano) -->",
+        "Referencia: Horizons desde el geocentro (`500@399`): Luna OBSERVER, cantidades 10 (Illu%) y 24 (S-T-O); vectores ICRF, sin corrección, del Sol y de la Luna. Respuestas en `pipeline/tests/reference/horizons_scene_*.txt`.",
+        "La fase de la escena usa la luz en la dirección `sun_dir` (Tierra → Sol) y la Tierra en `−moon_pos`; esa aproximación difiere ≤ 0.15° (paralaje Tierra–Luna) de la geometría vista desde la Luna.",
+        "",
+        f"**Resultado:** peor diferencia de fracción iluminada **{worst['illu']:.3f} puntos** (criterio < 0.5); dirección del Sol **{worst['sun']:.6f}°** (criterio < 0.1°); posición de la Luna **{worst['moon']:.2f} km**.",
+        "",
+        *lines,
+        "<!-- vs_scene:end -->",
+    ])
+    text = DOC.read_text(encoding="utf-8")
+    pat = re.compile(r"<!-- vs_scene:start.*?<!-- vs_scene:end -->", re.S)
+    if pat.search(text):
+        text = pat.sub(lambda _: block, text)
+    else:
+        text = text.rstrip("\n") + "\n\n## 4. Escena: fase lunar y dirección del Sol (T2.1.c)\n\n" + block + "\n"
+    DOC.write_text(text, encoding="utf-8", newline="\n")
