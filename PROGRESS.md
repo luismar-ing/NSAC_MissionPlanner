@@ -855,3 +855,30 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. Los valores de la máscara se revisan en T1.2.e.
 - **Siguiente tarea:** T1.2.e.
+
+## 2026-10-21 · T1.2.e · Máscaras de los sitios reales y gráficos
+
+- **Tarea:** T1.2.e — Máscaras de los sitios reales ([x]).
+- **Qué se hizo:** en `pipeline/horizon.py`, `save_mask` y `load_mask` (intermedio `pipeline/out/horizon_{sitio}.npz` con los parámetros) y `plot_mask`: silueta lineal con las trayectorias de un año del Sol y la Tierra (de T1.1.e) y vista polar. `python -m pipeline.horizon` lo genera todo. Figuras en `docs/figures/horizon_{sitio}.png`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.horizon
+  connecting_ridge   z0 1958.6 m  máscara [-3.85, -0.71]°  (máx en az 182°)
+  haworth            z0 2841.8 m  máscara [-3.59, +2.19]°  (máx en az 83°)
+  nobile_rim_1       z0 6799.8 m  máscara [-3.76, +0.38]°  (máx en az 25°)
+  malapert_massif    z0 5173.2 m  máscara [-3.08, -0.09]°  (máx en az 90°)
+  de_gerlache_rim_2  z0 1764.1 m  máscara [-3.51, +1.10]°  (máx en az 188°)
+  Total 7.2 s
+  ```
+  Máximos plausibles (pocos grados; negativos en las cumbres).
+  **Revisión visual (agente) de las 5 figuras:**
+  - Sol: onda anual, más alto hacia el Norte local (dirección del ecuador). ✓
+  - **Control independiente de azimuts:** en sitios cerca del polo la Tierra debe estar en az ≈ −longitud del sitio. Malapert (+2°) → ~358°; Haworth (−23°) → ~23°; de Gerlache (−68°) → ~68°; Connecting Ridge (−137°) → ~137°; Nobile Rim 1 (+37°) → ~323°. Coincide en los 5. ✓ (las convenciones de horizonte y efemérides coinciden en datos reales).
+  - Malapert: silueta ≤ −0.09°; el Sol solo roza el terreno hacia el Sur → muy iluminado (coherente con su fama).
+  - Haworth: pico de +2.19° al Este que tapa el Sol en parte de sus pasos bajos.
+  - de Gerlache Rim 2: macizo de +1.10° al Sur.
+  - Connecting Ridge: el Sol se mueve a ±2° y el horizonte está en ≤ −0.71°.
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. T1.2 completa.
+- **Siguiente tarea:** T1.3.d.

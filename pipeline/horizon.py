@@ -12,6 +12,8 @@ que sí se ve. La elección se escribe en manifest.params.horizon.clip_negative.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
 from pipeline import config
@@ -62,6 +64,62 @@ def site_mask(site: dict, r_max_m: float = config.HORIZON_R_MAX_KM * 1000.0, **k
     return mask, {"read_s": t1 - t0, "compute_s": t2 - t1, "z0_m": z0, "window_px": window.z.shape}
 
 
+OUT_DIR = Path(__file__).with_name("out")
+
+
+def save_mask(site_id: str, mask: np.ndarray, z0_m: float) -> Path:
+    """Intermedio pipeline/out/horizon_{sitio}.npz (el JSON del contrato lo escribe build_all, T2.4.a)."""
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = OUT_DIR / f"horizon_{site_id}.npz"
+    np.savez_compressed(path, elev_deg=mask, z0_m=z0_m, az_step_deg=config.HORIZON_AZ_STEP_DEG,
+                        h_obs_m=config.H_OBS_M, r_max_km=config.HORIZON_R_MAX_KM, clip_negative=CLIP_NEGATIVE)
+    return path
+
+
+def load_mask(site_id: str) -> np.ndarray:
+    return np.load(OUT_DIR / f"horizon_{site_id}.npz")["elev_deg"]
+
+
+def plot_mask(site: dict, mask: np.ndarray, path: Path) -> None:
+    """Figura de verificación: silueta lineal con las trayectorias anuales del Sol y la Tierra, y vista polar."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    from pipeline.ephemeris import load_series
+
+    az = np.arange(mask.size) * config.HORIZON_AZ_STEP_DEG
+    fig = plt.figure(figsize=(14, 4.8), dpi=110)
+    ax = fig.add_axes([0.05, 0.12, 0.62, 0.78])
+    try:
+        s = load_series(site["id"])
+        ax.scatter(s["earth_az"], s["earth_el"], s=0.2, color="#4aa3ff", alpha=0.25, label="Earth (1 year, 30 min)")
+        ax.scatter(s["sun_az"], s["sun_el"], s=0.2, color="#ffb347", alpha=0.25, label="Sun (1 year, 30 min)")
+    except FileNotFoundError:
+        pass
+    ax.fill_between(np.append(az, 360), np.append(mask, mask[0]), -15, color="#5a5a5a", alpha=0.9, label="terrain (horizon mask)")
+    ax.plot(np.append(az, 360), np.append(mask, mask[0]), color="black", lw=0.8)
+    ax.axhline(0, color="k", lw=0.4, ls=":")
+    lo = min(mask.min(), -3.0) - 1
+    ax.set_xlim(0, 360); ax.set_ylim(lo, 12)
+    ax.set_xticks(range(0, 361, 45)); ax.set_xticklabels(["N", "45", "E", "135", "S", "225", "W", "315", "N"])
+    ax.set_xlabel("azimuth (deg from local north, eastward)"); ax.set_ylabel("elevation (deg)")
+    ax.set_title(f"{site['name']}: horizon mask (LOLA 40 m, R_max {config.HORIZON_R_MAX_KM:.0f} km, h_obs {config.H_OBS_M:.0f} m); "
+                 f"max {mask.max():+.2f}° at az {int(np.argmax(mask))}°", fontsize=9)
+    ax.legend(loc="upper right", fontsize=7, markerscale=20)
+    pax = fig.add_axes([0.70, 0.08, 0.28, 0.84], projection="polar")
+    pax.set_theta_zero_location("N"); pax.set_theta_direction(-1)
+    pax.plot(np.radians(np.append(az, 360)), np.append(mask, mask[0]) - lo, color="black", lw=1)
+    pax.fill_between(np.radians(np.append(az, 360)), 0, np.append(mask, mask[0]) - lo, color="#5a5a5a", alpha=0.6)
+    pax.set_rlabel_position(135)
+    ticks = np.arange(np.ceil(lo), 3)
+    pax.set_rticks(ticks - lo); pax.set_yticklabels([f"{v:.0f}°" for v in ticks], fontsize=6)
+    pax.set_title("polar view (radius = elevation)", fontsize=8)
+    fig.savefig(path)
+    plt.close(fig)
+
+
 def main(argv=None) -> int:
     import argparse
     import json
@@ -73,6 +131,7 @@ def main(argv=None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description="Máscaras de horizonte de los sitios (T1.2.d/e)")
     ap.add_argument("--site", help="solo este sitio (id de sites.json)")
+    ap.add_argument("--no-plots", action="store_true")
     args = ap.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
     sites = json.loads((root / "pipeline" / "sites.json").read_text(encoding="utf-8"))
@@ -81,6 +140,9 @@ def main(argv=None) -> int:
     t_all = time.perf_counter()
     for site in sites:
         mask, t = site_mask(site)
+        save_mask(site["id"], mask, t["z0_m"])
+        if not args.no_plots:
+            plot_mask(site, mask, root / "docs" / "figures" / f"horizon_{site['id']}.png")
         print(f"{site['id']:18s} lectura {t['read_s']:5.1f} s  cálculo {t['compute_s']:5.1f} s  "
               f"ventana {t['window_px'][0]}×{t['window_px'][1]} px  z0 {t['z0_m']:7.1f} m  "
               f"máscara [{mask.min():+6.2f}, {mask.max():+6.2f}]°  (máx en az {int(np.argmax(mask))}°)")

@@ -250,7 +250,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.2.c · **Spec:** 8.7, 14 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** tiempo por sitio impreso; las pruebas de T1.2.c siguen pasando.
 
-##### [ ] T1.2.e — Máscaras de los sitios reales y gráficos
+##### [x] T1.2.e — Máscaras de los sitios reales y gráficos
 - **Qué:** máscaras de todos los sitios, figuras lineal y polar, máximo por sitio.
 - **Archivos:** `pipeline/horizon.py`, `docs/figures/horizon_{site}.png`
 - **Depende de:** T1.2.d, T0.3.b · **Spec:** 5.2, 10 (T1.2) · **Decisiones:** D12 · **Est.:** 2 h
