@@ -1,0 +1,46 @@
+# Datos externos pesados (DEM, kernels SPICE, texturas): no se versionan.
+# Sus URLs y checksums viven en data/README.md, que sí se versiona.
+data/*
+!data/README.md
+
+# Python: entornos virtuales y cachés
+.venv/
+venv/
+env/
+.env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Salidas intermedias del pipeline (se regeneran)
+pipeline/out/
+
+# Node
+node_modules/
+
+# Artefactos de build y cobertura
+web/dist/
+dist/
+build/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# Variables de entorno locales
+.env
+.env.*
+!.env.example
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Configuración local de Claude Code
+.claude/settings.local.json
