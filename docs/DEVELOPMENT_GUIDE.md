@@ -128,7 +128,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 - **Depende de:** T0.2.a, T0.1.b · **Spec:** 6, 11 regla 5 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** `python -m pipeline.fetch_data --kernels` descarga y verifica; una segunda ejecución informa "present, checksum OK" para cada archivo; los checksums quedan en `data/README.md`.
 
-##### [ ] T0.2.c — Carga SPICE y cobertura temporal
+##### [x] T0.2.c — Carga SPICE y cobertura temporal
 - **Qué:** prueba que carga el meta-kernel, calcula la posición de la Luna respecto a la Tierra en un instante del rango y la rotación MOON_ME (o MOON_PA) → J2000; comprueba con spkcov/pckcov que la cobertura incluye el rango de D4 más el margen de `transit_days` anterior.
 - **Archivos:** `pipeline/spice_utils.py`, `pipeline/tests/test_spice_load.py`
 - **Depende de:** T0.2.b · **Spec:** 5.1, 10 (T0.2) · **Decisiones:** D4 · **Est.:** 1.5 h

@@ -328,3 +328,27 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T0.2.c.
+
+## 2026-10-21 · T0.2.c · Carga SPICE y cobertura temporal
+
+- **Tarea:** T0.2.c — Carga SPICE y cobertura temporal ([x]).
+- **Qué se hizo:**
+  - `pipeline/spice_utils.py`: `load_kernels()` (furnsh del meta-kernel desde la raíz, una sola vez, con error claro si faltan kernels), `utc_to_et`, `spk_coverage`, `pck_coverage`, `covers` y `loaded_kernel_names` (para el manifiesto).
+  - `pipeline/config.py` (**archivo añadido**, no estaba en la guía): parámetros confirmados (D4 llegadas 2027-01-01 a 2027-12-31; D5 ILLUSTRATIVE, 3 días; D12 3 m y 0.5°; paso de 30 min; L = 3, 7, 14; pesos del score) y los rangos derivados del contrato §2. Es la única fuente de estos valores para el pipeline.
+  - `pipeline/tests/test_spice_load.py`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_spice_load.py -v -s
+  Distancia Tierra-Luna en 2027-01-01: 391,499.4 km
+  test_earth_moon_distance_is_plausible PASSED
+  test_lunar_frame_rotation_is_proper[MOON_ME] PASSED
+  test_lunar_frame_rotation_is_proper[MOON_PA] PASSED
+  Rango comprobado: 2026-12-28 a 2028-01-15 (ET 851688069 a 884779269)
+  test_kernels_cover_the_whole_mission_range PASSED
+  4 passed in 0.25s
+  ```
+  La cobertura se comprobó con `spkcov` para el Sol (10), el baricentro Tierra-Luna (3), la Luna (301) y la Tierra (399) en `de440s.bsp`, y con `pckcov` para MOON_PA_DE440 (31008). El rango cubre desde el primer despegue (2027-01-01 − 3 días − 1 día de margen) hasta el fin de las series (2027-12-31 + 1 + 14 días). Suite completa: `64 passed`.
+- **Decisiones tomadas:** las cadenas UTC se pasan a `str2et` como ISO sin sufijo (CSPICE no acepta `...T00:00:00 UTC`; el ISO sin zona se interpreta como UTC).
+- **Desviaciones de la spec / cambios en la guía:** se añade `pipeline/config.py`.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T0.2.d.
