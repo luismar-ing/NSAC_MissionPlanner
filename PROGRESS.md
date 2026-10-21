@@ -671,3 +671,8 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   Figuras: `docs/figures/sites_map.png`, `docs/figures/sites_zoom.png`.
 - **Pendiente para el humano:** confirmar los 5 sitios y el método (docs/sites.md); D1 (habilidades y horas); D8, D9 y D10 antes de la Fase 2; D11 antes de la Fase 7.
 - **Siguiente tarea:** T1.1.a (referencias de JPL Horizons).
+
+## 2026-10-21 · DECISIONES · D3 concretada y confirmada
+
+- **Qué:** el humano confirmó en el chat los 5 sitios (Connecting Ridge, Haworth, Nobile Rim 1, Malapert Massif y de Gerlache Rim 2) y el método (cota máxima del DEM dentro de la región oficial USGS). Anotado en la fila de D3 de `docs/DECISIONS.md`. También autorizó el push de los commits del hito de la Fase 0.
+- **Siguiente tarea:** T1.1.a.
