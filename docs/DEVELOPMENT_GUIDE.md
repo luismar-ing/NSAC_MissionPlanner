@@ -436,7 +436,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T2.3.a, T2.3.b, T1.4.d · **Spec:** 5.10, 8.6, 7.2 · **Decisiones:** D10 · **Est.:** 1.5 h
 - **Aceptación:** validación en 0; cada atributo tiene `source` o el valor "not available"; ninguno vacío.
 
-##### [ ] T2.3.d — Terreno del sitio en niveles de detalle
+##### [x] T2.3.d — Terreno del sitio en niveles de detalle
 - **Qué:** recorte del DEM alrededor de cada sitio (radio según D9; en el MVP, terreno simplificado), mallas de alturas en 3 LOD en coordenadas ENU locales en metros (escala real local, 5.9), formato binario compacto con cabecera JSON.
 - **Archivos:** `pipeline/terrain_lod.py`, `pipeline/tests/test_terrain_lod.py`
 - **Depende de:** T1.2.a, T0.3.b · **Spec:** 5.9, 7.2, 8.3 · **Decisiones:** D9, D13 · **Est.:** 3 h

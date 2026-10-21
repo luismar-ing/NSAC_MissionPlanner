@@ -1198,3 +1198,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T2.3.d.
+
+## 2026-10-21 · T2.3.d · Terreno del sitio en niveles de detalle
+
+- **Tarea:** T2.3.d — Terreno en LOD ([x]).
+- **Qué se hizo:** `pipeline/terrain_lod.py` (`python -m pipeline.terrain_lod`). Por sitio, 3 niveles en ENU_SITE: lod0 ±20 km cada 400 m (101²), lod1 ±10 km cada 80 m (251²) y lod2 ±3 km cada 40 m (151²). Los nodos se colocan por distancia y azimut geodésicos desde el sitio; la altura es la coordenada Arriba del ENU, con la caída por curvatura incluida. int16 × 0.25 m, con cabecera JSON del contrato §13 (convenciones ENU_SITE añadidas). Comando en `CLAUDE.md`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.terrain_lod
+  malapert_massif    lod0: 101×101 nodos cada 400 m (±20 km)    20.8 kB
+  malapert_massif    lod1: 251×251 nodos cada 80 m (±10 km)   126.4 kB
+  malapert_massif    lod2: 151×151 nodos cada 40 m (±3 km)    46.0 kB
+  ... (5 sitios)
+  Total 0.97 MB en 0.9 s; contrato: OK
+  $ python -m pytest pipeline/tests/test_terrain_lod.py -q
+  16 passed     (ida y vuelta int16 ≤ 0.125 m; por sitio y LOD: binario = byte_length, nodo central = sitio con z ≈ 0,
+                 50 nodos al azar frente al DEM − h0 − d²/2R: error < 1 m)
+  ```
+- **Decisiones tomadas:** terreno simplificado del MVP (D9). La curvatura va en la altura para que el zoom final a escala real (5.9) muestre el horizonte curvo. Número impar de nodos (nodo en el sitio): la primera versión de lod0 (cada 320 m) tenía 126 nodos sin nodo central; la prueba lo detectó y pasó a 400 m.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno (≈ 0.2 MB por sitio; presupuesto en T2.4.b).
+- **Siguiente tarea:** T2.3.e.
