@@ -212,7 +212,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.1.b · **Spec:** 5.1, 5.7 · **Decisiones:** — · **Est.:** 3 h
 - **Aceptación:** prueba para un sitio y 30 días a 30 min: |sun_el| ≤ (90° − |lat|) + 1.6°, |earth_el| ≤ (90° − |lat|) + 7.5° (límites de `docs/validation.md` §2, que corrigen el ±1.6° de 5.7, válido solo en el polo) y azimuts en [0, 360).
 
-##### [ ] T1.1.d — Comparación contra Horizons
+##### [x] T1.1.d — Comparación contra Horizons
 - **Qué:** prueba que compara contra las referencias de T1.1.a y escribe la tabla de errores (borrador) en `docs/validation.md`. Error medido como separación angular, o en elevación y azimut·cos(el) (documentar).
 - **Archivos:** `pipeline/tests/test_vs_horizons.py`, `docs/validation.md`
 - **Depende de:** T1.1.a, T1.1.c · **Spec:** 5.7, 10 (T1.1) · **Decisiones:** — · **Est.:** 2 h

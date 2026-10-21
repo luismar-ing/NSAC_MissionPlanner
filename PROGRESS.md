@@ -750,3 +750,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** **límite de la Tierra corregido de colat + 7.0° a colat + 7.5°**. Connecting Ridge dio −7.545° frente a un límite de 7.56°, porque en T1.1.a no conté la paralaje topocéntrica de la Tierra (~0.26°). Actualizados `ephemeris.py`, `test_horizons_refs.py`, `docs/validation.md` §2 y la aceptación de T1.1.c en la guía.
 - **Problemas abiertos:** el bucle sobre `spkcpo` es escalar. Se medirá el tiempo de un año completo en T1.1.e.
 - **Siguiente tarea:** T1.1.d.
+
+## 2026-10-21 · T1.1.d · Comparación contra Horizons
+
+- **Tarea:** T1.1.d — Comparación contra Horizons ([x]).
+- **Qué se hizo:** `pipeline/tests/test_vs_horizons.py` compara az/el de PolePlanner (DE440, MOON_ME, LT+S, `spkcpo`) con las 70 referencias de Horizons (5 sitios × Sol y Tierra × 7 instantes). Mide Δaz·cos(el), Δel y la separación angular (`atan2(|u×h|, u·h)`), y regenera la tabla de `docs/validation.md` §3 entre marcadores.
+- **Cómo se verificó:**
+  ```
+  $ python -m pytest pipeline/tests/test_vs_horizons.py -v -s
+  test_matches_horizons[sun-×5 sitios] PASSED
+  test_matches_horizons[earth-×5 sitios] PASSED
+  test_wrong_frame_would_be_detected PASSED
+  Peor separación: 0.0016″
+  12 passed
+  $ python -m pytest -q   → 154 passed
+  ```
+  Valores en bruto (Malapert, Sol, 2027-01-15 06:00): PolePlanner 87.556374315 / 0.912966891, Horizons 87.556374305 / 0.912966892.
+  Controles negativos (Malapert, Sol): MOON_PA → 101.6″; sin corrección (NONE) → 21.2″; solo LT → 21.2″.
+- **Decisiones tomadas:** además del criterio de la spec (< 0.05°), la prueba exige < 1″. Un error de marco (MOON_PA) da ~0.028°, que pasaría el criterio de la spec sin ser detectado. El control negativo lo deja demostrado.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** la primera versión calculaba la separación con `arccos` (precisión limitada a ~0.004″); se cambió a `atan2`. La tabla queda coherente: Δ = 0 ⇒ separación = 0.
+- **Siguiente tarea:** T1.1.e.
