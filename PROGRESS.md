@@ -1219,3 +1219,20 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno (≈ 0.2 MB por sitio; presupuesto en T2.4.b).
 - **Siguiente tarea:** T2.3.e.
+
+## 2026-10-21 · T2.3.e · Contexto polar de baja resolución para el zoom
+
+- **Tarea:** T2.3.e — Contexto polar ([x]).
+- **Qué se hizo:** en `pipeline/terrain_lod.py`, `build_polar` → `terrain/_polar/lod0`: frame POLAR_STEREO (proyección del DEM en `projection`), 303×303 nodos cada 2 km (±302 km, casi todo 80–90°S), a partir del DEM promediado a 2 km. Alturas sobre la esfera de 1737.4 km, relativas a la altura del polo (`origin.elevation_m` = 1026.7 m), en int16 × 0.5 m; sin curvatura añadida (coordenadas de mapa). `plot_polar` genera la vista previa `docs/figures/polar_context.png`. `write_lod` y `encode` aceptan ahora la escala por nivel.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.terrain_lod
+  _polar             lod0: 303×303 nodos cada 2000 m (±302 km, origen en el polo z = 1026.7 m)   184.1 kB
+  Total 1.15 MB en 2.5 s; contrato: OK
+  $ python -m pytest pipeline/tests/test_terrain_lod.py -q → 17 passed   (incluye test_polar_context)
+  ```
+  Vista previa revisada: los 5 sitios y la región polar (Shackleton junto al centro, Malapert y Nobile al norte del mapa) se reconocen igual que en `sites_map.png`.
+- **Decisiones tomadas:** escala de 0.5 m en el nivel polar (rango de ±7.3 km respecto al polo); los niveles de los sitios siguen con 0.25 m. La altura del polo en el nivel de 2 km (1026.7 m) es menor que la del píxel de 40 m (1285.9 m) porque el promedio mezcla el borde de Shackleton con su interior; es esperable y queda en la cabecera.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. T2.3 completa.
+- **Siguiente tarea:** T2.4.a.

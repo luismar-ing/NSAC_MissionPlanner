@@ -442,7 +442,7 @@ Permite desarrollar las Fases 3 y 4 sin esperar al pipeline (spec 14). Todo lo q
 - **Depende de:** T1.2.a, T0.3.b · **Spec:** 5.9, 7.2, 8.3 · **Decisiones:** D9, D13 · **Est.:** 3 h
 - **Aceptación:** validación en 0; las alturas reconstruidas coinciden con el DEM en puntos de control (error < 1 m con el mismo muestreo); tamaño por LOD impreso.
 
-##### [ ] T2.3.e — Contexto polar de baja resolución para el zoom
+##### [x] T2.3.e — Contexto polar de baja resolución para el zoom
 - **Qué:** un nivel extra que cubre la región polar a baja resolución, para el paso "polo sur" del zoom.
 - **Archivos:** `pipeline/terrain_lod.py`, `docs/figures/polar_context.png`
 - **Depende de:** T2.3.d · **Spec:** 8.3 · **Decisiones:** D9, D13 · **Est.:** 2 h

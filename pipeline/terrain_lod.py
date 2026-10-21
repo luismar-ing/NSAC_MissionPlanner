@@ -63,8 +63,8 @@ def surface_up_m(site: dict, x: np.ndarray, y: np.ndarray, window: DemWindow) ->
     return (R_MOON_M + h) * np.cos(theta) - r0
 
 
-def encode(z: np.ndarray) -> bytes:
-    q = np.round(z / HEIGHT_SCALE_M)
+def encode(z: np.ndarray, scale_m: float = HEIGHT_SCALE_M) -> bytes:
+    q = np.round(z / scale_m)
     if np.abs(q).max() > 32767:
         raise ValueError("alturas fuera del rango de int16 con la escala elegida")
     return q.astype("<i2").tobytes()
@@ -77,15 +77,16 @@ def decode(blob: bytes, header: dict) -> np.ndarray:
 
 
 def write_lod(site_id: str, lod: Lod, origin: dict, z: np.ndarray, frame: str = "ENU_SITE",
-              projection: str | None = None, out: Path = OUT, x0: float | None = None, y0: float | None = None) -> dict:
+              projection: str | None = None, out: Path = OUT, x0: float | None = None, y0: float | None = None,
+              scale_m: float = HEIGHT_SCALE_M) -> dict:
     folder = out / site_id
     folder.mkdir(parents=True, exist_ok=True)
-    blob = encode(z)
+    blob = encode(z, scale_m)
     header = {
         "site_id": site_id, "lod": lod.lod, "frame": frame, "origin": origin, "projection": projection,
         "grid": {"nx": int(z.shape[1]), "ny": int(z.shape[0]), "spacing_m": lod.spacing_m,
                  "x0_m": -lod.half_m if x0 is None else x0, "y0_m": lod.half_m if y0 is None else y0},
-        "height_encoding": "int16", "height_scale_m": HEIGHT_SCALE_M, "height_offset_m": 0.0,
+        "height_encoding": "int16", "height_scale_m": scale_m, "height_offset_m": 0.0,
         "bin_file": f"lod{lod.lod}.bin", "byte_length": len(blob),
     }
     (folder / f"lod{lod.lod}.bin").write_bytes(blob)
@@ -102,6 +103,63 @@ def build_site(site: dict, out: Path = OUT) -> list[dict]:
         x, y = enu_grid(lod.half_m, lod.spacing_m)
         headers.append(write_lod(site["id"], lod, origin, surface_up_m(site, x, y, window), out=out))
     return headers
+
+
+# ---------------------------------------------------------------- contexto polar (T2.3.e)
+
+POLAR_LOD = Lod(0, 302_000.0, 2_000.0)  # 80–90°S casi completo (el DEM llega a ±304 km), un nodo cada 2 km
+POLAR_SCALE_M = 0.5  # rango del DEM ±7.3 km respecto al polo: int16 × 0.5 m cubre ±16 km
+
+
+def build_polar(out: Path = OUT) -> dict:
+    """terrain/_polar/lod0: alturas sobre la esfera de 1737.4 km respecto a la altura del polo, en la malla del DEM
+    (POLAR_STEREO). Sin curvatura añadida: el front end coloca cada nodo sobre la esfera a partir de x, y."""
+    import rasterio
+    from rasterio.enums import Resampling
+
+    from pipeline.dem import DEM_PATH
+    from pipeline.regions import DEM_CRS
+
+    with rasterio.open(DEM_PATH) as ds:
+        factor = int(round(POLAR_LOD.spacing_m / ds.res[0]))
+        shape = (ds.height // factor, ds.width // factor)
+        z = ds.read(1, out_shape=shape, resampling=Resampling.average)
+        transform = ds.transform * ds.transform.scale(ds.width / shape[1], ds.height / shape[0])
+    window = DemWindow(z, transform)
+    x, y = enu_grid(POLAR_LOD.half_m, POLAR_LOD.spacing_m)  # aquí x, y son coordenadas del mapa (polo en 0, 0)
+    h = window.sample(x, y)
+    if np.isnan(h).any():
+        raise ValueError("el contexto polar se sale del DEM promediado")
+    pole = float(window.sample(np.array([0.0]), np.array([0.0]))[0])
+    origin = {"lat": -90.0, "lon": 0.0, "elevation_m": round(pole, 1)}
+    return write_lod("_polar", POLAR_LOD, origin, h - origin["elevation_m"], frame="POLAR_STEREO",
+                     projection=DEM_CRS.to_proj4(), out=out, scale_m=POLAR_SCALE_M)
+
+
+def plot_polar(header: dict, path: Path) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LightSource
+
+    z = decode((OUT / "_polar" / header["bin_file"]).read_bytes(), header) + header["origin"]["elevation_m"]
+    g = header["grid"]
+    ext = (g["x0_m"] / 1e3, (g["x0_m"] + (g["nx"] - 1) * g["spacing_m"]) / 1e3,
+           (g["y0_m"] - (g["ny"] - 1) * g["spacing_m"]) / 1e3, g["y0_m"] / 1e3)
+    hs = LightSource(azdeg=315, altdeg=35).hillshade(z, vert_exag=2, dx=g["spacing_m"], dy=g["spacing_m"])
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=110)
+    ax.imshow(hs, cmap="gray", extent=ext)
+    sites = json.loads((ROOT / "pipeline" / "sites.json").read_text(encoding="utf-8"))
+    for s in sites:
+        sx, sy = latlon_to_xy(s["lat"], s["lon"])
+        ax.plot(sx / 1e3, sy / 1e3, "o", ms=5, mfc="#4aa3ff", mec="white")
+        ax.annotate(s["name"], (sx / 1e3, sy / 1e3), xytext=(4, 4), textcoords="offset points", fontsize=7, color="white")
+    ax.set_title(f"Polar context LOD (terrain/_polar/lod0): {g['nx']}×{g['ny']} nodes every {g['spacing_m'] / 1000:.0f} km", fontsize=9)
+    ax.set_xlabel("x (km)"); ax.set_ylabel("y (km)")
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
 
 
 def main(argv=None) -> int:
@@ -123,6 +181,14 @@ def main(argv=None) -> int:
             total += size
             print(f"{site['id']:18s} lod{h['lod']}: {h['grid']['nx']}×{h['grid']['ny']} nodos cada {h['grid']['spacing_m']:.0f} m "
                   f"(±{-h['grid']['x0_m'] / 1000:.0f} km)  {size / 1e3:6.1f} kB")
+    h = build_polar()
+    p = OUT / "_polar" / "lod0.json"
+    errors += validate_file(p, "terrain_header")[1]
+    size = h["byte_length"] + p.stat().st_size
+    total += size
+    print(f"_polar             lod0: {h['grid']['nx']}×{h['grid']['ny']} nodos cada {h['grid']['spacing_m']:.0f} m "
+          f"(±{-h['grid']['x0_m'] / 1000:.0f} km, origen en el polo z = {h['origin']['elevation_m']} m)  {size / 1e3:6.1f} kB")
+    plot_polar(h, ROOT / "docs" / "figures" / "polar_context.png")
     print(f"Total {total / 1e6:.2f} MB en {time.perf_counter() - t0:.1f} s; contrato: {'OK' if not errors else errors[:3]}")
     return 0 if not errors else 1
 

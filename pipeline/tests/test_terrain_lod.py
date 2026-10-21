@@ -43,3 +43,17 @@ def test_heights_match_dem_at_control_points(site, lod):
     h = DemWindow.read(sx, sy, lod.half_m * 1.45 + 1000).sample(np.asarray(px), np.asarray(py))
     approx = h - site["elevation_m"] - d**2 / (2 * R_MOON_M)
     assert np.max(np.abs(z[i, j] - approx)) < 1.0  # < 1 m (la fórmula aproximada difiere < 0.3 m a 28 km)
+
+
+def test_polar_context():
+    from pipeline.contract import TerrainHeader
+
+    header = json.loads((OUT / "_polar" / "lod0.json").read_text(encoding="utf-8"))
+    TerrainHeader.model_validate(header)
+    assert header["frame"] == "POLAR_STEREO" and "+R=1737400" in header["projection"]
+    z = decode((OUT / "_polar" / header["bin_file"]).read_bytes(), header) + header["origin"]["elevation_m"]
+    assert z.shape == (303, 303)
+    assert -7400 < z.min() < z.max() < 7100  # rango del DEM (actual_range −7296.5 … +7026.8 m)
+    # el nodo central es el polo
+    c = z.shape[0] // 2
+    assert abs(z[c, c] - header["origin"]["elevation_m"]) < 0.5
