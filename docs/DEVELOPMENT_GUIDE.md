@@ -322,7 +322,7 @@ Esta fase nunca se recorta (spec 1, 11 regla 6).
 - **Depende de:** T1.5.a · **Spec:** 5.7, 11 regla 4 · **Decisiones:** — · **Est.:** 1 h
 - **Aceptación:** `python -m pytest pipeline/tests/test_sanity.py -v` pasa sobre los datos reales.
 
-##### [ ] T1.5.c — Informe de sitio para el hito
+##### [x] T1.5.c — Informe de sitio para el hito
 - **Qué:** comando que, para un plan (sitio, llegada, L), imprime las métricas de 5.5 y guarda una figura con la máscara y las trayectorias del Sol y la Tierra de la ventana.
 - **Archivos:** `pipeline/report_site.py`
 - **Depende de:** T1.5.a · **Spec:** 5.5, 8.4 · **Decisiones:** — · **Est.:** 1.5 h

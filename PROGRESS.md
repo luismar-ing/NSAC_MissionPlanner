@@ -964,3 +964,21 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** los límites del Sol y la Tierra son los corregidos por latitud de T1.1.a, en lugar del ±1.6° literal.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T1.5.c.
+
+## 2026-10-21 · T1.5.c · Informe de sitio para el hito
+
+- **Tarea:** T1.5.c — Informe de sitio ([x]).
+- **Qué se hizo:** `pipeline/report_site.py` (`python -m pipeline.report_site --site ID --arrival AAAA-MM-DD --window L [--out ruta]`): imprime las métricas de 5.5 del plan y genera una figura con los colores de la spec 9: silueta del horizonte con las trayectorias del Sol y la Tierra en la ventana, y cinta de tiempo (ambos / solo Sol / solo Tierra / ninguno) con la racha de oscuridad más larga rayada. Comprueba que sun_pct y longest_dark_h del JSON coinciden con las banderas. Es un prototipo de lo que mostrarán el panel 2D y el panorama. Ejemplo versionado: `docs/figures/report_haworth_20270310_7d.png`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.report_site --site haworth --arrival 2027-03-10 --window 7
+  sun_pct (%) 38.1 | longest_dark_h (h) 65.5 | earth_h_per_day_min (h) 24.0 | earth_h_per_day_mean (h) 24.0 | longest_comm_gap_h (h) 0.0 | score 0.6354
+  $ python -m pipeline.report_site --site malapert_massif --arrival 2027-10-15 --window 14
+  sun_pct (%) 100.0 | longest_dark_h (h) 0.0 | earth_h_per_day_min (h) 0.0 | earth_h_per_day_mean (h) 20.46 | longest_comm_gap_h (h) 49.5 | score 0.9535
+  ```
+  Revisión visual (Haworth): los primeros 2.7 días el Sol está tapado por el pico de +2.2° al Este (racha de 65.5 h, rayada); al pasar al Sur del pico hay Sol y Tierra (verde); al final el Sol baja por debajo del horizonte. La Tierra está alta (8–10°) toda la ventana → 24 h/día. Coherente con las métricas.
+  El ejemplo de Malapert muestra el compromiso que la herramienta debe hacer visible: 100 % de Sol pero un día sin Tierra (hueco de 49.5 h).
+- **Decisiones tomadas:** ninguna nueva.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** cierre de la Fase 1 → hito de demo y parada.
