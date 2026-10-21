@@ -148,3 +148,94 @@ button {
     margin-left: 0;
   }
 }
+
+/* ------------------------------------------------------------------ calendar (T3.2.a) */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.calendar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.segmented button {
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.segmented button + button {
+  border-left: 1px solid var(--color-border);
+}
+
+.segmented button.on {
+  background: var(--color-panel-raised);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+.legend-name {
+  color: var(--color-text);
+}
+
+.legend-ramp {
+  display: inline-block;
+  width: 160px;
+  height: 10px;
+  border-radius: 4px;
+}
+
+.calendar-canvas-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.calendar-canvas-wrap canvas {
+  display: block;
+  cursor: crosshair;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.45);
+}

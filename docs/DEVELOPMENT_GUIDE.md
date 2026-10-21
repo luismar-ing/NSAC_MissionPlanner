@@ -514,7 +514,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 
 ### T3.2 Calendario de calor con restricciones (spec 8.5)
 
-##### [ ] T3.2.a — Mapa de calor en canvas
+##### [x] T3.2.a — Mapa de calor en canvas
 - **Qué:** filas = días de llegada, columnas = sitios, color = score; alternancia energía / comunicaciones / combinado; leyenda; selector de L (3, 7, 14).
 - **Archivos:** `web/src/views/Calendar.tsx`, `web/src/lib/colorScale.ts`
 - **Depende de:** T3.1.c, T3.1.d · **Spec:** 8.5, 9 · **Decisiones:** D7 · **Est.:** 3 h · **Adelantable**

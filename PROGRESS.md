@@ -1421,3 +1421,28 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. T3.1 completa.
 - **Siguiente tarea:** T3.2.a.
+
+## 2026-10-21 · T3.2.a · Mapa de calor del calendario en canvas
+
+- **Tarea:** T3.2.a — Mapa de calor ([x]).
+- **Qué se hizo:**
+  - `web/src/views/Calendar.tsx`: canvas 2D (sin WebGL, regla 7) con un mapa de calor de llegadas; modo de color *Combined score* / *Energy* / *Comms*; selector de L (3, 7, 14) ligado a `selectedWindow`; leyenda con rampa y dominio; tooltip por celda (sitio, llegada, sol, oscuridad, Tierra, score).
+  - `web/src/lib/calendar.ts`: geometría pura (celda ↔ píxel, filas separadas 2 px, meses) e índices de color.
+  - `web/src/lib/colorScale.ts`: rampas secuenciales interpoladas en OKLab desde los tokens; cada modo usa el color de la spec 9 (combinado = verde «ambos», energía = naranja Sol, comunicaciones = azul Tierra), del fondo hasta el color puro; dominios fijos (score 0–1, sol 0–100 %, Tierra 0–24 h/día).
+  - En el store: `loadWindows(L)` construye y guarda el `WindowIndex` (lo compartirá la bandeja).
+  - Textos en `strings.ts` y estilos (`.segmented`, `.legend`, `.tooltip`) con tokens.
+  Se siguió la guía de visualización (forma: mapa de calor secuencial de una tonalidad; color al final; hover por celda; leyenda).
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test           → Tests 66 passed
+    calendar.test.ts: changing the mode changes the colour source | changing L changes the colour source |
+    combined/energy/comms ramp gets lighter monotonically | maps cells to pixels and back | labels months and dates
+  $ npm --prefix web run typecheck  → exit 0
+  ```
+  En el navegador a 1920×1080: 5 filas de sitios × 365 columnas con los meses arriba, 162 px de alto; el canvas (1 422 px) cabe en su panel y no hay scroll horizontal. Tooltip sobre Haworth, 10/03/2027, L = 7: «Sunlight 38.1 % · Longest dark 65.5 h · Earth 24.0 h/day (min 24.0) · Score 0.64», idéntico al informe del pipeline de T1.5.c. En el modo *Energy* se ven claramente las noches lunares como bandas oscuras.
+- **Decisiones tomadas:**
+  - **A5 (propuesta, revisable): calendario transpuesto**, con una fila por sitio y una columna por día. La spec 8.5 dice filas = días, pero 365 filas no caben en el calendario compacto de arriba (8.0) en 1920×1080. Registrada en `docs/DECISIONS.md`.
+  - Primera versión de las rampas con un tinte más claro por encima del color: se salía del gamut sRGB y perdía luminosidad (la prueba lo detectó). Ahora acaban en el color puro del token.
+- **Desviaciones de la spec / cambios en la guía:** A5 (orientación del calendario).
+- **Problemas abiertos:** el resaltado de celdas válidas y la atenuación son de T3.2.b; la selección, el anclaje y el arrastre, de T3.2.c.
+- **Siguiente tarea:** T3.2.b.

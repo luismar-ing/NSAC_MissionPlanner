@@ -5,6 +5,7 @@
  */
 import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
+import { buildWindowIndex, type WindowIndex } from "../lib/constraints";
 import type { Manifest, Plan, Site } from "../lib/contract";
 import { DataStore } from "../lib/data";
 
@@ -38,8 +39,10 @@ export interface AppState {
   missionTime: number | null; // absolute instant (epoch ms, UTC) of the selected plan's mission clock
   compareTime: number; // relative clock shared by the 2D panels: hours since arrival
   notice: string | null; // last user-facing message (e.g. tray full)
+  windowIndex: Partial<Record<number, WindowIndex>>; // per window length L, built on demand
 
   loadCore(): Promise<void>;
+  loadWindows(days: number): Promise<WindowIndex>;
   selectPlan(id: string | null): void;
   selectSite(siteId: string | null): void;
   setWindow(days: number): void;
@@ -71,6 +74,18 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     missionTime: null,
     compareTime: 0,
     notice: null,
+    windowIndex: {},
+
+    async loadWindows(days) {
+      const cached = get().windowIndex[days];
+      if (cached) return cached;
+      const { data, sites } = get();
+      const ids = sites.map((s) => s.id);
+      const all = await Promise.all(ids.map((id) => data.windows(id, days)));
+      const index = buildWindowIndex(days, Object.fromEntries(ids.map((id, i) => [id, all[i].rows])), ids);
+      set({ windowIndex: { ...get().windowIndex, [days]: index } });
+      return index;
+    },
 
     async loadCore() {
       if (get().load.status === "loading" || get().load.status === "ready") return; // one load per store

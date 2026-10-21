@@ -27,6 +27,7 @@ Las 13 decisiones de la sección 13 de [SPEC.md](SPEC.md). Una subtarea que cita
 | A1 | Fecha límite de entrega | **confirmada** (2026-10-20) | 2026-11-13 |
 | A2 | Otras decisiones ya tomadas por el equipo | pendiente | Preguntado al humano en la sesión de arranque. |
 | A4 | Omitir la Pista S (datos SYNTHETIC para el front end) | **confirmada** (2026-10-21) | Los datos reales ya existen (Fase 2); el front end los usa directamente. Las pruebas usan las fixtures del contrato. |
+| A5 | Calendario transpuesto: una fila por sitio y una columna por día (spec 8.5 dice filas = días) | propuesta del agente (2026-10-21), revisable | 365 filas no caben en el «calendario compacto» de arriba (8.0) en 1920×1080; transpuesto ocupa ~160 px de alto. Se revierte cambiando `lib/calendar.ts`. |
 | A3 | Límites de elevación de 5.7 corregidos por latitud (Sol: colat + 1.6°; Tierra: colat + 7.5°) | **confirmada** (2026-10-21) | Aceptada por el humano; motivo y evidencia en docs/validation.md §2. |
 
 ## Decisiones de diseño de la guía (revisables, no bloquean)

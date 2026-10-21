@@ -1,6 +1,7 @@
 import { SyntheticBanner } from "../components/SyntheticBanner";
 import { STRINGS } from "../lib/strings";
 import { useApp } from "../store/appStore";
+import { Calendar } from "./Calendar";
 
 /**
  * Compare mode layout (spec 8.0): constraints and compact calendar on top, comparison tray below.
@@ -26,7 +27,8 @@ export function CompareView() {
           <h2 id="calendar-title" className="panel-title">
             {STRINGS.calendarTitle}
           </h2>
-          <p className="placeholder">{STRINGS.calendarPlaceholder(nSites, nDays)}</p>
+          <p className="visually-hidden">{STRINGS.calendarPlaceholder(nSites, nDays)}</p>
+          <Calendar />
         </div>
       </section>
       <section className="panel tray-area" aria-labelledby="tray-title">
