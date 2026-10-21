@@ -578,7 +578,7 @@ Sin WebGL en esta fase (regla 7). Se desarrolla directamente sobre los datos rea
 - **Depende de:** T3.4.a · **Spec:** 8.4, 10 (T3.4) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** prueba: en el mismo instante, el panorama y la silueta del panel usan exactamente los mismos az/el; revisión visual de la reproducción.
 
-##### [ ] T3.4.c — Panel de características del sitio (componente 2D)
+##### [x] T3.4.c — Panel de características del sitio (componente 2D)
 - **Qué:** tarjeta de 8.6 con los atributos de 5.10 y las métricas de 5.5, texto "why", comparación compacta con los planes anclados y fuente o criterio en un tooltip por valor; "Not available" donde falte. Es independiente del 3D para que sobreviva a cualquier recorte (regla 6); la Fase 4 solo lo monta.
 - **Archivos:** `web/src/views/SitePanel.tsx`, `web/tests/sitePanel.test.tsx`
 - **Depende de:** T3.3.d · **Spec:** 8.6, 5.10 · **Decisiones:** D10 · **Est.:** 2.5 h · **Adelantable**

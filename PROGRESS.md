@@ -1668,3 +1668,27 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T3.4.c.
+
+## 2026-10-21 · T3.4.c · Panel de características del sitio
+
+- **Tarea:** T3.4.c — Panel de características del sitio (componente 2D) ([x]).
+- **Qué se hizo:**
+  - `web/src/views/SitePanel.tsx`: tarjeta de 8.6 con cinco bloques. (1) Ubicación y terreno: los atributos de `site_features/{site}.json` (región USGS, lat/lon, elevación, pendiente media y máxima, radio de 1 km de D10). (2) Las seis métricas de la ventana (5.5) y el texto «why». (3) Horas de Sol y de Tierra por día de la ventana, desde `daily/{site}.json`, con barras. (4) Rasgos con nombre cercanos del nomenclátor IAU. (5) Si hay otros planes anclados, una tabla compacta con ellos (el plan actual marcado con ▸).
+  - Cada valor lleva su fuente o método como tooltip (`title`) y como descripción accesible (`aria-description`), y se puede enfocar con el teclado. Las fuentes de las métricas describen el método real del pipeline (borde superior del Sol + 0.265°, margen de antena de 0.5°, normalización min–max del score sobre todos los sitios con la misma L).
+  - Un atributo `not available`, o uno «available» sin fuente (defensivo, aunque el contrato ya lo impide), muestra «Not available» y nunca el valor (regla 1, 5.10).
+  - `SiteSection` carga además las características, los agregados diarios y los planes anclados (la caché del DataStore evita repetir descargas) y monta el panel bajo el panorama.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 110 passed
+    sitePanel.test.tsx: every shown value has a tooltip with its source or method (34 valores; elevación «2841.8 m» con LOLA; rasgos con el Gazetteer)
+                        an attribute without a source shows 'Not available', never a value
+                        daily Sun and Earth hours are the window's days from daily/{site}.json
+                        compact comparison with the other pinned plans and a why text with the plan's figures
+                        no comparison block when nothing else is pinned
+  $ npm --prefix web run typecheck → exit 0
+  ```
+  En el navegador (Haworth, llegada 2027-03-18): día 1 con 1.5 h de Sol (coincide con el panorama: Sol tapado por la loma del este al llegar), Tierra 24 h los días 1–4 y 0 h los días 6–7 (de ahí «Earth drops to 0 h on the worst day»). La tabla compara con los 4 planes anclados. A 774 px de ancho la tabla ocupa todo el panel, con cabeceras cortas y la etiqueta larga en el tooltip, sin scroll horizontal de página.
+- **Decisiones tomadas:** tooltips nativos (`title`) más `aria-description`, sin dependencia nueva. El panel vive en la sección «At the site» de la vista de comparación; en la Fase 4 se monta en la fase «sitio» del modo vivir.
+- **Desviaciones de la spec / cambios en la guía:** ninguno.
+- **Problemas abiertos:** ninguno. T3.4 completa.
+- **Siguiente tarea:** T3.5.a.

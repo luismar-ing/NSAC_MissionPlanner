@@ -670,3 +670,120 @@ button {
   flex-wrap: wrap;
   margin-bottom: var(--space-sm);
 }
+
+/* ------------------------------------------------------------------ site panel (T3.4.c) */
+
+.site-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md) var(--space-lg);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-sm);
+}
+
+.site-panel h3 {
+  font-size: var(--font-md);
+  margin-bottom: var(--space-sm);
+}
+
+.kv {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.kv > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.kv dt {
+  color: var(--color-text-muted);
+}
+
+.kv dd {
+  margin: 0;
+  text-align: right;
+}
+
+.sourced {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px dotted var(--color-text-muted);
+  cursor: help;
+}
+
+.sourced.na {
+  font-family: var(--font-family);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.daily-table,
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.daily-table th,
+.daily-table td,
+.compare-table th,
+.compare-table td {
+  padding: 2px var(--space-sm) 2px 0;
+  text-align: left;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+.daily-table thead th,
+.compare-table thead th {
+  color: var(--color-text-muted);
+}
+
+.compare-table td {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.compare-table tr.this-plan th,
+.compare-table tr.this-plan td {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.hbar {
+  display: inline-block;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.hbar.sun {
+  background: var(--color-sun);
+}
+
+.hbar.earth {
+  background: var(--color-earth);
+}
+
+.site-panel section.wide {
+  grid-column: 1 / -1;
+}
+
+.compare-table tbody th {
+  white-space: normal;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.nearby {
+  margin: 0;
+  padding-left: 1.1em;
+}
