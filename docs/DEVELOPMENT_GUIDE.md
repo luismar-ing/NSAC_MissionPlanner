@@ -154,8 +154,7 @@ Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end progra
 
 ### T0.3 Sitios candidatos: sites.json (spec 6.1)
 
-##### [!] T0.3.a — Fuentes oficiales de los sitios (verificación)
-- **Bloqueo:** (2026-10-21) la fuente oficial con la geometría de las regiones candidatas de Artemis III (USGS, ScienceBase, CC0) solo se descarga desde sciencebase.gov, que responde con un desafío anti-bots de Cloudflare (HTTP 403). Necesita una descarga manual del humano a `data/regions/` (instrucciones en PROGRESS.md, entrada de T0.3.a).
+##### [x] T0.3.a — Fuentes oficiales de los sitios (verificación)
 - **Qué:** para cada sitio de D3, encontrar el listado oficial o la publicación que lo define y registrar la cita. Si la fuente define regiones y no puntos, definir y documentar el método de elección del punto dentro de la región (con el DEM). Ninguna coordenada sin fuente.
 - **Archivos:** `docs/sites.md`
 - **Depende de:** T0.2.d · **Spec:** 6.1, 5.10, 11 regla 1 · **Decisiones:** D3 · **Est.:** 2.5 h

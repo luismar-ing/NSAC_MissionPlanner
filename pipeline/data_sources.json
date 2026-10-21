@@ -72,6 +72,28 @@
       "bytes": 6003000,
       "md5": null,
       "sha256": "5ea6b68a4412421cae11711ae4fec1a7b1f2dbd7265c0c3004d487a03c43be9a"
+    },
+    {
+      "id": "usgs_a3_9regions",
+      "group": "regions",
+      "manual": true,
+      "url": "https://www.sciencebase.gov/catalog/item/671a6fa8d34efed5620f89f8",
+      "path": "regions/A3_9regions-lonlat-simplified.zip",
+      "bytes": 637136,
+      "md5": null,
+      "sha256": "a0ca63acc829f8e8188bc90217512a81ce4f09c88126ec45efb74be560091b42",
+      "doi": "https://doi.org/10.5066/P1MEQ6UK"
+    },
+    {
+      "id": "usgs_connecting_ridge",
+      "group": "regions",
+      "manual": true,
+      "url": "https://www.sciencebase.gov/catalog/item/67168797d34ebf903f48b6fc",
+      "path": "regions/Connecting_Ridge.zip",
+      "bytes": 83294903,
+      "md5": null,
+      "sha256": "6f8b6bf9da77745acd938b5439a15771c17107bd3af6b1654f0bb2420aca07a6",
+      "doi": "https://doi.org/10.5066/P13FD9ZD"
     }
   ]
 }

@@ -53,6 +53,17 @@ Notas de la selección:
 - **Tierra:** el servidor original de Blue Marble NG (Visible Earth, NEO) redirige ahora a science.nasa.gov y no publica listados de archivos; SVS 3615 ofrece la Tierra equirectangular para envolver una esfera, con crédito BMNG.
 - **Presupuesto (D13 < 50 MB):** se reservan 10 MB para texturas web. Prueba de conversión a 4096 × 2048 JPEG calidad 85: Luna 1,55 MB + Tierra 1,54 MB = 3,09 MB. La conversión definitiva (y la de 2k para móvil) se hace en T4.1.c. Los originales de `data/textures/` no se publican.
 
+## Regiones candidatas de Artemis III (T0.3.a) — descarga MANUAL
+
+`sciencebase.gov` bloquea las descargas automáticas (desafío anti-bots de Cloudflare). Estos archivos se bajan **a mano en el navegador** desde la página del DOI y se dejan **tal cual (.zip)** en `data/regions/`. `python -m pipeline.fetch_data --regions` solo comprueba el SHA-256 o explica cómo obtenerlos. Restricciones de uso según los metadatos: «None».
+
+| Archivo | DOI (página de descarga) | Contenido usado | Tamaño (bytes) | SHA-256 | Fecha | Cita |
+|---|---|---|---|---|---|---|
+| `A3_9regions-lonlat-simplified.zip` | https://doi.org/10.5066/P1MEQ6UK | Contornos de las 9 regiones de 2024 (GeoJSON/shapefile, lon/lat sobre la esfera Moon 2000, R = 1 737 400 m) | 637,136 | `a0ca63acc829f8e8188bc90217512a81ce4f09c88126ec45efb74be560091b42` | 2026-10-21 | McClernan, M. T., 2024, Down Selected Artemis III Candidate Landing Site Navigational Grids, USGS data release |
+| `Connecting_Ridge.zip` | https://doi.org/10.5066/P13FD9ZD | Rejilla LGRS de 1 km de Connecting Ridge (proyección polar LPS de USGS); su unión da la huella de la región | 83,294,903 | `6f8b6bf9da77745acd938b5439a15771c17107bd3af6b1654f0bb2420aca07a6` | 2026-10-21 | McClernan, M. T., 2024, LGRS Artemis III Candidate Landing Site Navigational Grids in ACC Format, USGS data release |
+
+El humano descargó también los zips de las demás regiones y el XML de metadatos `Publication_Data_Release_LGRS3.xml`; no se usan por ahora, así que no se registran.
+
 ## Otras fuentes (trayectoria real, nomenclatura, cohete)
 
 | Uso | Fuente | URL | Licencia | Fecha |

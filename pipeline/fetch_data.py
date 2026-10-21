@@ -6,7 +6,8 @@
 Lee pipeline/data_sources.json. Cada archivo se descarga a data/<path> solo si falta.
 Se comprueban tamaño, MD5 publicado (si existe) y SHA-256. En la primera descarga el
 SHA-256 se registra en data_sources.json; desde entonces se exige que coincida.
-Es idempotente: una segunda ejecución solo verifica.
+Es idempotente: una segunda ejecución solo verifica. Las fuentes con "manual": true (sitios que
+bloquean descargas automáticas) no se descargan: solo se verifican, o se explica cómo obtenerlas.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 SOURCES = Path(__file__).with_name("data_sources.json")
-GROUPS = ("kernels", "dem", "textures")
+GROUPS = ("kernels", "dem", "textures", "regions")
 CHUNK = 1 << 20
 
 
@@ -67,6 +68,11 @@ def fetch(groups: list[str]) -> int:
             continue
         path = DATA / src["path"]
         state = "present"
+        if not path.exists() and src.get("manual"):
+            failures += 1
+            print(f"[{src['id']}] FALTA {src['path']}: descarga manual (la web bloquea descargas automáticas). "
+                  f"Bájalo en el navegador desde {src['url']} y déjalo tal cual en data/{src['path']}")
+            continue
         if not path.exists():
             print(f"[{src['id']}] descargando {src['url']} ...", flush=True)
             download(src["url"], path)

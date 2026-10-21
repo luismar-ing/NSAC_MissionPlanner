@@ -577,3 +577,36 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Método propuesto una vez descargados (para confirmar con el humano):** por región, el punto del DEM LOLA de máxima elevación dentro del polígono oficial (los nombres de D3 son bordes, macizos y crestas), documentado en `docs/sites.md`. Nombres concretos propuestos para D3: Connecting Ridge (borde de Shackleton; lista de 2022), Haworth, Nobile Rim 1, Malapert Massif y de Gerlache Rim 2 (2024). Si el item de 2022 no tiene Connecting Ridge, se sustituye por otra región de 2024 (por ejemplo Mons Mouton) o se baja a 4 sitios.
 - **Problemas abiertos:** T0.3.b y T0.3.c dependen de esta subtarea, y con ellas el cierre de la Fase 0 y casi toda la Fase 1 (T1.1.a, T1.1.b, T1.2.e y T1.3.d necesitan los sitios).
 - **Siguiente tarea:** tras el desbloqueo, T0.3.a → T0.3.b → T0.3.c. Elegibles mientras tanto: la Pista S (TS.1.a–c) y las adelantables de las Fases 1 y 3.
+
+## 2026-10-21 · T0.3.a · Fuentes oficiales de los sitios (verificación) — desbloqueada y cerrada
+
+- **Tarea:** T0.3.a — Fuentes oficiales de los sitios ([x]).
+- **Desbloqueo:** el humano descargó a mano los zips de ScienceBase a `data/regions/`. Antes se hizo `git push` de los 23 commits pendientes a `origin/master` (`a5dd822..f0aebb8`), a petición del humano.
+- **Qué se hizo:**
+  - `docs/sites.md`: fuentes oficiales (dos data releases de USGS, McClernan 2024, con DOI), la región elegida para cada sitio de D3 con su extensión en lat/lon tal como la da la fuente, y el método para elegir el punto: **la cota más alta del DEM LOLA dentro del polígono oficial**, con su motivo y limitaciones.
+  - `pipeline/regions.py`: lee los zips tal cual (GeoJSON de las 9 regiones; rejilla LGRS de 1 km para Connecting Ridge, que no está entre las 9) y lo reproyecta todo al CRS del DEM.
+  - `pipeline/tests/test_regions.py` (se omite si faltan los zips).
+  - `fetch_data.py`: nuevo grupo `regions` y soporte `"manual": true`. Esas fuentes no se descargan: se verifica su SHA-256 o se explica cómo obtenerlas.
+  - `data_sources.json` y `data/README.md`: los dos zips usados, con DOI, tamaño, SHA-256 y cita.
+  - `pyshp==3.1.6` (MIT) añadido y fijado en `requirements.txt`.
+- **Cómo se verificó:**
+  ```
+  $ python -m pipeline.regions
+  Malapert Massif     1 polígono(s)  441.0 km²  lat [-86.326, -85.634]  lon [-5.66, 5.15]
+  de Gerlache Rim 2   1 polígono(s)  400.0 km²  lat [-88.660, -87.785]  lon [-77.47, -49.40]
+  Nobile Rim 1        1 polígono(s)  400.0 km²  lat [-85.897, -84.975]  lon [31.64, 43.21]
+  Haworth             1 polígono(s)  888.0 km²  lat [-87.394, -86.112]  lon [-34.98, -12.36]
+  Connecting Ridge  289 polígono(s)  292.5 km²  lat [-89.880, -89.085]  lon [-174.29, -98.97]
+  (+ las otras 4 regiones de 2024)
+  $ python -m pytest pipeline/tests/test_regions.py -v
+  test_nine_regions_area_matches_usgs_attribute PASSED   (área reproyectada = Area_km2 de USGS, ±0.1 %)
+  test_connecting_ridge_footprint PASSED
+  $ python -m pipeline.fetch_data --regions
+  [usgs_a3_9regions] present, checksum OK
+  [usgs_connecting_ridge] present, checksum OK          (con el zip retirado: "FALTA ... descarga manual ...", exit 1)
+  ```
+  Los dos DOI resuelven a los items de ScienceBase de los que se descargaron los archivos (`P1MEQ6UK → 671a6fa8…`, `P13FD9ZD → 67168797…`).
+- **Decisiones tomadas:** regiones concretas para D3: Connecting Ridge, Haworth, Nobile Rim 1 (más cerca del polo que Rim 2), Malapert Massif y de Gerlache Rim 2. Método del punto: cota máxima del DEM dentro del polígono. El `.qmd` del zip dice WGS 84, pero es un residuo de QGIS; manda el `.prj` (esfera Moon 2000, R = 1 737 400 m) y las áreas lo confirman.
+- **Desviaciones de la spec / cambios en la guía:** archivos añadidos fuera de la lista de T0.3.a: `pipeline/regions.py`, `pipeline/tests/test_regions.py`, cambios en `fetch_data.py` y dependencia `pyshp`.
+- **Problemas abiertos:** confirmar con el humano las 5 regiones y el método (propuestos y documentados; cambiarlos es barato). Quien clone el repo tiene que bajar estos zips a mano (indicado en `data/README.md` y en el mensaje de `fetch_data`).
+- **Siguiente tarea:** T0.3.b.
