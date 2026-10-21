@@ -181,3 +181,34 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno.
 - **Problemas abiertos:** ninguno. T0.1 completa.
 - **Siguiente tarea:** T0.4.a.
+
+## 2026-10-21 · T0.4.a · docs/DATA_CONTRACT.md
+
+- **Tarea:** T0.4.a — docs/DATA_CONTRACT.md ([x]).
+- **Qué se hizo:** contrato de datos v1.0.0: convenciones (UTC, ISO 8601 con `Z`, azimut N→E en [0, 360), latitud planetocéntrica y longitud este en [-180, 180), ids de sitio, plan y trayectoria), los tres rangos de fechas (llegadas, series, escena), `manifest.json` con todos los parámetros de 7.2 más `data_status`, una sección por cada archivo de 7.2 con tipo, unidad, rango y obligatoriedad, convención de cuaterniones `[x, y, z, w]`, formato del terreno (cabecera JSON + int16), 12 comprobaciones entre archivos y la tabla de desviaciones respecto a 7.2.
+- **Cómo se verificó:**
+  ```
+  manifest.json                      ## 3. `manifest.json`
+  sites.json                         ## 4. `sites.json`
+  plans.json                         ## 5. `plans.json`
+  horizon/{site}.json                ## 6. `horizon/{site}.json`
+  timeseries/{site}.json             ## 7. `timeseries/{site}.json`
+  daily/{site}.json                  ## 8. `daily/{site}.json`
+  windows/{site}_{L}d.json           ## 9. `windows/{site}_{L}d.json`
+  scene/ephemeris.json               ## 10. `scene/ephemeris.json`
+  trajectory/{trajectory_id}.json    ## 11. `trajectory/{trajectory_id}.json`
+  site_features/{site}.json          ## 12. `site_features/{site}.json`
+  terrain/{site}/lod{n}              ## 13. `terrain/{site}/lod{n}.json` + `lod{n}.bin`
+  == Campos de 7.2 (faltan):
+    ninguno (36 campos encontrados)
+  ```
+- **Decisiones tomadas (técnicas, documentadas en el contrato):**
+  - `arrival_utc` = 00:00:00Z del día de llegada; ventana semiabierta `[t0, t0 + L días)`.
+  - Las series cubren las llegadas + 1 día + 14 días, para que las 365 llegadas tengan ventana completa en las tres L (con D6: 5 × 365 × 3 = 5 475 planes).
+  - Series cuantizadas a enteros de 0.01° (`angle_scale`), como permite 7.2.
+  - `score` normalizado sobre todas las filas de todos los sitios con la misma L.
+  - `trajectory_id` = `{site_id}_{YYYYMMDD}` (D6).
+  - Marco de escena propuesto: J2000 con centro en la Tierra (se confirma en T2.1.a).
+- **Desviaciones de la spec / cambios en la guía:** añadidos y cambios respecto a 7.2 listados en la sección 15 del contrato. El único cambio de forma es `trajectory.t0_utc` + `t_s` (segundos) en lugar de `t_utc`, por tamaño (D6, D13); la información es la misma.
+- **Problemas abiertos:** `params.scale_mode` depende de D8 (pendiente); el contrato solo exige un string.
+- **Siguiente tarea:** T0.4.b.

@@ -96,7 +96,7 @@ Las carpetas vacías de 7.1 (con `.gitkeep`), `PROGRESS.md`, `CLAUDE.md` y `.git
 
 Desbloquea el trabajo en paralelo: el pipeline, la Pista S y el front end programan contra el mismo contrato.
 
-##### [ ] T0.4.a — docs/DATA_CONTRACT.md
+##### [x] T0.4.a — docs/DATA_CONTRACT.md
 - **Qué:** especificar, campo a campo, cada archivo de 7.2: tipo, unidad, rango, obligatoriedad, longitud de los arrays, formato de fecha (ISO 8601 UTC con `Z`), cuantización (decidir: enteros en centésimas de grado con factor de escala explícito, o floats), convención del cuaternión (orden de componentes, marco origen y destino), marcos de coordenadas, convención de ids (sitio, plan y `trajectory_id` según D6), `contract_version`, y en `manifest.json`: versión, parámetros (paso, h_obs, margen de antena, criterio del Sol, modo de trayectoria, modo de escala), rango de fechas y `data_status: "REAL" | "SYNTHETIC"` (extensión para cumplir la regla 1; documentarla). Añadir las comprobaciones entre archivos.
 - **Archivos:** `docs/DATA_CONTRACT.md`
 - **Depende de:** T0.1.a · **Spec:** 7.2, 5.1, 5.8 · **Decisiones:** D6, D7 · **Est.:** 2.5 h
