@@ -663,7 +663,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.3.a · **Spec:** 5.9, 8.3 · **Decisiones:** D9, D13 · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** aproximación final sin temblor ni saltos (revisión visual y prueba de magnitud de coordenadas); en la pestaña de red, los LOD no se descargan antes de la fase de aterrizaje.
 
-##### [ ] T4.3.c — Llegada: panorama y panel del sitio
+##### [x] T4.3.c — Llegada: panorama y panel del sitio
 - **Qué:** al entrar en `missionPhase = site` aparecen el panorama (T3.4) y el panel de características (T3.4.c), sincronizados con `missionTime`.
 - **Archivos:** `web/src/views/LiveView.tsx`
 - **Depende de:** T4.3.b, T3.4.b, T3.4.c · **Spec:** 8.2, 8.6, 10 (T4.3) · **Decisiones:** — · **Est.:** 1.5 h · **Adelantable**

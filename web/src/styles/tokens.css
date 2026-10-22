@@ -1057,3 +1057,35 @@ button {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
 }
+
+/* ------------------------------------------------------------------ arrival at the site (T4.3.c) */
+
+/* at the site the scene gives room to the panorama, so its sky is in view together with the 3D one */
+.scene-host {
+  transition: height 300ms ease;
+}
+
+.live-area.at-site .scene-host {
+  height: min(52vh, 560px);
+}
+
+.live-site {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  animation: live-site-in 300ms ease both;
+}
+
+@keyframes live-site-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

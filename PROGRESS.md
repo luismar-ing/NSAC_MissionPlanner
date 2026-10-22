@@ -2016,3 +2016,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/skycheck.test.ts`, la comprobación cruzada 2D/3D, que conviene mantener. El modo de escala de T4.1.b se amplía con la escala local λ.
 - **Problemas abiertos:** el cambio de curvatura durante el reescalado (entre ~24 y 7 km) es visible, aunque continuo. Queda un rastro muy tenue de la costura entre lod1 y lod2 con el Sol rasante.
 - **Siguiente tarea:** T4.3.c.
+
+## 2026-10-22 · T4.3.c · Llegada: panorama y panel del sitio
+
+- **Tarea:** T4.3.c — Llegada: panorama y panel del sitio ([x]).
+- **Qué se hizo:**
+  - `web/src/views/LiveView.tsx` sustituye a `LiveStub.tsx` (borrado): escena, controles de misión, indicador de escala y etiqueta ILLUSTRATIVE como antes, y **al entrar en `missionPhase = site`** aparece debajo de la escena una sección «At the site» con el panorama (T3.4.a) y el panel de características (T3.4.c). Ambos leen el **mismo `missionTime`** que la escena 3D, así que el scrubber, los saltos de fase y la reproducción de la misión mueven a la vez el cielo 3D y el panorama. Al salir de la fase (volver a «Landing») la sección desaparece.
+  - En la fase de sitio la escena se reduce de 72 vh a 52 vh (transición de 300 ms) para que el panorama quede a la vista; la sección entra con un fundido de 300 ms (0 ms con movimiento reducido). Un aviso `aria-live` anuncia la llegada.
+  - `web/src/views/useSiteData.ts`: la carga de datos del sitio (serie del plan, horizonte, características, agregados diarios y planes anclados) sale de `SiteSection.tsx` a un hook que comparten la vista de comparación y la de vivir; la caché del DataStore evita cargar dos veces.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/liveView.test.tsx
+   ✓ before landing: scene, scale indicator and ILLUSTRATIVE label, no panorama or site panel
+   ✓ entering the site phase shows the panorama and the site panel; leaving it hides them
+   ✓ the panorama follows missionTime: scrubbing and playback move it with the scene clock (1, 26, 100 y 167 h)
+  $ npm --prefix web test → Test Files 26 passed · Tests 172 passed · typecheck → exit 0
+  ```
+  En el navegador (Haworth, llegada 2027-03-09) se recorrió la misión fotograma a fotograma, del despegue hasta 2 h después del aterrizaje (829 fotogramas: 10 s de misión por fotograma en el despegue y 6 min después). Pasó por las 4 fases, el cambio de vista máximo entre fotogramas fue de 3,53° (en la aproximación final) y no hubo cortes. Se pidió el terreno polar, lod0, lod1 y lod2, λ = 1 al llegar, y el panorama apareció en el primer fotograma de la fase de sitio. A 2027-03-09 14:00 UTC, el reloj de misión y el panorama marcan la misma hora; el panel muestra atributos, métricas, horas por día y la comparación con el otro plan anclado.
+- **Decisiones tomadas:** panorama y panel debajo de la escena (no superpuestos), con la escena más baja en la fase de sitio. Fuera de la fase de sitio no se cargan los datos del panorama en la vista de vivir.
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/views/useSiteData.ts` (hook compartido; `SiteSection.tsx` solo cambia para usarlo) y `web/tests/liveView.test.tsx`; `LiveStub.tsx` se elimina un paso antes de lo previsto (T4.4.a amplía `LiveView`).
+- **Problemas abiertos:** ninguno nuevo.
+- **Siguiente tarea:** T4.4.a.

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { STRINGS } from "./lib/strings";
 import { appStore, useApp } from "./store/appStore";
 import { CompareView } from "./views/CompareView";
-import { LiveStub } from "./views/LiveStub";
+import { LiveView } from "./views/LiveView";
 
 export const APP_TITLE = STRINGS.appTitle;
 
@@ -34,7 +34,7 @@ export function App() {
           {STRINGS.loadError} {load.message}
         </p>
       )}
-      {load.status === "ready" && (viewMode === "live" ? <LiveStub /> : <CompareView />)}
+      {load.status === "ready" && (viewMode === "live" ? <LiveView /> : <CompareView />)}
       <footer className="app-footer">{STRINGS.footerCredits}</footer>
     </div>
   );

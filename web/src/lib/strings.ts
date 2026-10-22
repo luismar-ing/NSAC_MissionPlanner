@@ -145,6 +145,7 @@ export const STRINGS = {
     illustrative: "Launch from a generic pad and simplified trajectory, computed with the real Moon position",
     cameraHelp: "3D scene of the selected plan. Drag, use the mouse wheel or the arrow keys and + / − to move the camera yourself.",
     guided: "Guided camera",
+    arrived: (site: string) => `Arrived at ${site}. The horizon panorama and the site features are shown below the scene.`,
   },
   scale: {
     notToScale: "Not to scale",

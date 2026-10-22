@@ -9,7 +9,7 @@ import { parseInstant } from "../src/lib/contract";
 import { trailSamples, trailStyle, trajectoryPositionKm } from "../src/scene3d/trajectory";
 import type { Vec3 } from "../src/scene3d/scale";
 import { appStore } from "../src/store/appStore";
-import { LiveStub } from "../src/views/LiveStub";
+import { LiveView } from "../src/views/LiveView";
 
 const DATA = join(__dirname, "..", "public", "data");
 const files = readdirSync(join(DATA, "trajectory")).filter((f) => f.endsWith(".json"));
@@ -96,7 +96,7 @@ describe("trail style and label (spec 9, rule 2)", () => {
   it("the live view shows the ILLUSTRATIVE label while the mode is ILLUSTRATIVE", async () => {
     appStore.getState().selectPlan("haworth_20270309_7d");
     appStore.getState().setMissionPhase("transit");
-    render(<LiveStub />);
+    render(<LiveView />);
     const label = await screen.findByTestId("illustrative-label");
     expect(label.textContent).toContain("ILLUSTRATIVE");
   });
