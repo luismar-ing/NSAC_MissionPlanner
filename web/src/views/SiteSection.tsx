@@ -18,6 +18,7 @@ export function SiteSection() {
   const data = useApp((s) => s.data);
   const missionTime = useApp((s) => s.missionTime);
   const comparePlans = useApp((s) => s.comparePlans);
+  const setViewMode = useApp((s) => s.setViewMode);
   const [plan, setPlan] = useState<PlanData | null>(null);
   const [site, setSite] = useState<{ features: SiteFeatures; daily: Daily } | null>(null);
   const [pinned, setPinned] = useState<PlanData[]>([]);
@@ -55,9 +56,14 @@ export function SiteSection() {
   if (!plan || !site || plan.plan.id !== selectedPlanId || missionTime === null) return <p className="placeholder">{STRINGS.loading}</p>;
   return (
     <>
-      <p className="site-heading">
-        <strong>{plan.site.name}</strong> · {STRINGS.arrival} {plan.plan.arrival_utc.slice(0, 10)} · {STRINGS.windowDays(plan.plan.window_days)}
-      </p>
+      <div className="site-heading">
+        <p>
+          <strong>{plan.site.name}</strong> · {STRINGS.arrival} {plan.plan.arrival_utc.slice(0, 10)} · {STRINGS.windowDays(plan.plan.window_days)}
+        </p>
+        <button type="button" className="btn" onClick={() => setViewMode("live")}>
+          {STRINGS.live.open}
+        </button>
+      </div>
       <TimeControl startMs={plan.series.startMs} windowDays={plan.plan.window_days} stepMin={plan.series.stepMin} />
       <Panorama data={plan} timeMs={missionTime} />
       <SitePanel plan={plan} features={site.features} daily={site.daily} pinned={pinned} />

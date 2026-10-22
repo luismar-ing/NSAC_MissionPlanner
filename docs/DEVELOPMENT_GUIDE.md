@@ -605,7 +605,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T4.1 Escena Tierra, Luna, Sol y control de tiempo (spec 8.2, 5.9)
 
-##### [ ] T4.1.a — Gestor del único contexto WebGL y carga diferida
+##### [x] T4.1.a — Gestor del único contexto WebGL y carga diferida
 - **Qué:** un solo renderer three.js reutilizado, montado y desmontado con el modo vivir; three.js en un chunk aparte con import dinámico.
 - **Archivos:** `web/src/scene3d/renderer.ts`, `web/src/scene3d/SceneHost.tsx`, `web/tests/webgl.test.ts`
 - **Depende de:** T3.1.b · **Spec:** 2, 7, 8.7, 11 regla 7 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

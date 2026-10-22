@@ -722,7 +722,16 @@ button {
 }
 
 .site-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
   margin: 0 0 var(--space-sm);
+}
+
+.site-heading p {
+  margin: 0;
 }
 
 .panorama-controls {
@@ -914,4 +923,39 @@ button {
 .nearby {
   margin: 0;
   padding-left: 1.1em;
+}
+
+/* ------------------------------------------------------------------ live view (T4.1.a, provisional layout) */
+
+.live-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.scene-host {
+  position: relative;
+  width: 100%;
+  height: min(72vh, 760px);
+  min-height: 360px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.scene-host canvas {
+  display: block;
+  max-width: 100%;
+}
+
+.scene-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--color-text-muted);
 }

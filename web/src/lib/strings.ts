@@ -135,6 +135,14 @@ export const STRINGS = {
     notAvailable: "Not available",
     noSource: "No verifiable source: value not shown (spec 5.10).",
   },
+  live: {
+    open: "Open 3D view",
+    back: "Back to compare",
+    sceneAria: "3D scene of the selected plan: Earth, Moon and Sun",
+    loading: "Loading the 3D scene…",
+    error: "The 3D scene could not be started (WebGL unavailable). The 2D comparison still works.",
+    title: (site: string) => `Live view · ${site}`,
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

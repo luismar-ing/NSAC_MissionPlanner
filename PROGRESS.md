@@ -1769,3 +1769,35 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** los colores de la spec 9 se sustituyen por la paleta Quantum (A6). El resto de la spec 9 (Sol y Tierra distinguibles, estado con forma además de color, contraste, movimiento reducido) se mantiene.
 - **Problemas abiertos:** en Quantum el verde marca a la vez la Tierra y la selección / «Best»; se distinguen por la forma (insignia con estrella y texto), pero un acento propio requeriría un séptimo color.
 - **Siguiente tarea:** Fase 4 (T4.1.a), cuando el humano lo indique.
+
+## 2026-10-22 · T4.1.a · Gestor del único contexto WebGL y carga diferida
+
+- **Tarea:** T4.1.a — Gestor del único contexto WebGL y carga diferida ([x]).
+- **Qué se hizo:**
+  - Dependencias: `three` 0.186.1 y `@types/three` 0.186.0 (versiones exactas de hace más de dos semanas).
+  - `web/src/scene3d/renderer.ts`: `createRendererManager(factory)` crea el renderer three.js una sola vez y lo reutiliza; salir de la vista 3D solo para el bucle y desengancha el canvas, sin destruir el contexto, así alternar modos no acumula contextos. `rendererManager` es el gestor de la app; `mountScene(container)` monta una escena (vacía por ahora: los cuerpos llegan en T4.1.c) con ajuste de tamaño y devuelve la función de desmontaje.
+  - `web/src/scene3d/SceneHost.tsx`: carga `renderer.ts` con `import()` dinámico; three.js queda en un chunk aparte y la vista 2D no lo descarga. Estados de carga y de error (sin WebGL, la comparación 2D sigue funcionando).
+  - Store: `viewMode` («compare» | «live») y `setViewMode`; el modo vivo exige un plan seleccionado (spec 8.0).
+  - Provisional hasta T4.4.a: `web/src/views/LiveStub.tsx` (escena y botón «Back to compare») y el botón «Open 3D view» junto al plan seleccionado en «At the site» (archivos extra respecto a la guía, justificados para poder alternar los modos y verificar la aceptación). T4.4.a los sustituye por `LiveView` con la transición animada, la franja de miniaturas y Esc.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 116 passed
+    webgl.test.ts: creates one renderer and reuses it across 10 mode toggles (1 creación, 1 canvas, bucle parado al salir)
+                   release before any acquire is harmless
+                   live mode needs a selected plan
+                   only scene3d/ imports three, and SceneHost loads it with a dynamic import
+  $ npm --prefix web run typecheck → exit 0
+  $ npm --prefix web run build
+    dist/assets/index-CxRo41bf.js     380.21 kB │ gzip: 117.49 kB   (shell inicial; antes 376.91 kB)
+    dist/assets/renderer-DqDZ5bF8.js  523.10 kB │ gzip: 130.12 kB   (three.js, chunk aparte)
+  ```
+  En el navegador (servidor de desarrollo), con `getContext` instrumentado para contar contextos WebGL distintos:
+  ```
+  10 ciclos «Open 3D view» → «Back to compare»
+  distinctWebGLContexts: 1 · canvas WebGL en el DOM en cada vista viva: [1,1,1,1,1,1,1,1,1,1] · en comparar: 0
+  three.js descargado antes de la primera apertura: [] · después: /src/scene3d/renderer.ts, three.js
+  ```
+- **Decisiones tomadas:** el contexto no se destruye al salir (desenganchar en lugar de `dispose`), porque recrearlo es lento y los navegadores limitan el número de contextos.
+- **Desviaciones de la spec / cambios en la guía:** archivos provisionales `LiveStub.tsx` y botón «Open 3D view» (ver arriba). Vite avisa de que el chunk de three.js pasa de 500 kB; es esperable (three.js completo) y se carga solo en la vista 3D.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.1.b.

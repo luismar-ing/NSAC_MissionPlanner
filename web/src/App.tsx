@@ -2,12 +2,14 @@ import { useEffect } from "react";
 import { STRINGS } from "./lib/strings";
 import { appStore, useApp } from "./store/appStore";
 import { CompareView } from "./views/CompareView";
+import { LiveStub } from "./views/LiveStub";
 
 export const APP_TITLE = STRINGS.appTitle;
 
 export function App() {
   const load = useApp((s) => s.load);
   const manifest = useApp((s) => s.manifest);
+  const viewMode = useApp((s) => s.viewMode);
 
   useEffect(() => {
     void appStore.getState().loadCore(); // idempotent: StrictMode's double effect does not load twice
@@ -32,7 +34,7 @@ export function App() {
           {STRINGS.loadError} {load.message}
         </p>
       )}
-      {load.status === "ready" && <CompareView />}
+      {load.status === "ready" && (viewMode === "live" ? <LiveStub /> : <CompareView />)}
       <footer className="app-footer">{STRINGS.footerCredits}</footer>
     </div>
   );

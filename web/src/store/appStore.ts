@@ -13,6 +13,8 @@ import { DataStore } from "../lib/data";
 export const MAX_COMPARE = 5; // spec 4.1, 8.5
 export type MissionPhase = "overview" | "launch" | "transit" | "landing" | "site";
 export const MISSION_PHASES: readonly MissionPhase[] = ["overview", "launch", "transit", "landing", "site"];
+/** Screen mode (spec 8.0): compare (2D) or live (the selected plan in 3D). */
+export type ViewMode = "compare" | "live";
 
 /** Spec 5.6 constraints; null = control disabled (not evaluated). */
 export interface Constraints {
@@ -36,6 +38,8 @@ export interface AppState {
   selectedSite: string | null;
   selectedWindow: 3 | 7 | 14 | number; // window length L shown in the calendar
   constraints: Constraints;
+  viewMode: ViewMode;
+  setViewMode(mode: ViewMode): void;
   missionPhase: MissionPhase;
   missionTime: number | null; // absolute instant (epoch ms, UTC) of the selected plan's mission clock
   compareTime: number; // relative clock shared by the 2D panels: hours since arrival
@@ -77,6 +81,12 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     selectedSite: null,
     selectedWindow: 7,
     constraints: { ...DEFAULT_CONSTRAINTS },
+    viewMode: "compare",
+    setViewMode(mode) {
+      // live mode needs a selected plan (spec 8.0: the selected panel expands to the 3D scene)
+      if (mode === "live" && !get().selectedPlanId) return set({ notice: "Select a plan to open the 3D view." });
+      set({ viewMode: mode });
+    },
     missionPhase: "overview",
     missionTime: null,
     compareTime: 0,
