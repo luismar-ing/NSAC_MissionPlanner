@@ -1927,3 +1927,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/launch.test.ts`; `mission.test.tsx` ajustado a la cuenta atrás.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.2.c.
+
+## 2026-10-22 · T4.2.c · Trayectoria y estela REAL / ILLUSTRATIVE
+
+- **Tarea:** T4.2.c — Trayectoria y estela REAL / ILLUSTRATIVE ([x]).
+- **Qué se hizo:**
+  - `web/src/scene3d/trajectory.ts`: posición del cohete en cualquier instante con una cúbica de Hermite con tangentes de Catmull-Rom para muestras irregulares (100 s en el ascenso, 412,5 s en la órbita de espera, densas tras la inyección, 180 s en la última hora). Es exacta en cada muestra y vale la última muestra desde el aterrizaje en adelante. `trailSamples` remuestrea 800 puntos para la estela, y `trailStyle(mode)` da el estilo: sólida si es REAL, discontinua con etiqueta si es ILLUSTRATIVE (spec 9, regla 2).
+  - `launch.ts`: `launchPositionKm` usa ahora esta cúbica después del despegue (una sola fuente para la posición del cohete).
+  - `renderer.ts`: estela en dos líneas que se unen en el cohete: el tramo recorrido en texto claro y el que falta en gris medio, ambas discontinuas (los datos son ILLUSTRATIVE). Los puntos cercanos a la Tierra y a la Luna se empujan igual que el cohete, y la geometría se actualiza en cada fotograma.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/trajectory.test.tsx --reporter=verbose
+  trajectory: 50 plans, max |rocket(arrival_utc) − last point| = 0.00e+0 km
+  parking orbit: max radius error cubic 8.6 km vs linear 195.0 km
+   ✓ at arrival_utc the rocket is at the last point (landing), for a sample of plans of every site     (criterio)
+   ✓ passes through every sample exactly
+   ✓ stays on the parking orbit between samples 28° apart (a straight line would cut ~195 km inside)
+   ✓ the dense trail has no jumps (continuous curve from the pad to the site)
+   ✓ REAL is solid without label; ILLUSTRATIVE is dashed with its label
+   ✓ the live view shows the ILLUSTRATIVE label while the mode is ILLUSTRATIVE                        (criterio)
+  $ npm --prefix web test → Tests 147 passed · typecheck → exit 0
+  ```
+  En el navegador, reproduciendo el tránsito a 1 h/s durante 4 s con el panel visible: **60 fps** (contador con requestAnimationFrame; 11 llamadas de dibujo, 33 120 triángulos). Al inicio del aterrizaje se ve la estela discontinua de la Tierra a la Luna, el cohete llegando y el descenso que falta en gris tenue; la etiqueta ILLUSTRATIVE está visible.
+- **Decisiones tomadas:** cúbica de Hermite en lugar de lineal, por el error de 195 km en la órbita de espera. Estela en dos tonos (recorrido / por recorrer) dentro de la paleta Quantum.
+- **Desviaciones de la spec / cambios en la guía:** la prueba es `trajectory.test.tsx` (necesita jsdom para la etiqueta), no `.ts`.
+- **Problemas abiertos:** ninguno. T4.2 completo.
+- **Siguiente tarea:** T4.3.a.

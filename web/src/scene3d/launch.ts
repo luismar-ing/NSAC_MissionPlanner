@@ -12,6 +12,7 @@ import type { Trajectory } from "../lib/contract";
 import { PRELAUNCH_MS } from "../lib/mission";
 import { parseInstant } from "../lib/contract";
 import { rotate, type Quat } from "./ephemeris";
+import { trajectoryPositionKm } from "./trajectory";
 import type { Vec3 } from "./scale";
 
 /** Same generic pad and radius as pipeline/trajectory.py (PAD_LAT_DEG = PAD_LON_DEG = 0, R_EARTH_KM). */
@@ -55,18 +56,10 @@ export function plumeIntensity(traj: Trajectory, tMs: number): number {
 }
 
 /**
- * Rocket position (km) during the launch: on the pad (turning with the Earth) before launch_utc, then the
- * trajectory's own ascent samples, interpolated linearly (100 s apart; T4.2.c interpolates the whole flight).
+ * Rocket position (km) at any instant of the mission: on the pad (turning with the Earth) before launch_utc,
+ * then the trajectory, interpolated with the cubic of trajectory.ts (T4.2.c), up to the landing point.
  */
 export function launchPositionKm(traj: Trajectory, earthQuat: Quat, tMs: number): Vec3 {
-  const launch = parseInstant(traj.phases.launch_utc);
-  if (tMs <= launch) return padPositionKm(earthQuat);
-  const s = (tMs - launch) / 1000;
-  const t = traj.t_s;
-  let k = 0;
-  while (k < t.length - 2 && t[k + 1] < s) k++;
-  const u = Math.min(1, Math.max(0, (s - t[k]) / (t[k + 1] - t[k])));
-  const a = traj.pos_km[k];
-  const b = traj.pos_km[k + 1];
-  return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
+  if (tMs <= parseInstant(traj.phases.launch_utc)) return padPositionKm(earthQuat);
+  return trajectoryPositionKm(traj, tMs);
 }

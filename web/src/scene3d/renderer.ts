@@ -14,6 +14,7 @@ import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setP
 import { createBodies, loadTextures, updateBodies } from "./bodies";
 import { indexEphemeris, sceneStateAt } from "./ephemeris";
 import { pointToScene, RelativeOrigin, toScene, type Vec3 } from "./scale";
+import { trailSamples, trailStyle } from "./trajectory";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -151,6 +152,45 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
   pad.scale.set(0.012, 0.012, 1);
   scene.add(rocket, pad);
   rocket.visible = pad.visible = opts.trajectory !== null;
+  // trail (T4.2.c): flown part in light text, remaining part in medium grey; dashed if ILLUSTRATIVE (rule 2)
+  const trail = opts.trajectory ? trailSamples(opts.trajectory) : null;
+  const style = opts.trajectory ? trailStyle(opts.trajectory.mode) : null;
+  const makeLine = (color: string) => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(((trail?.km.length ?? 0) + 1) * 3), 3));
+    const mat = style?.dashed
+      ? new THREE.LineDashedMaterial({ color, dashSize: 2.5, gapSize: 1.8, transparent: true, opacity: 0.9 })
+      : new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 });
+    const line = new THREE.Line(geo, mat);
+    line.frustumCulled = false;
+    scene.add(line);
+    handle.world.set(line, [0, 0, 0]); // geometry in world units; the object follows the camera-relative origin
+    return line;
+  };
+  const flown = makeLine(COLORS.text);
+  const ahead = makeLine(COLORS.borderStrong);
+  flown.name = "trail-flown";
+  ahead.name = "trail-ahead";
+  /** Fills the two trail lines for instant t (points near the bodies pushed out like the rocket). */
+  const updateTrail = (t: number, moonKm: Vec3, rocketAt: Vec3) => {
+    if (!trail) return;
+    let split = trail.tMs.findIndex((x) => x > t);
+    if (split < 0) split = trail.tMs.length;
+    const fill = (line: THREE.Line, from: number, to: number, last: Vec3 | null, first: Vec3 | null) => {
+      const attr = line.geometry.getAttribute("position") as THREE.BufferAttribute;
+      let n = 0;
+      const put = (p: Vec3) => attr.setXYZ(n++, p[0], p[1], p[2]);
+      if (first) put(first);
+      for (let i = from; i < to; i++) put(pointToScene(trail.km[i], moonKm));
+      if (last) put(last);
+      line.geometry.setDrawRange(0, n);
+      attr.needsUpdate = true;
+      if (style?.dashed && n > 1) line.computeLineDistances();
+    };
+    // both lines meet at the rocket, so the trail never shows a gap at "now"
+    fill(flown, 0, Math.min(split, trail.km.length - 1), rocketAt, null);
+    fill(ahead, split, trail.km.length, null, rocketAt);
+  };
   const Y = new THREE.Vector3(0, 1, 0);
   const dir = new THREE.Vector3();
   if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad };
@@ -186,6 +226,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
       const dist = Math.hypot(p[0] - cam.position[0], p[1] - cam.position[1], p[2] - cam.position[2]);
       rocket.scale.setScalar(apparentLength(dist, camera.fov, ROCKET_SCREEN_FRACTION));
       setPlume(plume, plumeIntensity(traj, t));
+      updateTrail(t, state.moonKm, p);
       // pad marker while the launch phase lasts
       pad.visible = t < Date.parse(traj.phases.injection_utc);
       if (pad.visible) handle.world.set(pad, pointToScene(padPositionKm(state.earthQuat), state.moonKm));

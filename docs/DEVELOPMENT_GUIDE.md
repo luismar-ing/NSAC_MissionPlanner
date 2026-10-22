@@ -643,7 +643,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.2.a · **Spec:** 5.8, 8.2 · **Decisiones:** D8 · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** prueba de continuidad: el último punto del despegue coincide con el primero de la trayectoria; etiqueta visible.
 
-##### [ ] T4.2.c — Trayectoria y estela REAL / ILLUSTRATIVE
+##### [x] T4.2.c — Trayectoria y estela REAL / ILLUSTRATIVE
 - **Qué:** estela sólida si es REAL y punteada con etiqueta si es ILLUSTRATIVE; el cohete sigue las muestras interpoladas y llega al sitio en `arrival_utc`.
 - **Archivos:** `web/src/scene3d/trajectory.ts`, `web/tests/trajectory.test.ts`
 - **Depende de:** T4.2.b · **Spec:** 8.2, 9, 11 regla 2, 10 (T4.2) · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
