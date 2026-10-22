@@ -9,17 +9,18 @@
 import * as THREE from "three";
 import type { SceneEphemeris, Trajectory } from "../lib/contract";
 import { parseInstant } from "../lib/contract";
-import type { MissionTimeline } from "../lib/mission";
+import { phaseAt, type MissionTimeline } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { COLORS } from "../styles/tokens";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
-import { CameraController, directorPose, localBlend, reducedMotionPose, transitPose, type DirectorInput, type Pose } from "./cameraDirector";
+import { CameraController, directorPose, fromFrame, hopPose, localBlend, reducedMotionPose, switchEase, toFrame, transitPose, type BodyFrame, type DirectorInput, type Pose } from "./cameraDirector";
 import { indexEphemeris, rotate, sceneStateAt } from "./ephemeris";
 import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity } from "./launch";
 import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
 import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, earthOffset, pointToScene, RelativeOrigin, SPACE_SCALE, toScene, type Vec3 } from "./scale";
 import { siteBodyFixedKm, sitePositionKm, trailSamples, trailStyle } from "./trajectory";
 import { TerrainManager, type TerrainData } from "./terrain";
+import type { PlanSpec } from "./bridge";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -138,6 +139,12 @@ export interface SceneControl {
   unmount(): void;
   /** Gives the camera back to the director (guided camera). */
   resumeCamera(): void;
+  /**
+   * Switches to another plan without leaving live mode (T4.4.b): same renderer and scene; the plan's trail,
+   * site and terrain are rebuilt and the camera hops from its current view to the new plan's (SWITCH_MS).
+   * Call it in the same task as the missionTime change of the new plan.
+   */
+  setPlan(p: PlanSpec): void;
 }
 
 /**
@@ -153,8 +160,6 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   const ix = indexEphemeris(opts.eph);
   const bodies = createBodies(scene);
   loadTextures(bodies, opts.baseUrl, renderer instanceof THREE.WebGLRenderer ? renderer.capabilities.maxTextureSize : 4096);
-  const traj = opts.trajectory;
-  const tl = opts.timeline;
   const rocket = createRocket();
   const plume = createPlume();
   rocket.add(plume);
@@ -162,29 +167,88 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   pad.name = "launch-pad";
   pad.scale.set(0.012, 0.012, 1);
   scene.add(rocket, pad);
-  rocket.visible = pad.visible = traj !== null;
 
-  // trail (T4.2.c): flown part in light text, remaining part in medium grey; dashed if ILLUSTRATIVE (rule 2)
-  const trail = traj ? trailSamples(traj) : null;
-  const style = traj ? trailStyle(traj.mode) : null;
-  const makeLine = (color: string) => {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(((trail?.km.length ?? 0) + 1) * 3), 3));
-    const mat = style?.dashed
-      ? new THREE.LineDashedMaterial({ color, dashSize: 2.5, gapSize: 1.8, transparent: true, opacity: 0.9 })
-      : new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 });
-    const line = new THREE.Line(geo, mat);
-    line.frustumCulled = false;
-    scene.add(line);
-    handle.world.set(line, [0, 0, 0]); // geometry in world units; the object follows the camera-relative origin
-    return line;
+  const earthR = bodyRadius(EARTH_RADII_KM.equatorial);
+  const moonR = bodyRadius(MOON_RADIUS_KM);
+
+  /**
+   * Everything that depends on the plan: its trajectory, timeline, trail, site and terrain. Built at mount and
+   * rebuilt in place when the plan changes in live mode (T4.4.b): same renderer, scene, bodies and camera.
+   */
+  interface PlanRig {
+    traj: Trajectory | null;
+    tl: MissionTimeline | null;
+    trail: ReturnType<typeof trailSamples> | null;
+    style: ReturnType<typeof trailStyle> | null;
+    flown: THREE.Line;
+    ahead: THREE.Line;
+    landingMs: number;
+    injectionMs: number;
+    padUpAtLaunch: Vec3;
+    siteBody: Vec3 | null;
+    siteRadiusUnits: number; // R + site elevation, real scale
+    terrain: TerrainManager | null;
+  }
+
+  const buildRig = (p: PlanSpec): PlanRig => {
+    const traj = p.trajectory;
+    const trail = traj ? trailSamples(traj) : null;
+    const style = traj ? trailStyle(traj.mode) : null;
+    // trail (T4.2.c): flown part in light text, remaining part in medium grey; dashed if ILLUSTRATIVE (rule 2)
+    const makeLine = (color: string, name: string) => {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(((trail?.km.length ?? 0) + 1) * 3), 3));
+      const mat = style?.dashed
+        ? new THREE.LineDashedMaterial({ color, dashSize: 2.5, gapSize: 1.8, transparent: true, opacity: 0.9 })
+        : new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 });
+      const line = new THREE.Line(geo, mat);
+      line.name = name;
+      line.frustumCulled = false;
+      scene.add(line);
+      handle.world.set(line, [0, 0, 0]); // geometry in world units; the object follows the camera-relative origin
+      return line;
+    };
+    const launchMs = traj ? parseInstant(traj.phases.launch_utc) : ix.startMs;
+    const siteBody = traj ? siteBodyFixedKm(traj, ix) : null;
+    // terrain at real local scale (T4.3.b): loaded by distance during the final approach, never before
+    const terrain = siteBody && p.siteId && opts.loadTerrain ? new TerrainManager(p.siteId, siteBody, opts.loadTerrain) : null;
+    if (terrain) scene.add(terrain.group);
+    rocket.visible = pad.visible = traj !== null;
+    return {
+      traj,
+      tl: p.timeline,
+      trail,
+      style,
+      flown: makeLine(COLORS.text, "trail-flown"),
+      ahead: makeLine(COLORS.borderStrong, "trail-ahead"),
+      landingMs: traj ? parseInstant(traj.phases.landing_utc) : Number.POSITIVE_INFINITY,
+      injectionMs: traj ? parseInstant(traj.phases.injection_utc) : Number.NEGATIVE_INFINITY,
+      padUpAtLaunch: padUp(sceneStateAt(ix, launchMs).earthQuat),
+      siteBody,
+      siteRadiusUnits: siteBody ? Math.hypot(...siteBody) / 1000 : 0,
+      terrain,
+    };
   };
-  const flown = makeLine(COLORS.text);
-  const ahead = makeLine(COLORS.borderStrong);
-  flown.name = "trail-flown";
-  ahead.name = "trail-ahead";
+
+  const disposeRig = (r: PlanRig) => {
+    for (const line of [r.flown, r.ahead]) {
+      scene.remove(line);
+      handle.world.delete(line);
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    }
+    if (r.terrain) {
+      scene.remove(r.terrain.group);
+      handle.world.delete(r.terrain.group);
+      r.terrain.dispose();
+    }
+  };
+
+  let rig = buildRig({ trajectory: opts.trajectory, timeline: opts.timeline, siteId: opts.siteId });
+
   /** Fills the two trail lines for instant t (points near the bodies pushed out like the rocket). */
   const updateTrail = (t: number, moonKm: Vec3, rocketAt: Vec3) => {
+    const { trail, style, flown, ahead } = rig;
     if (!trail) return;
     let split = trail.tMs.findIndex((x) => x > t);
     if (split < 0) split = trail.tMs.length;
@@ -204,17 +268,6 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
     fill(ahead, split, trail.km.length, null, rocketAt);
   };
 
-  // fixed facts of the plan for the camera and the rocket
-  const earthR = bodyRadius(EARTH_RADII_KM.equatorial);
-  const moonR = bodyRadius(MOON_RADIUS_KM);
-  const launchMs = traj ? parseInstant(traj.phases.launch_utc) : ix.startMs;
-  const landingMs = traj ? parseInstant(traj.phases.landing_utc) : Number.POSITIVE_INFINITY;
-  const padUpAtLaunch = padUp(sceneStateAt(ix, launchMs).earthQuat);
-  const siteBody = traj ? siteBodyFixedKm(traj, ix) : null;
-  const siteRadiusUnits = siteBody ? Math.hypot(...siteBody) / 1000 : 0; // R + site elevation, real scale
-  // terrain at real local scale (T4.3.b): loaded by distance during the final approach, never before
-  const terrain = siteBody && opts.siteId && opts.loadTerrain ? new TerrainManager(opts.siteId, siteBody, opts.loadTerrain) : null;
-  if (terrain) scene.add(terrain.group);
   const moonQ = new THREE.Quaternion();
 
   // camera director and user take-over (T4.3.a)
@@ -223,11 +276,15 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   let lastPose: Pose | null = null;
   let earthW: Vec3 = [0, 0, 0];
   let moonW: Vec3 = [0, 0, 0];
+  // body frames of the last drawn instant, to carry the camera across a change of plan (T4.4.b)
+  let lastFrames: { earth: BodyFrame; moon: BodyFrame } | null = null;
+  let switching: { from: { earth: Pose; moon: Pose }; startMs: number } | null = null;
   const canvas = renderer.domElement;
   canvas.tabIndex = 0;
   canvas.setAttribute("aria-label", STRINGS.live.cameraHelp);
   const takeOver = () => {
     if (lastPose && controller.mode === "director") {
+      switching = null;
       controller.cancel(lastPose, earthW, moonW);
       opts.onCameraModeChange?.("manual");
     }
@@ -276,10 +333,25 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
 
   const Y = new THREE.Vector3(0, 1, 0);
   const dir = new THREE.Vector3();
-  if (import.meta.env.DEV)
-    (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad, controller, terrain, lastPose: () => lastPose, lambda: () => lambda };
   let lambda = 0;
   let reportedScale: "space" | "local" = "space";
+  if (import.meta.env.DEV)
+    (window as unknown as { __pp3d?: unknown }).__pp3d = {
+      THREE,
+      renderer,
+      ...handle,
+      handle,
+      bodies,
+      ix,
+      rocket,
+      pad,
+      controller,
+      terrain: () => rig.terrain,
+      lastPose: () => lastPose,
+      lastFrames: () => lastFrames,
+      lambda: () => lambda,
+      switching: () => switching !== null,
+    };
 
   const resize = () => {
     const w = Math.max(1, container.clientWidth);
@@ -294,6 +366,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   ro.observe(container);
 
   renderer.setAnimationLoop(() => {
+    const { traj, tl, siteBody, siteRadiusUnits, terrain, landingMs, flown, ahead } = rig;
     const t = opts.getTimeMs();
     const state = sceneStateAt(ix, t);
     updateBodies(bodies, state, handle);
@@ -306,7 +379,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       sunDir: state.sunDir,
       earthRadius: earthR,
       moonRadius: moonR,
-      padUpAtLaunch,
+      padUpAtLaunch: rig.padUpAtLaunch,
       moonNorth: rotate(state.moonQuat, [0, 0, 1]),
       site: moonW, // set just below, once λ is known
     };
@@ -323,6 +396,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
     // …and the Earth moves so that, at real local scale, site → Earth is the true vector
     earthW = siteKm && lambda > 0 ? earthOffset(siteKm, state.moonKm, lambda) : [0, 0, 0];
     handle.world.set(bodies.earth, earthW);
+    let moonDrawnR = moonR;
     if (lambda > 0 && siteBody) {
       // re-scale anchored at the site: the Moon centre slides towards the site and the sphere shrinks to its
       // real size, so the ground under the camera stays put and only its curvature changes
@@ -330,18 +404,34 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       const r = Math.hypot(anchor[0] - moonW[0], anchor[1] - moonW[1], anchor[2] - moonW[2]) * (1 - lambda) + siteRadiusUnits * lambda;
       moonW = [anchor[0] - n[0] * r, anchor[1] - n[1] * r, anchor[2] - n[2] * r];
       handle.world.set(bodies.moon, moonW);
-      const drawn = moonR * (1 - lambda) + ((MOON_RADIUS_KM - MOON_SPHERE_DROP_KM) / 1000) * lambda;
-      bodies.moon.scale.setScalar(drawn / moonR);
+      moonDrawnR = moonR * (1 - lambda) + ((MOON_RADIUS_KM - MOON_SPHERE_DROP_KM) / 1000) * lambda;
+      bodies.moon.scale.setScalar(moonDrawnR / moonR);
     } else bodies.moon.scale.setScalar(1);
     // the Earth also goes back to its real size at real local scale (seen from the site it is a ~1.9° disc,
     // like in the 2D panorama); it is far away, so no anchoring is needed
     const earthK = 1 - (1 - 1 / SPACE_SCALE.bodyExaggeration) * lambda;
     bodies.earth.scale.set(earthK, earthK * (EARTH_RADII_KM.polar / EARTH_RADII_KM.equatorial), earthK);
 
-    const pose =
+    let pose =
       (controller.mode === "manual" ? controller.manualPose(earthW, moonW) : null) ??
       (tl ? (reduced?.matches ? reducedMotionPose(tl, input) : directorPose(tl, input)) : transitPose(input));
+    const frames: { earth: BodyFrame; moon: BodyFrame } = {
+      earth: { centre: earthW, quat: null, radius: earthR * earthK },
+      moon: { centre: moonW, quat: state.moonQuat, radius: moonDrawnR },
+    };
+    if (switching) {
+      // change of plan (T4.4.b): hop from the old view, kept relative to the ground of the body it framed, to
+      // the new plan's view, in the frame of the body the new view frames (the Earth at launch, else the Moon)
+      const w = switchEase(performance.now() - switching.startMs);
+      if (w >= 1) switching = null;
+      else {
+        const kind = tl && phaseAt(tl, t) === "launch" ? "earth" : "moon";
+        const f = frames[kind];
+        pose = fromFrame(hopPose(switching.from[kind], toFrame(pose, f), w, f.radius), f);
+      }
+    }
     lastPose = pose;
+    lastFrames = frames;
     handle.cameraWorld = pose.position;
 
     if (terrain && siteBody) {
@@ -377,7 +467,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       (flown.material as THREE.LineBasicMaterial).opacity = (ahead.material as THREE.LineBasicMaterial).opacity = 0.9 * (1 - lambda);
       if (flown.visible) updateTrail(t, state.moonKm, p);
       // pad marker while the launch phase lasts
-      pad.visible = t < parseInstant(traj.phases.injection_utc);
+      pad.visible = t < rig.injectionMs;
       if (pad.visible) handle.world.set(pad, pointToScene(padPositionKm(state.earthQuat), state.moonKm));
     }
     applyCameraRelative(handle);
@@ -391,6 +481,18 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       controller.resume();
       opts.onCameraModeChange?.("director");
     },
+    setPlan(p) {
+      // the camera leaves from where it is, kept relative to each body's ground, and hops to the new view
+      if (lastPose && lastFrames && !reduced?.matches) {
+        switching = { from: { earth: toFrame(lastPose, lastFrames.earth), moon: toFrame(lastPose, lastFrames.moon) }, startMs: performance.now() };
+      }
+      if (controller.mode === "manual") {
+        controller.resume();
+        opts.onCameraModeChange?.("director");
+      }
+      disposeRig(rig);
+      rig = buildRig(p);
+    },
     unmount() {
       ro.disconnect();
       canvas.removeEventListener("pointerdown", onDown);
@@ -400,7 +502,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       canvas.removeEventListener("wheel", onWheel);
       canvas.removeEventListener("keydown", onKey);
       rendererManager.release();
-      terrain?.dispose();
+      rig.terrain?.dispose();
       scene.traverse((o) => {
         const m = o as THREE.Mesh;
         m.geometry?.dispose();

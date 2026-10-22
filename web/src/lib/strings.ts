@@ -154,6 +154,7 @@ export const STRINGS = {
     title: "Other plans · since arrival",
     empty: "Pin more plans in the tray to compare them here.",
     score: "Score",
+    switch: (site: string, date: string, L: number) => `Show ${site} (arrival ${date}, ${L}-day window) in the 3D view`,
   },
   scale: {
     notToScale: "Not to scale",

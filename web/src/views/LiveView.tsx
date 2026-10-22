@@ -26,7 +26,8 @@ export function LiveView() {
   const missionPhase = useApp((s) => s.missionPhase);
   const sceneScale = useApp((s) => s.sceneScale);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
-  const [timeline, setTimeline] = useState<MissionTimeline | null>(null);
+  // timeline of the plan it was computed for: after a switch (T4.4.b) the old one is never shown with the new plan
+  const [timeline, setTimeline] = useState<{ planId: string; tl: MissionTimeline } | null>(null);
   const atSite = missionPhase === "site";
   const sceneRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +48,7 @@ export function LiveView() {
   useEffect(() => {
     if (!plan) return;
     let alive = true;
-    data.trajectory(plan.trajectory_id).then((t) => alive && setTimeline(timelineOf(plan, t)));
+    data.trajectory(plan.trajectory_id).then((t) => alive && setTimeline({ planId: plan.id, tl: timelineOf(plan, t) }));
     return () => {
       alive = false;
     };
@@ -77,7 +78,7 @@ export function LiveView() {
               </p>
             )}
           </div>
-          {timeline && <MissionControls timeline={timeline} />}
+          {timeline && timeline.planId === plan?.id && <MissionControls key={timeline.planId} timeline={timeline.tl} />}
           <p className="visually-hidden" aria-live="polite">
             {atSite && site ? STRINGS.live.arrived(site.name) : ""}
           </p>

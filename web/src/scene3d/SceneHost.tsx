@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { timelineOf } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { appStore } from "../store/appStore";
+import { sceneBridge, type PlanSpec } from "./bridge";
 
 /**
  * Hosts the 3D scene. three.js is loaded on demand with a dynamic import (its own chunk), the first time the
@@ -10,7 +11,7 @@ import { appStore } from "../store/appStore";
  */
 export function SceneHost() {
   const ref = useRef<HTMLDivElement>(null);
-  const control = useRef<{ unmount(): void; resumeCamera(): void } | null>(null);
+  const control = useRef<{ unmount(): void; resumeCamera(): void; setPlan(p: PlanSpec): void } | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [cameraMode, setCameraMode] = useState<"director" | "manual">("director");
 
@@ -33,11 +34,13 @@ export function SceneHost() {
           siteId: plan?.site_id,
           loadTerrain: (siteId, lod) => st.data.terrain(siteId, lod),
         });
+        sceneBridge.setPlan = (p) => control.current?.setPlan(p); // plan switch from the thumbnails (T4.4.b)
         setStatus("ready");
       })
       .catch(() => !cancelled && setStatus("error"));
     return () => {
       cancelled = true;
+      sceneBridge.setPlan = null;
       control.current?.unmount();
       control.current = null;
     };

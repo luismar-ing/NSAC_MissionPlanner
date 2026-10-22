@@ -4,7 +4,9 @@
  * view that arrives plays a FLIP animation from that rectangle to its own element. Nothing here touches the
  * data or the WebGL context: the scene keeps the single renderer (renderer.ts) and the store keeps the state.
  */
+import { sceneBridge } from "../scene3d/bridge";
 import { appStore } from "../store/appStore";
+import { clampMission, phaseAt, timelineOf } from "./mission";
 
 export const TRANSITION_MS = 300;
 
@@ -64,4 +66,31 @@ export function playFrom(el: HTMLElement | null, from: DOMRect | null, ms = TRAN
     ],
     { duration: ms, easing: "cubic-bezier(0.2, 0, 0, 1)" },
   );
+}
+
+let switchToken = 0;
+
+/**
+ * Change the live plan from a thumbnail without leaving live mode (T4.4.b). The new plan opens at the same
+ * moment relative to its arrival as the current one (the clock the thumbnails show), clamped to its mission.
+ * Its trajectory is loaded first; then the scene (camera hop, new trail and terrain) and the store change in
+ * the same task, so no frame draws the old plan at the new instant. A later click wins over an earlier one.
+ */
+export async function switchLivePlan(planId: string): Promise<void> {
+  const token = ++switchToken;
+  const st = appStore.getState();
+  const plan = st.plansById.get(planId);
+  const old = st.selectedPlanId ? st.plansById.get(st.selectedPlanId) : undefined;
+  if (!plan || planId === st.selectedPlanId) return;
+  const [traj, oldTraj] = await Promise.all([st.data.trajectory(plan.trajectory_id), old ? st.data.trajectory(old.trajectory_id) : Promise.resolve(null)]);
+  const now = appStore.getState();
+  if (token !== switchToken || now.viewMode !== "live") return;
+  const tl = timelineOf(plan, traj);
+  const oldLanding = old && oldTraj ? timelineOf(old, oldTraj).landingMs : null;
+  const rel = oldLanding !== null && now.missionTime !== null && now.missionPhase !== "overview" ? now.missionTime - oldLanding : tl.startMs - tl.landingMs;
+  const t = clampMission(tl, tl.landingMs + rel);
+  sceneBridge.setPlan?.({ trajectory: traj, timeline: tl, siteId: plan.site_id });
+  now.selectPlan(planId);
+  now.setMissionTime(t);
+  now.setMissionPhase(phaseAt(tl, t));
 }

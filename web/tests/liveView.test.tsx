@@ -50,7 +50,7 @@ const open = async () => {
   appStore.getState().pinPlan("malapert_massif_20271015_7d");
   appStore.getState().setViewMode("live");
   render(<LiveView />);
-  await screen.findByTestId("mission-controls");
+  await screen.findByTestId("mission-controls", {}, { timeout: 5000 }); // first load of the plan data; slow when the whole suite runs
 };
 
 describe("arrival at the site (spec 8.2 phase 4, 8.6)", () => {

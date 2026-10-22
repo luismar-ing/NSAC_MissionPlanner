@@ -3,6 +3,7 @@ import { loadPlanData, type PlanData } from "../lib/planData";
 import { relativeLabel } from "../lib/ribbon";
 import { sharedElevationScale } from "../lib/scale";
 import { STRINGS } from "../lib/strings";
+import { switchLivePlan } from "../lib/modeTransition";
 import { useApp } from "../store/appStore";
 import { HorizonSilhouette } from "./HorizonSilhouette";
 import { TimeRibbon } from "./TimeRibbon";
@@ -16,7 +17,8 @@ export function liveRelativeHours(missionTime: number | null, arrivalMs: number 
 /**
  * Live mode's strip of the other pinned plans (spec 8.0): small 2D panels (silhouette with the Sun and Earth,
  * time ribbon, score), still live and linked: they follow the live plan's clock as "hours since arrival", the
- * same relative clock the tray uses, so each one shows its own site at the same moment of its stay. SVG only.
+ * same relative clock the tray uses, so each one shows its own site at the same moment of its stay. Clicking
+ * one switches the 3D plan without leaving live mode (T4.4.b). SVG only.
  */
 export function ThumbnailStrip() {
   const ids = useApp((s) => s.comparePlans);
@@ -59,21 +61,28 @@ export function ThumbnailStrip() {
       <ul className="thumb-list">
         {others.map((p) => (
           <li key={p.plan.id}>
-            <article className="thumb" data-testid="thumb" data-plan-id={p.plan.id} aria-label={STRINGS.panel.aria(p.site.name, p.plan.arrival_utc.slice(0, 10), p.plan.window_days)}>
-              <header className="thumb-head">
+            <button
+              type="button"
+              className="thumb"
+              data-testid="thumb"
+              data-plan-id={p.plan.id}
+              aria-label={STRINGS.thumbs.switch(p.site.name, p.plan.arrival_utc.slice(0, 10), p.plan.window_days)}
+              onClick={() => void switchLivePlan(p.plan.id)}
+            >
+              <span className="thumb-head">
                 <span className="plan-site">{p.site.name}</span>
                 <span className="plan-meta">
                   {p.plan.arrival_utc.slice(0, 10)} · {STRINGS.windowDays(p.plan.window_days)}
                 </span>
-              </header>
-              <div className="thumb-silhouette">
+              </span>
+              <span className="thumb-silhouette">
                 <HorizonSilhouette data={p} scale={scale} exaggeration={exaggeration} compareTime={hours} />
-              </div>
+              </span>
               <TimeRibbon series={p.series} compareTime={hours} />
-              <p className="thumb-score">
+              <span className="thumb-score">
                 {STRINGS.thumbs.score} <span className="mono">{p.metrics.score.toFixed(2)}</span>
-              </p>
-            </article>
+              </span>
+            </button>
           </li>
         ))}
       </ul>

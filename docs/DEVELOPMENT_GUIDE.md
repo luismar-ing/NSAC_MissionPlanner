@@ -677,7 +677,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.1.a, T3.3.e · **Spec:** 8.0, 9 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**
 - **Aceptación:** prueba: tras ida y vuelta el estado se conserva y hay un solo contexto WebGL; revisión visual de la animación.
 
-##### [ ] T4.4.b — Cambio de plan desde las miniaturas
+##### [x] T4.4.b — Cambio de plan desde las miniaturas
 - **Qué:** clic en una miniatura cambia el plan en 3D sin salir del modo vivir, con transición de cámara suave.
 - **Archivos:** `web/src/views/LiveView.tsx`, `web/src/scene3d/cameraDirector.ts`
 - **Depende de:** T4.4.a, T4.3.c · **Spec:** 8.0, 9, 10 (T4.4) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**

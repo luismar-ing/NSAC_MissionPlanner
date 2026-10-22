@@ -130,7 +130,7 @@ export function sitePose(i: DirectorInput): Pose {
   return pose(position, target, normal);
 }
 
-type Quat = [number, number, number, number]; // [x, y, z, w]
+export type Quat = [number, number, number, number]; // [x, y, z, w]
 
 /** Camera orientation (view direction + up) as a quaternion of the basis [right, up, −forward]. */
 function poseQuat(p: Pose): Quat {
@@ -331,3 +331,66 @@ export class CameraController {
 function orthoAny(v: Vec3): Vec3 {
   return unit(cross(v, Math.abs(v[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0]));
 }
+
+/* ------------------------------------------------------------------ change of plan in live mode (T4.4.b) */
+
+/** Real-time length of the camera move when the plan changes (ms). */
+export const SWITCH_MS = 1600;
+
+/**
+ * A body's frame in the scene: its drawn centre and its orientation (body → world, [x, y, z, w]); `quat`
+ * null = an inertial frame centred on the body. Poses expressed in the Moon's body-fixed frame stay put when
+ * the plan (and so the date) changes: the camera keeps its place relative to the ground it was looking at.
+ */
+export interface BodyFrame {
+  centre: Vec3;
+  quat: Quat | null;
+  radius: number; // drawn radius (scene units)
+}
+
+const conj = (q: Quat): Quat => [-q[0], -q[1], -q[2], q[3]];
+
+/** World pose → pose in the body frame. */
+export function toFrame(p: Pose, f: BodyFrame): Pose {
+  const r = (v: Vec3) => (f.quat ? rotateQ(conj(f.quat), v) : v);
+  return { position: r(sub(p.position, f.centre)), target: r(sub(p.target, f.centre)), up: r(p.up) };
+}
+
+/** Pose in the body frame → world pose. */
+export function fromFrame(p: Pose, f: BodyFrame): Pose {
+  const r = (v: Vec3) => (f.quat ? rotateQ(f.quat, v) : v);
+  return { position: add(r(p.position), f.centre), target: add(r(p.target), f.centre), up: r(p.up) };
+}
+
+/**
+ * Move from pose a to pose b, both in one body frame (centre at the origin), as a "hop" over the body: the
+ * direction from the centre turns along the great circle, the altitude is interpolated on a log scale and lifted
+ * by a bump proportional to the ground distance covered, so the camera never cuts through the body or the
+ * terrain; the orientation turns with a quaternion slerp. w = 0 gives a, w = 1 gives b.
+ */
+export function hopPose(a: Pose, b: Pose, w: number, radius: number): Pose {
+  if (w <= 0) return a;
+  if (w >= 1) return b;
+  const ua = unit(a.position);
+  const ub = unit(b.position);
+  const theta = Math.acos(Math.max(-1, Math.min(1, dot(ua, ub))));
+  let dir: Vec3;
+  if (theta < 1e-9) dir = ua;
+  else {
+    const s = Math.sin(theta);
+    dir = unit(add(mul(ua, Math.sin((1 - w) * theta) / s), mul(ub, Math.sin(w * theta) / s)));
+  }
+  const floor = radius * 1e-4; // log interpolation needs a positive altitude
+  const altA = Math.max(floor, len(a.position) - radius);
+  const altB = Math.max(floor, len(b.position) - radius);
+  const bump = Math.sin(Math.PI * w) * 0.5 * radius * theta; // half the ground distance at mid-hop
+  const alt = Math.exp(Math.log(altA) * (1 - w) + Math.log(altB) * w) + bump;
+  const position = mul(dir, radius + alt);
+  const ta = len(sub(a.target, a.position));
+  const tb = len(sub(b.target, b.position));
+  const q = slerpQ(poseQuat(a), poseQuat(b), w);
+  return { position, target: add(position, mul(rotateQ(q, [0, 0, -1]), Math.exp(Math.log(ta) * (1 - w) + Math.log(tb) * w))), up: rotateQ(q, [0, 1, 0]) };
+}
+
+/** Ease of the plan-switch move: smooth start and end. */
+export const switchEase = (elapsedMs: number) => smoothstep(elapsedMs / SWITCH_MS);

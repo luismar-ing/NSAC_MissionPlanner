@@ -2059,3 +2059,32 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/lib/modeTransition.ts`, `web/tests/modeTransition.test.tsx`, y cambios pequeños en `PlanPanel.tsx`, `Tray.tsx` y `SiteSection.tsx` (botón y animación de vuelta).
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.4.b.
+
+## 2026-10-22 · T4.4.b · Cambio de plan desde las miniaturas
+
+- **Tarea:** T4.4.b — Cambio de plan desde las miniaturas ([x]).
+- **Qué se hizo:**
+  - Las miniaturas del modo vivir son botones («Show {site} (arrival …) in the 3D view»). Un clic cambia el plan **sin salir del modo vivir** (`switchLivePlan` en `web/src/lib/modeTransition.ts`). El nuevo plan se abre en el **mismo momento relativo a su llegada** que el actual: el reloj que ya muestran las miniaturas. Antes del aterrizaje se toma la misma distancia a su propio aterrizaje, acotada a su misión. Primero se carga la trayectoria y después la escena y el store cambian en la misma tarea, de modo que ningún fotograma dibuja el plan viejo en el instante nuevo. Si hay dos clics seguidos, gana el último.
+  - `renderer.ts`: lo que depende del plan (trayectoria, línea de tiempo, estela, sitio y terreno) pasa a un objeto `PlanRig` que `setPlan` reconstruye en el mismo renderer y escena: **un solo contexto WebGL**. Si el usuario llevaba la cámara a mano, el cambio la devuelve al director.
+  - `cameraDirector.ts`: transición de cámara de 1,6 s (`SWITCH_MS`, con smoothstep). La pose de partida se guarda **relativa al suelo del cuerpo** (marco fijo a la Luna, o inercial centrado en la Tierra si la nueva vista es el despegue). Desde ahí la cámara «salta» a la vista del nuevo plan: la dirección gira por el círculo máximo, la altitud se interpola en escala logarítmica y se eleva con una joroba proporcional al terreno recorrido, para no atravesar nunca la Luna ni el relieve, y la orientación gira con slerp (`hopPose`, `toFrame`, `fromFrame`). Con movimiento reducido el cambio es directo.
+  - `web/src/scene3d/bridge.ts`: enlace de la UI 2D a la escena montada (`sceneBridge.setPlan`) sin importar `renderer.ts`, para que three.js siga fuera del chunk 2D (lo comprueba la prueba del grafo de imports). `LiveView` vuelve a montar los controles de misión con la línea de tiempo del plan nuevo.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/planSwitch.test.tsx --reporter=verbose
+   ✓ switches the 3D plan without leaving live mode, at the same time since arrival, with one scene call
+     (Haworth +30 h → Malapert +30 h, fase «At the site»; setPlan llamado 1 vez; la franja pasa a [Haworth, Connecting Ridge])
+   ✓ before landing the new plan opens at the same time before its own landing (clamped to its mission)
+  hop between 5 sites: min clearance 1.97 km, worst turn 2.70°/frame, worst step 26 % of the height per frame
+   ✓ camera hop: ends exactly on both views, stays above the real terrain (polar LOLA grid) and moves smoothly
+  $ npm --prefix web test → Test Files 28 passed · Tests 178 passed (3 ejecuciones seguidas) · typecheck → exit 0
+  ```
+  En el navegador, contando los contextos con un envoltorio de `getContext` y midiendo la cámara en el marco de la Luna fotograma a fotograma:
+  - **En el sitio** (Haworth, +38 h → Malapert Massif): 78 fotogramas en 1 607 ms. El salto del primer fotograma es de 65 m respecto al suelo y el giro máximo de 0,07° por fotograma. La altitud va de 12,5 a 39,3 km sobre la esfera dibujada. Se pidió el terreno del nuevo sitio; modo vivir, fase de sitio, **1 contexto WebGL**. La captura muestra Malapert con el Sol sobre el horizonte, y la franja con Haworth y Connecting Ridge.
+  - **En el tránsito** (→ Connecting Ridge): 97 fotogramas, giro máximo de 1,89° por fotograma y paso máximo del 1,1 % de la distancia; 1 contexto WebGL.
+- **Decisiones tomadas:**
+  - Al cambiar de plan se conserva el tiempo relativo a la llegada, no la fecha absoluta: los planes tienen fechas distintas y así se compara el mismo momento de la estancia, como en la bandeja.
+  - El cielo (Sol, Tierra, estrellas) cambia en el acto, porque la fecha cambia; la continuidad se mantiene respecto al suelo lunar.
+  - Si la misión se estaba reproduciendo, el cambio la pausa (los controles se montan de nuevo con el plan nuevo).
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/scene3d/bridge.ts`, `web/src/lib/modeTransition.ts` (ampliado), `web/src/panels2d/ThumbnailStrip.tsx` (botones) y `web/tests/planSwitch.test.tsx`. En `tests/liveView.test.tsx`, la primera espera sube a 5 s porque falló una vez por tiempo con toda la suite en marcha.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.4.c.
