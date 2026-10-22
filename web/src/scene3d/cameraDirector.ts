@@ -113,13 +113,21 @@ export function landingPose(i: DirectorInput, progress: number): Pose {
   return pose(position, target, rotateAbout(up0, axis, swung));
 }
 
-/** Site: low over the landing point, looking at it with the horizon in view. */
+/** Site framing at REAL local scale (spec 5.9): metres-scale view from just above the site. */
+export const SITE_VIEW_KM = { height: 1.5, back: 5, ahead: 10 } as const;
+
+/**
+ * Site: 1.5 km above the ground, 5 km behind the landing point, looking 10 km past it towards the horizon on
+ * the Earth's side (the Earth stays low over the horizon at the pole, so it is in view). Scene units = 1000 km.
+ */
 export function sitePose(i: DirectorInput): Pose {
   const normal = unit(sub(i.site, i.moon));
-  const toEarth = unit(mul(i.moon, -1));
+  const toEarth = unit(mul(i.site, -1)); // the Earth is at the origin
   const horiz = unit(sub(toEarth, mul(normal, dot(toEarth, normal))));
-  const position = add(add(i.site, mul(normal, i.moonRadius * 0.35)), mul(horiz, -i.moonRadius * 0.6));
-  return pose(position, i.site, normal);
+  const k = 1 / 1000; // km → scene units
+  const position = add(add(i.site, mul(normal, SITE_VIEW_KM.height * k)), mul(horiz, -SITE_VIEW_KM.back * k));
+  const target = add(i.site, mul(horiz, SITE_VIEW_KM.ahead * k));
+  return pose(position, target, normal);
 }
 
 type Quat = [number, number, number, number]; // [x, y, z, w]
@@ -193,10 +201,45 @@ export function lerpPose(a: Pose, b: Pose, w: number): Pose {
 export const WINDOWS = {
   launchToTransit: [-30 * 60_000, 8 * 3_600_000], // around injection
   transitToLanding: [-8 * 3_600_000, 1 * 3_600_000], // around lunar arrival
-  landingToSite: [-4 * 3_600_000, 0], // ending exactly at landing
+  approach: [-8 * 3_600_000, 0], // final approach to the site, ending exactly at landing
 } as const;
 
 const weight = (t: number, at: number, [a, b]: readonly [number, number]) => smoothstep((t - (at + a)) / (b - a));
+
+/**
+ * Final approach: from thousands of km to a few km of the site. The distance to the site is interpolated on a
+ * LOG scale (constant relative speed: each frame covers the same fraction of the remaining distance), the
+ * direction from the site and the camera orientation turn smoothly (slerp).
+ */
+export function approachPose(a: Pose, b: Pose, anchor: Vec3, w: number): Pose {
+  if (w <= 0) return a;
+  if (w >= 1) return b;
+  const ra = sub(a.position, anchor);
+  const rb = sub(b.position, anchor);
+  const da = len(ra);
+  const db = len(rb);
+  const dir = unit(lerp(unit(ra), unit(rb), w));
+  const position = add(anchor, mul(dir, Math.exp(Math.log(da) * (1 - w) + Math.log(db) * w)));
+  const ta = len(sub(a.target, a.position));
+  const tb = len(sub(b.target, b.position));
+  const q = slerpQ(poseQuat(a), poseQuat(b), w);
+  const forward = rotateQ(q, [0, 0, -1]);
+  return { position, target: add(position, mul(forward, Math.exp(Math.log(ta) * (1 - w) + Math.log(tb) * w))), up: rotateQ(q, [0, 1, 0]) };
+}
+
+/** Progress of the final approach (0 before, 1 at landing and after), smoothed. */
+export function approachProgress(tl: MissionTimeline, t: number): number {
+  return weight(t, tl.landingMs, WINDOWS.approach);
+}
+
+/**
+ * Local scale λ (0 = space scale, bodies ×6; 1 = real local scale): it changes only in the last stretch of the
+ * approach, from ~300 km to ~50 km of the site (approach progress 0.82 → 0.96 on the log path; measured in the
+ * browser), so the re-scaling, anchored at the site, only changes the curvature of the ground far below.
+ */
+export function localBlend(tl: MissionTimeline, t: number): number {
+  return smoothstep((approachProgress(tl, t) - 0.82) / 0.14);
+}
 
 /** The director's pose at instant `i.t` (continuous in t). */
 export function directorPose(tl: MissionTimeline, i: DirectorInput): Pose {
@@ -205,8 +248,7 @@ export function directorPose(tl: MissionTimeline, i: DirectorInput): Pose {
   let p = launchPose(i);
   p = lerpPose(p, transitPose(i), weight(t, tl.injectionMs, WINDOWS.launchToTransit));
   p = lerpPose(p, landingPose(i, lp), weight(t, tl.lunarArrivalMs, WINDOWS.transitToLanding));
-  p = lerpPose(p, sitePose(i), weight(t, tl.landingMs, WINDOWS.landingToSite));
-  return p;
+  return approachPose(p, sitePose(i), i.site, approachProgress(tl, t));
 }
 
 /** Reduced motion: one fixed framing per phase (a cut at each phase change, nothing sweeps). */

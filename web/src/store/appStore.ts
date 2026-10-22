@@ -40,6 +40,9 @@ export interface AppState {
   constraints: Constraints;
   viewMode: ViewMode;
   setViewMode(mode: ViewMode): void;
+  /** Scale the 3D scene is drawn at (spec 5.9): "space" (bodies ×6) or "local" (real size near the site). */
+  sceneScale: "space" | "local";
+  setSceneScale(s: "space" | "local"): void;
   missionPhase: MissionPhase;
   missionTime: number | null; // absolute instant (epoch ms, UTC) of the selected plan's mission clock
   compareTime: number; // relative clock shared by the 2D panels: hours since arrival
@@ -82,6 +85,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     selectedWindow: 7,
     constraints: { ...DEFAULT_CONSTRAINTS },
     viewMode: "compare",
+    sceneScale: "space",
+    setSceneScale(s) {
+      set({ sceneScale: s });
+    },
     setViewMode(mode) {
       // live mode needs a selected plan (spec 8.0: the selected panel expands to the 3D scene)
       if (mode === "live" && !get().selectedPlanId) return set({ notice: "Select a plan to open the 3D view." });

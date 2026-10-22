@@ -64,7 +64,9 @@ function jumps(tl: MissionTimeline, input: (t: number) => DirectorInput, stepMs:
     const u = angle(prev.up, p.up);
     if (d > maxDir) [maxDir, atDir] = [d, t];
     if (u > maxUp) [maxUp, atUp] = [u, t];
-    maxRel = Math.max(maxRel, len(sub(p.position, prev.position)) / len(view(prev)));
+    // camera motion relative to what it looks at (a translation shared by camera and target — e.g. riding with
+    // the Moon at ~1 km/s after landing — changes nothing on screen)
+    maxRel = Math.max(maxRel, len(sub(view(p), view(prev))) / len(view(prev)));
     prev = p;
   }
   // where the worst frames are, in hours from launch (for diagnosis)
@@ -108,11 +110,14 @@ describe("camera director: continuous path, no jumps between frames", () => {
   it("ends at the site framing exactly at landing, after travelling Earth → Moon", () => {
     const { tl, input } = setup("haworth_20270309_7d");
     const atLanding = directorPose(tl, input(tl.landingMs));
-    const site = sitePose(input(tl.landingMs));
-    expect(len(sub(atLanding.position, site.position))).toBeLessThan(1e-9);
+    const framing = sitePose(input(tl.landingMs));
+    expect(len(sub(atLanding.position, framing.position))).toBeLessThan(1e-12);
     const start = directorPose(tl, input(tl.startMs));
     expect(len(start.target)).toBeLessThan(bodyRadius(EARTH_RADII_KM.equatorial)); // looks at the Earth at launch
-    expect(len(sub(atLanding.target, input(tl.landingMs).site))).toBeLessThan(1e-9); // looks at the site at the end
+    // at the end: a few km from the site at real local scale (1.5 km up, 5 km back), looking 10 km past it
+    const site = input(tl.landingMs).site;
+    expect(len(sub(atLanding.position, site)) * 1000).toBeCloseTo(Math.hypot(1.5, 5), 6);
+    expect(len(sub(atLanding.target, site)) * 1000).toBeCloseTo(10, 6);
   });
 });
 

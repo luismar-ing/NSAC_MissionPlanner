@@ -1986,3 +1986,33 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno. El zoom a escala real local y el terreno son de T4.3.b.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.3.b.
+
+## 2026-10-22 · T4.3.b · Carga progresiva del terreno y escala local
+
+- **Tarea:** T4.3.b — Carga progresiva del terreno y escala local ([x]).
+- **Qué se hizo:**
+  - `web/src/scene3d/terrain.ts`: terreno a escala real (D9: simplificado). El contexto polar `_polar/lod0` (estereográfica polar, ±302 km cada 2 km) cubre todo lo visible desde unos km de altura; los niveles del sitio lod0/lod1/lod2 (±20/±10/±3 km; 400/80/40 m) afinan el centro. Proyección inversa (lon = atan2(x, y), colatitud = 2·atan(ρ/2R)) comprobada contra pyproj. Cada nivel fino abre un hueco en el más grueso y lleva un faldón en su borde (sin grietas ni superficies solapadas). La geometría va en el marco fijo de la Luna y **relativa al sitio**, para que los números sean pequeños cerca de la cámara.
+  - Carga **por distancia** de la cámara al sitio y **nunca antes de la aproximación final**: polar + lod0 a menos de 200 km, lod1 a menos de 30 km y lod2 a menos de 10 km (`TerrainManager`).
+  - `cameraDirector.ts`: aproximación final en las últimas 8 h, con la distancia al sitio interpolada en escala **logarítmica** (de miles de km a 5 km) y la orientación con slerp. El encuadre del sitio es ahora a escala real: 1,5 km sobre el suelo, 5 km detrás del punto de aterrizaje, mirando 10 km más allá hacia el horizonte del lado de la Tierra. `localBlend` da la escala local λ (0 = espacio ×6, 1 = escala real), que cambia en el último tramo (≈ 24 → 7 km del sitio).
+  - `renderer.ts`: reescalado **anclado en el sitio dibujado**. El centro de la Luna se desliza y la esfera se encoge a su tamaño real (8 km por debajo de la referencia, para que no corte los cráteres polares del terreno), así que el suelo bajo la cámara no se mueve y solo cambia su curvatura. La Tierra vuelve a su tamaño real (disco de ~1,9°) y **se desplaza λ · (sitio dibujado − sitio real)** (8 686 km, ≈ 1,2° vistos desde el sitio), de modo que con λ = 1 los vectores sitio → Tierra y sitio → centro lunar son los reales. El cohete pasa de tamaño aparente a su tamaño real (~100 m) y la estela se desvanece. El indicador de escala dice «Real scale» desde λ ≥ 0,5 (`sceneScale` en el store).
+  - Correcciones encontradas al revisar: (1) la Tierra seguía ×6 a escala real y asomaba sobre el horizonte cuando estaba 8,5° por debajo; (2) anclar el reescalado en el sitio dibujado desviaba ~1,3° la dirección a la Tierra (corregido con el desplazamiento de la Tierra; un primer intento, deslizar el ancla, rompía la trayectoria de la cámara a mitad del cambio y se descartó); (3) los faldones, con normales horizontales, se iluminaban como paredes con el Sol rasante y dibujaban una línea brillante: ahora copian la normal del borde.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/terrain.test.ts tests/skycheck.test.ts --reporter=verbose
+   ✓ polar stereographic inverse matches pyproj to 1e-8 degrees (5 puntos de referencia)
+   ✓ <cada sitio>: ENU basis orthonormal, site at the centre of every level (< 0,5 m), holes and skirts
+  terrain: 178 polar nodes within 15 km of Haworth, median |Δh| vs lod0 = 39 m
+   ✓ requests nothing in space scale, then polar + lod0, lod1 and lod2 as the camera closes in
+  precision: |anchor| = 391.1 units, terrain within 9.2 km of the camera, worst float32 error 0.461 mm
+  earth offset at real scale: 8686 km (≈ 1.23° seen from the site)
+   ✓ at λ = 1 the vector site → Earth (with the Earth offset) is the true one
+  sky <cada sitio>: 188 instants, max |Δ earth_el| = 0.005°, max |Δ sun_el| ≤ 0.031°   (escena 3D frente a las series 2D)
+  $ npx vitest run tests/camera.test.ts → camera, 25 plans at 6 h/s: worst view 3.97°, up 3.97°, move 15.2 %
+  $ npm --prefix web test → Test Files 25 passed · Tests 169 passed · typecheck → exit 0
+  $ npm --prefix web run build → index 387.33 kB · renderer 596.37 kB (three.js + escena + terreno)
+  ```
+  En el navegador (Connecting Ridge, llegada 2027-01-02), con la pestaña de red: **ninguna petición de terreno** en el despegue, el tránsito, el inicio del aterrizaje ni las primeras horas de la aproximación; polar, lod0 y lod1 se piden en la aproximación final y lod2 al final. La distancia de la cámara al sitio baja de forma monótona (≈ 58 000 km a T+64 h, ≈ 20 km a T+70 h, 5,2 km en el aterrizaje), sin saltos. Se ve el terreno con relieve a escala real y el cohete en el sitio a tamaño real. Elevación de la Tierra vista desde el sitio el 2027-01-08 23:55 UTC: escena −3,009°, datos −3,013°.
+- **Decisiones tomadas:** reescalado anclado en el sitio dibujado más el desplazamiento de la Tierra (cámara suave y geometría exacta a escala real). Terreno gris sin textura, sombreado por el Sol real (el relieve se lee por la iluminación). Faldones de 120 m.
+- **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/skycheck.test.ts`, la comprobación cruzada 2D/3D, que conviene mantener. El modo de escala de T4.1.b se amplía con la escala local λ.
+- **Problemas abiertos:** el cambio de curvatura durante el reescalado (entre ~24 y 7 km) es visible, aunque continuo. Queda un rastro muy tenue de la costura entre lod1 y lod2 con el Sol rasante.
+- **Siguiente tarea:** T4.3.c.

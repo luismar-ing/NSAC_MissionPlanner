@@ -118,3 +118,16 @@ export function pointToScene(km: Vec3, moonKm: Vec3, mode: ScaleMode = SPACE_SCA
   const nearEarth = exaggerateNear(p, [0, 0, 0], EARTH_RADII_KM.equatorial / mode.kmPerUnit, E);
   return exaggerateNear(nearEarth, toScene(moonKm, mode), MOON_RADIUS_KM / mode.kmPerUnit, E);
 }
+
+/**
+ * Earth offset of the local re-scaling (T4.3.b). The re-scaling is anchored at the site AS DRAWN in space (×6),
+ * which keeps the camera path smooth; but that point is ~8 700 km further out than the true site. To make the
+ * geometry exact at real local scale, the Earth is moved by λ · (drawn site − true site): at λ = 1 the vector
+ * site → Earth is the true one (and site → Moon centre too, see renderer.ts), so the Earth's elevation and
+ * azimuth seen from the site are those of the data. Seen from the site the Earth shifts by ~1.3° in total.
+ */
+export function earthOffset(siteKm: Vec3, moonKm: Vec3, lambda: number): Vec3 {
+  const drawn = pointToScene(siteKm, moonKm, SPACE_SCALE);
+  const real = toScene(siteKm, SPACE_SCALE);
+  return [(drawn[0] - real[0]) * lambda, (drawn[1] - real[1]) * lambda, (drawn[2] - real[2]) * lambda];
+}

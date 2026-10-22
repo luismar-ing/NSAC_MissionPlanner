@@ -29,6 +29,9 @@ export function SceneHost() {
           trajectory,
           timeline: plan && trajectory ? timelineOf(plan, trajectory) : null,
           onCameraModeChange: setCameraMode,
+          onScaleChange: (s) => appStore.getState().setSceneScale(s),
+          siteId: plan?.site_id,
+          loadTerrain: (siteId, lod) => st.data.terrain(siteId, lod),
         });
         setStatus("ready");
       })

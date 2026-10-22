@@ -657,7 +657,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.2.c · **Spec:** 8.3, 9 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba automática sobre la curva de cámara: sin saltos mayores que el umbral entre frames; cancelar devuelve el control al usuario.
 
-##### [ ] T4.3.b — Carga progresiva del terreno y escala local
+##### [x] T4.3.b — Carga progresiva del terreno y escala local
 - **Qué:** LOD del terreno (T2.3.d/e o los sintéticos) cargados por distancia; cambio a escala real local; reubicación del origen para mantener la precisión.
 - **Archivos:** `web/src/scene3d/terrain.ts`
 - **Depende de:** T4.3.a · **Spec:** 5.9, 8.3 · **Decisiones:** D9, D13 · **Est.:** 3 h · **Adelantable**

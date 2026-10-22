@@ -5,7 +5,7 @@ import { timelineOf, type MissionTimeline } from "../lib/mission";
 import { SceneHost } from "../scene3d/SceneHost";
 import { ScaleIndicator } from "../scene3d/ScaleIndicator";
 import { MissionControls } from "../scene3d/MissionControls";
-import { SPACE_SCALE } from "../scene3d/scale";
+import { LOCAL_SCALE, SPACE_SCALE } from "../scene3d/scale";
 
 /**
  * Provisional live view (T4.1.a): the 3D scene of the selected plan, its mission controls (T4.1.d) and a way
@@ -17,6 +17,7 @@ export function LiveStub() {
   const plan = useApp((s) => (s.selectedPlanId ? s.plansById.get(s.selectedPlanId) : undefined));
   const site = useApp((s) => s.sites.find((x) => x.id === plan?.site_id));
   const missionPhase = useApp((s) => s.missionPhase);
+  const sceneScale = useApp((s) => s.sceneScale);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
   const [timeline, setTimeline] = useState<MissionTimeline | null>(null);
 
@@ -41,8 +42,9 @@ export function LiveStub() {
       </div>
       <div className="scene-wrap">
         <SceneHost />
-        {/* spec 8.2: the scale indicator is shown in phases 1 to 3 (launch, transit, landing) */}
-        {missionPhase !== "site" && <ScaleIndicator mode={SPACE_SCALE} />}
+        {/* spec 8.2: the scale indicator is shown in phases 1 to 3 (launch, transit, landing); it says "real
+            scale" once the final approach has switched to it (T4.3.b) */}
+        {missionPhase !== "site" && <ScaleIndicator mode={sceneScale === "local" ? LOCAL_SCALE : SPACE_SCALE} />}
         {/* rule 2: a launch / trajectory that is not real is labelled ILLUSTRATIVE wherever it is shown */}
         {trajectoryMode === "ILLUSTRATIVE" && missionPhase !== "site" && (
           <p className="scene-badge" data-testid="illustrative-label" title={STRINGS.panel.illustrativeTitle}>

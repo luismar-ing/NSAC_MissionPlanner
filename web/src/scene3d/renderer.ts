@@ -13,12 +13,13 @@ import type { MissionTimeline } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { COLORS } from "../styles/tokens";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
-import { CameraController, directorPose, reducedMotionPose, transitPose, type DirectorInput, type Pose } from "./cameraDirector";
+import { CameraController, directorPose, localBlend, reducedMotionPose, transitPose, type DirectorInput, type Pose } from "./cameraDirector";
 import { indexEphemeris, rotate, sceneStateAt } from "./ephemeris";
 import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity } from "./launch";
 import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
-import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, pointToScene, RelativeOrigin, toScene, type Vec3 } from "./scale";
+import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, earthOffset, pointToScene, RelativeOrigin, SPACE_SCALE, toScene, type Vec3 } from "./scale";
 import { siteBodyFixedKm, sitePositionKm, trailSamples, trailStyle } from "./trajectory";
+import { TerrainManager, type TerrainData } from "./terrain";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -103,6 +104,11 @@ export function applyCameraRelative(h: SceneHandle): void {
   }
 }
 
+const unit = (a: Vec3): Vec3 => {
+  const n = Math.hypot(...a) || 1;
+  return [a[0] / n, a[1] / n, a[2] / n];
+};
+
 export interface MountOptions {
   eph: SceneEphemeris;
   /** missionTime (epoch ms, UTC), read every frame. */
@@ -115,7 +121,18 @@ export interface MountOptions {
   timeline: MissionTimeline | null;
   /** Called when the user takes the camera ("manual") or gives it back ("director"). */
   onCameraModeChange?(mode: "director" | "manual"): void;
+  /** Called when the scene switches between space scale (bodies ×6) and real local scale (λ ≥ 0.5). */
+  onScaleChange?(scale: "space" | "local"): void;
+  /** Site id and terrain loader (T4.3.b), called by distance during the final approach only. */
+  siteId?: string;
+  loadTerrain?(siteId: string, lod: number): Promise<TerrainData>;
 }
+
+/** Real size of the rocket at the site, drawn at real local scale (λ = 1): ~100 m, a generic launcher. */
+export const ROCKET_REAL_LENGTH_UNITS = 100 / 1e6;
+/** At real local scale the smooth Moon sphere is drawn this much below the reference radius, so the deepest
+ *  polar craters of the terrain (a few km below it) are not cut by the sphere. */
+const MOON_SPHERE_DROP_KM = 8;
 
 export interface SceneControl {
   unmount(): void;
@@ -194,6 +211,11 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   const landingMs = traj ? parseInstant(traj.phases.landing_utc) : Number.POSITIVE_INFINITY;
   const padUpAtLaunch = padUp(sceneStateAt(ix, launchMs).earthQuat);
   const siteBody = traj ? siteBodyFixedKm(traj, ix) : null;
+  const siteRadiusUnits = siteBody ? Math.hypot(...siteBody) / 1000 : 0; // R + site elevation, real scale
+  // terrain at real local scale (T4.3.b): loaded by distance during the final approach, never before
+  const terrain = siteBody && opts.siteId && opts.loadTerrain ? new TerrainManager(opts.siteId, siteBody, opts.loadTerrain) : null;
+  if (terrain) scene.add(terrain.group);
+  const moonQ = new THREE.Quaternion();
 
   // camera director and user take-over (T4.3.a)
   const controller = new CameraController();
@@ -255,7 +277,9 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   const Y = new THREE.Vector3(0, 1, 0);
   const dir = new THREE.Vector3();
   if (import.meta.env.DEV)
-    (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad, controller, lastPose: () => lastPose };
+    (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad, controller, terrain, lastPose: () => lastPose, lambda: () => lambda };
+  let lambda = 0;
+  let reportedScale: "space" | "local" = "space";
 
   const resize = () => {
     const w = Math.max(1, container.clientWidth);
@@ -284,20 +308,59 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       moonRadius: moonR,
       padUpAtLaunch,
       moonNorth: rotate(state.moonQuat, [0, 0, 1]),
-      site: siteKm ? pointToScene(siteKm, state.moonKm) : moonW,
+      site: moonW, // set just below, once λ is known
     };
+    // local scale λ (T4.3.b): 0 = space scale (bodies ×6), 1 = real local scale at the site
+    lambda = tl ? (reduced?.matches ? (t >= tl.landingMs ? 1 : 0) : localBlend(tl, t)) : 0;
+    // the site as drawn (×6): the fixed point of the re-scaling (the camera path stays smooth)
+    const anchor = siteKm ? pointToScene(siteKm, state.moonKm) : moonW;
+    input.site = anchor;
+    const scaleNow = lambda >= 0.5 ? "local" : "space";
+    if (scaleNow !== reportedScale) {
+      reportedScale = scaleNow;
+      opts.onScaleChange?.(scaleNow);
+    }
+    // …and the Earth moves so that, at real local scale, site → Earth is the true vector
+    earthW = siteKm && lambda > 0 ? earthOffset(siteKm, state.moonKm, lambda) : [0, 0, 0];
+    handle.world.set(bodies.earth, earthW);
+    if (lambda > 0 && siteBody) {
+      // re-scale anchored at the site: the Moon centre slides towards the site and the sphere shrinks to its
+      // real size, so the ground under the camera stays put and only its curvature changes
+      const n = unit([anchor[0] - moonW[0], anchor[1] - moonW[1], anchor[2] - moonW[2]]);
+      const r = Math.hypot(anchor[0] - moonW[0], anchor[1] - moonW[1], anchor[2] - moonW[2]) * (1 - lambda) + siteRadiusUnits * lambda;
+      moonW = [anchor[0] - n[0] * r, anchor[1] - n[1] * r, anchor[2] - n[2] * r];
+      handle.world.set(bodies.moon, moonW);
+      const drawn = moonR * (1 - lambda) + ((MOON_RADIUS_KM - MOON_SPHERE_DROP_KM) / 1000) * lambda;
+      bodies.moon.scale.setScalar(drawn / moonR);
+    } else bodies.moon.scale.setScalar(1);
+    // the Earth also goes back to its real size at real local scale (seen from the site it is a ~1.9° disc,
+    // like in the 2D panorama); it is far away, so no anchoring is needed
+    const earthK = 1 - (1 - 1 / SPACE_SCALE.bodyExaggeration) * lambda;
+    bodies.earth.scale.set(earthK, earthK * (EARTH_RADII_KM.polar / EARTH_RADII_KM.equatorial), earthK);
+
     const pose =
       (controller.mode === "manual" ? controller.manualPose(earthW, moonW) : null) ??
       (tl ? (reduced?.matches ? reducedMotionPose(tl, input) : directorPose(tl, input)) : transitPose(input));
     lastPose = pose;
     handle.cameraWorld = pose.position;
 
+    if (terrain && siteBody) {
+      terrain.update(Math.hypot(pose.position[0] - anchor[0], pose.position[1] - anchor[1], pose.position[2] - anchor[2]), lambda);
+      handle.world.set(terrain.group, anchor);
+      terrain.group.quaternion.copy(moonQ.set(...state.moonQuat)); // Moon-fixed geometry, relative to the site
+    }
+
     if (traj) {
       // rocket: on the pad during the countdown, then the trajectory; after landing it stays on the site,
       // which moves with the Moon
       const stage = launchStage(traj, t);
       const km = t >= landingMs && siteKm ? siteKm : launchPositionKm(traj, state.earthQuat, t);
-      const p = pointToScene(km, state.moonKm);
+      let p = pointToScene(km, state.moonKm);
+      if (lambda > 0 && siteKm) {
+        // near the site, blend its offset from the site between the pushed-out (×6) and the true geometry
+        const trueRel = toScene([km[0] - siteKm[0], km[1] - siteKm[1], km[2] - siteKm[2]]);
+        p = [0, 1, 2].map((c) => anchor[c] + (p[c] - anchor[c]) * (1 - lambda) + trueRel[c] * lambda) as Vec3;
+      }
       handle.world.set(rocket, p);
       if (t >= landingMs) dir.set(input.site[0] - moonW[0], input.site[1] - moonW[1], input.site[2] - moonW[2]); // standing on the site
       else if (stage === "flight") {
@@ -306,10 +369,12 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       } else dir.set(p[0], p[1], p[2]); // standing up and climbing: along the local vertical
       if (dir.lengthSq() > 0) rocket.quaternion.setFromUnitVectors(Y, dir.normalize());
       const dist = Math.hypot(p[0] - pose.position[0], p[1] - pose.position[1], p[2] - pose.position[2]);
-      rocket.scale.setScalar(apparentLength(dist, camera.fov, ROCKET_SCREEN_FRACTION));
+      // enlarged in space (constant apparent size), real size (~100 m) at real local scale
+      rocket.scale.setScalar(apparentLength(dist, camera.fov, ROCKET_SCREEN_FRACTION) * (1 - lambda) + ROCKET_REAL_LENGTH_UNITS * lambda);
       setPlume(plume, plumeIntensity(traj, t));
       // the trail belongs to the flight: hidden once landed (its end stays in space while the Moon moves on)
-      flown.visible = ahead.visible = t < landingMs;
+      flown.visible = ahead.visible = t < landingMs && lambda < 1;
+      (flown.material as THREE.LineBasicMaterial).opacity = (ahead.material as THREE.LineBasicMaterial).opacity = 0.9 * (1 - lambda);
       if (flown.visible) updateTrail(t, state.moonKm, p);
       // pad marker while the launch phase lasts
       pad.visible = t < parseInstant(traj.phases.injection_utc);
@@ -335,6 +400,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       canvas.removeEventListener("wheel", onWheel);
       canvas.removeEventListener("keydown", onKey);
       rendererManager.release();
+      terrain?.dispose();
       scene.traverse((o) => {
         const m = o as THREE.Mesh;
         m.geometry?.dispose();
