@@ -143,6 +143,8 @@ export const STRINGS = {
     error: "The 3D scene could not be started (WebGL unavailable). The 2D comparison still works.",
     title: (site: string) => `Live view · ${site}`,
     illustrative: "Launch from a generic pad and simplified trajectory, computed with the real Moon position",
+    cameraHelp: "3D scene of the selected plan. Drag, use the mouse wheel or the arrow keys and + / − to move the camera yourself.",
+    guided: "Guided camera",
   },
   scale: {
     notToScale: "Not to scale",

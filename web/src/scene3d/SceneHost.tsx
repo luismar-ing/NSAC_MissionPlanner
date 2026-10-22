@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
+import { timelineOf } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { appStore } from "../store/appStore";
 
 /**
  * Hosts the 3D scene. three.js is loaded on demand with a dynamic import (its own chunk), the first time the
  * live view opens; later openings reuse the cached module and the same WebGL context (renderer.ts).
+ * While the user drives the camera (drag, wheel, arrow keys), a button gives it back to the director.
  */
 export function SceneHost() {
   const ref = useRef<HTMLDivElement>(null);
+  const control = useRef<{ unmount(): void; resumeCamera(): void } | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [cameraMode, setCameraMode] = useState<"director" | "manual">("director");
 
   useEffect(() => {
-    let unmount: (() => void) | null = null;
     let cancelled = false;
     const st = appStore.getState();
     const plan = st.selectedPlanId ? st.plansById.get(st.selectedPlanId) : undefined;
@@ -19,28 +22,36 @@ export function SceneHost() {
       .then(([{ mountScene }, eph, trajectory]) => {
         if (cancelled || !ref.current) return;
         const fallback = Date.parse(eph.start_utc);
-        unmount = mountScene(ref.current, {
+        control.current = mountScene(ref.current, {
           eph,
           getTimeMs: () => appStore.getState().missionTime ?? fallback,
           baseUrl: import.meta.env.BASE_URL,
           trajectory,
+          timeline: plan && trajectory ? timelineOf(plan, trajectory) : null,
+          onCameraModeChange: setCameraMode,
         });
         setStatus("ready");
       })
       .catch(() => !cancelled && setStatus("error"));
     return () => {
       cancelled = true;
-      unmount?.();
+      control.current?.unmount();
+      control.current = null;
     };
   }, []);
 
   return (
-    <div ref={ref} className="scene-host" data-testid="scene-host" data-status={status} role="img" aria-label={STRINGS.live.sceneAria}>
+    <div ref={ref} className="scene-host" data-testid="scene-host" data-status={status} data-camera={cameraMode}>
       {status === "loading" && <p className="scene-status">{STRINGS.live.loading}</p>}
       {status === "error" && (
         <p className="scene-status" role="alert">
           {STRINGS.live.error}
         </p>
+      )}
+      {status === "ready" && cameraMode === "manual" && (
+        <button type="button" className="btn scene-camera-btn" onClick={() => control.current?.resumeCamera()}>
+          {STRINGS.live.guided}
+        </button>
       )}
     </div>
   );

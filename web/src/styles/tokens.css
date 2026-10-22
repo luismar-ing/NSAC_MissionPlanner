@@ -1043,3 +1043,17 @@ button {
   color: var(--color-text-muted);
   font-size: var(--font-sm);
 }
+
+/* ------------------------------------------------------------------ camera take-over (T4.3.a) */
+
+.scene-camera-btn {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: var(--color-bg);
+}
+
+.scene-host canvas:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

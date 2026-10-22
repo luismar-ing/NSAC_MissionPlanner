@@ -1953,3 +1953,36 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** la prueba es `trajectory.test.tsx` (necesita jsdom para la etiqueta), no `.ts`.
 - **Problemas abiertos:** ninguno. T4.2 completo.
 - **Siguiente tarea:** T4.3.a.
+
+## 2026-10-22 · T4.3.a · Director de cámara Tierra → Luna → polo sur → sitio
+
+- **Tarea:** T4.3.a — Director de cámara Tierra → Luna → polo sur → sitio ([x]).
+- **Qué se hizo:**
+  - `web/src/scene3d/cameraDirector.ts`: un recorrido continuo según `missionTime`, con un encuadre por fase y mezclas suaves en los cambios de fase (ventanas de 8,5 h en la inyección, 9 h en la llegada a la Luna y 4 h antes del aterrizaje):
+    - **despegue:** vista fija de la Tierra desde encima de la plataforma (el cohete sube y orbita dentro de la vista; seguirlo a 6 h/s haría girar la cámara ~25° por fotograma);
+    - **tránsito:** la línea Tierra–Luna vista desde el lado norte lunar, con la Tierra a la izquierda y la Luna a la derecha. El lado sale del eje de giro de la Luna, cuyo signo no cambia; uno basado en Luna × Sol se invertiría en luna nueva o llena;
+    - **aterrizaje:** acercamiento de 8 a 3 radios lunares, rodeando el polo sur hasta el lado desde el que mira el encuadre del sitio, mientras el objetivo se desliza del centro de la Luna al sitio. El vector «arriba» gira con el barrido, así que nunca queda indefinido al pasar bajo el polo;
+    - **sitio:** a poca altura sobre el punto de aterrizaje, mirándolo con el horizonte a la vista.
+  - Las mezclas interpolan la posición y la distancia, y la orientación entera (vista y «arriba») con slerp de cuaterniones. Mezclar vista y «arriba» por separado fallaba en fechas en que los dos «arriba» eran casi opuestos.
+  - **Cancelable:** arrastrar, la rueda o las flechas (y + / −) con el canvas enfocado le dan la cámara al usuario sin salto. La cámara orbita el cuerpo más cercano y lo sigue mientras se mueve; el botón «Guided camera» la devuelve al director.
+  - **Movimiento reducido** (`prefers-reduced-motion`): un encuadre fijo por fase, con un corte en cada cambio y sin barridos.
+  - Corrección encontrada aquí: tras el aterrizaje el cohete se quedaba en el último punto de la trayectoria, fijo en el espacio, mientras la Luna avanzaba ~3 600 km/h. Ahora el sitio se fija al marco lunar (`siteBodyFixedKm` / `sitePositionKm`) y el cohete se mueve con la Luna. La estela se oculta al aterrizar.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/camera.test.ts --reporter=verbose
+  camera haworth_20270309_7d: per frame at 6 h/s → view 2.32°, up 2.32°, move 6.6 % of the distance; at 1 h/s → 0.39°, 0.39°, 1.1 %
+  camera connecting_ridge_20270102_7d: per frame at 6 h/s → view 2.66°, up 2.66°, move 6.2 %; at 1 h/s → 0.44°, 0.44°, 1.1 %
+  camera malapert_massif_20271015_14d: per frame at 6 h/s → view 2.24°, up 2.24°, move 6.4 %; at 1 h/s → 0.37°, 0.37°, 1.1 %
+  camera, 25 plans at 6 h/s: worst view 2.69°, up 2.70°, move 6.6 %          (umbrales: 6°, 6°, 20 %)
+   ✓ continuous path, no jumps between frames (3 planes + 25 planes de todos los sitios a lo largo del año)
+   ✓ ends at the site framing exactly at landing, after travelling Earth → Moon
+   ✓ reduced motion: holds one framing per phase
+   ✓ user take-over (cancel) and guided camera: sin salto al tomar el control, órbita y zoom, sigue a la Luna, resume
+  $ npm --prefix web test → Tests 154 passed · typecheck → exit 0
+  ```
+  La prueba recorre la misión entera fotograma a fotograma, a 6 h/s (6 min de misión por fotograma a 60 fps) y a 1 h/s. Fue útil: detectó cuatro fallos que solo aparecían en ciertas fases o fechas (el objetivo saltando en la última hora; «arriba» indefinido bajo el polo; el lado del tránsito invirtiéndose; «arriba» casi opuestos en la inyección). Están todos corregidos.
+  En el navegador: despegue (la Tierra de cerca, con la plataforma), tránsito (Tierra a la izquierda, Luna a la derecha), aterrizaje (Luna a 4,25 radios, mitad iluminada, con la estela llegando) y sitio (cohete en la superficie del polo sur, Tierra sobre el horizonte). Durante la revisión, la cámara apareció en modo manual por una interacción con el panel; apareció el botón «Guided camera» y al pulsarlo el director retomó el encuadre de aterrizaje.
+- **Decisiones tomadas:** encuadre fijo en el despegue, sin seguir al cohete. Tránsito con la Tierra a la izquierda y la Luna a la derecha. La cámara manual sigue al cuerpo más cercano.
+- **Desviaciones de la spec / cambios en la guía:** ninguno. El zoom a escala real local y el terreno son de T4.3.b.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.3.b.

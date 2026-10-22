@@ -7,14 +7,18 @@
  * lands in its own chunk and the 2D shell does not download it.
  */
 import * as THREE from "three";
-import { COLORS } from "../styles/tokens";
 import type { SceneEphemeris, Trajectory } from "../lib/contract";
-import { launchPositionKm, launchStage, padPositionKm, plumeIntensity } from "./launch";
-import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
+import { parseInstant } from "../lib/contract";
+import type { MissionTimeline } from "../lib/mission";
+import { STRINGS } from "../lib/strings";
+import { COLORS } from "../styles/tokens";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
-import { indexEphemeris, sceneStateAt } from "./ephemeris";
-import { pointToScene, RelativeOrigin, toScene, type Vec3 } from "./scale";
-import { trailSamples, trailStyle } from "./trajectory";
+import { CameraController, directorPose, reducedMotionPose, transitPose, type DirectorInput, type Pose } from "./cameraDirector";
+import { indexEphemeris, rotate, sceneStateAt } from "./ephemeris";
+import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity } from "./launch";
+import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
+import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, pointToScene, RelativeOrigin, toScene, type Vec3 } from "./scale";
+import { siteBodyFixedKm, sitePositionKm, trailSamples, trailStyle } from "./trajectory";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -107,36 +111,24 @@ export interface MountOptions {
   baseUrl: string;
   /** Trajectory of the selected plan (launch, ascent and flight of the rocket); null hides the rocket. */
   trajectory: Trajectory | null;
+  /** Mission timeline of the plan (drives the camera director); null keeps the transit framing. */
+  timeline: MissionTimeline | null;
+  /** Called when the user takes the camera ("manual") or gives it back ("director"). */
+  onCameraModeChange?(mode: "director" | "manual"): void;
 }
 
-const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const unit = (a: Vec3): Vec3 => {
-  const n = Math.hypot(...a) || 1;
-  return [a[0] / n, a[1] / n, a[2] / n];
-};
-
-/**
- * Overview framing (until the camera director of T4.3.a): from above the Earth–Moon line, on the side of the
- * orbit normal, looking at the midpoint, with celestial north up. Shows both bodies and the Moon's phase.
- */
-export function overviewCamera(moonScene: Vec3, sunDir: Vec3): { position: Vec3; target: Vec3; up: Vec3 } {
-  const d = Math.hypot(...moonScene);
-  const n = unit(cross(moonScene, sunDir));
-  const along = unit(moonScene);
-  const target: Vec3 = [moonScene[0] / 2, moonScene[1] / 2, moonScene[2] / 2];
-  const position: Vec3 = [0, 1, 2].map((i) => target[i] + n[i] * d * 1.15 - along[i] * d * 0.25) as Vec3;
-  const view = unit([target[0] - position[0], target[1] - position[1], target[2] - position[2]]);
-  const z: Vec3 = [0, 0, 1];
-  const dz = view[2];
-  const up: Vec3 = Math.abs(dz) > 0.98 ? [0, 1, 0] : unit([z[0] - dz * view[0], z[1] - dz * view[1], z[2] - dz * view[2]]);
-  return { position, target, up };
+export interface SceneControl {
+  unmount(): void;
+  /** Gives the camera back to the director (guided camera). */
+  resumeCamera(): void;
 }
 
 /**
- * Mounts the live scene into `container` and returns the unmount function: the Earth, the Moon, the Sun and
- * the stars at missionTime (T4.1.c), on the single renderer (T4.1.a) with camera-relative rendering (T4.1.b).
+ * Mounts the live scene into `container`: the Earth, the Moon, the Sun and the stars at missionTime (T4.1.c),
+ * the rocket, its launch and its trail (T4.2), and the camera director with user take-over (T4.3.a), on the
+ * single renderer (T4.1.a) with camera-relative rendering (T4.1.b).
  */
-export function mountScene(container: HTMLElement, opts: MountOptions): () => void {
+export function mountScene(container: HTMLElement, opts: MountOptions): SceneControl {
   const renderer = rendererManager.acquire(container);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, CAMERA_NEAR, CAMERA_FAR);
@@ -144,6 +136,8 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
   const ix = indexEphemeris(opts.eph);
   const bodies = createBodies(scene);
   loadTextures(bodies, opts.baseUrl, renderer instanceof THREE.WebGLRenderer ? renderer.capabilities.maxTextureSize : 4096);
+  const traj = opts.trajectory;
+  const tl = opts.timeline;
   const rocket = createRocket();
   const plume = createPlume();
   rocket.add(plume);
@@ -151,10 +145,11 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
   pad.name = "launch-pad";
   pad.scale.set(0.012, 0.012, 1);
   scene.add(rocket, pad);
-  rocket.visible = pad.visible = opts.trajectory !== null;
+  rocket.visible = pad.visible = traj !== null;
+
   // trail (T4.2.c): flown part in light text, remaining part in medium grey; dashed if ILLUSTRATIVE (rule 2)
-  const trail = opts.trajectory ? trailSamples(opts.trajectory) : null;
-  const style = opts.trajectory ? trailStyle(opts.trajectory.mode) : null;
+  const trail = traj ? trailSamples(traj) : null;
+  const style = traj ? trailStyle(traj.mode) : null;
   const makeLine = (color: string) => {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(((trail?.km.length ?? 0) + 1) * 3), 3));
@@ -191,9 +186,76 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
     fill(flown, 0, Math.min(split, trail.km.length - 1), rocketAt, null);
     fill(ahead, split, trail.km.length, null, rocketAt);
   };
+
+  // fixed facts of the plan for the camera and the rocket
+  const earthR = bodyRadius(EARTH_RADII_KM.equatorial);
+  const moonR = bodyRadius(MOON_RADIUS_KM);
+  const launchMs = traj ? parseInstant(traj.phases.launch_utc) : ix.startMs;
+  const landingMs = traj ? parseInstant(traj.phases.landing_utc) : Number.POSITIVE_INFINITY;
+  const padUpAtLaunch = padUp(sceneStateAt(ix, launchMs).earthQuat);
+  const siteBody = traj ? siteBodyFixedKm(traj, ix) : null;
+
+  // camera director and user take-over (T4.3.a)
+  const controller = new CameraController();
+  const reduced = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  let lastPose: Pose | null = null;
+  let earthW: Vec3 = [0, 0, 0];
+  let moonW: Vec3 = [0, 0, 0];
+  const canvas = renderer.domElement;
+  canvas.tabIndex = 0;
+  canvas.setAttribute("aria-label", STRINGS.live.cameraHelp);
+  const takeOver = () => {
+    if (lastPose && controller.mode === "director") {
+      controller.cancel(lastPose, earthW, moonW);
+      opts.onCameraModeChange?.("manual");
+    }
+  };
+  const minDist = () => (controller.orbit?.body === "moon" ? moonR : earthR) * 0.05;
+  let drag: { x: number; y: number } | null = null;
+  const onDown = (e: PointerEvent) => {
+    takeOver();
+    drag = { x: e.clientX, y: e.clientY };
+    canvas.setPointerCapture?.(e.pointerId);
+  };
+  const onMove = (e: PointerEvent) => {
+    if (!drag) return;
+    controller.rotate(-(e.clientX - drag.x) * 0.005, (e.clientY - drag.y) * 0.005);
+    drag = { x: e.clientX, y: e.clientY };
+  };
+  const onUp = () => {
+    drag = null;
+  };
+  const onWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    takeOver();
+    controller.zoom(e.deltaY > 0 ? 1.1 : 1 / 1.1, minDist());
+  };
+  const onKey = (e: KeyboardEvent) => {
+    const keys: Record<string, () => void> = {
+      ArrowLeft: () => controller.rotate(0.06, 0),
+      ArrowRight: () => controller.rotate(-0.06, 0),
+      ArrowUp: () => controller.rotate(0, 0.06),
+      ArrowDown: () => controller.rotate(0, -0.06),
+      "+": () => controller.zoom(1 / 1.15, minDist()),
+      "-": () => controller.zoom(1.15, minDist()),
+    };
+    const action = keys[e.key];
+    if (!action) return;
+    e.preventDefault();
+    takeOver();
+    action();
+  };
+  canvas.addEventListener("pointerdown", onDown);
+  canvas.addEventListener("pointermove", onMove);
+  canvas.addEventListener("pointerup", onUp);
+  canvas.addEventListener("pointercancel", onUp);
+  canvas.addEventListener("wheel", onWheel, { passive: false });
+  canvas.addEventListener("keydown", onKey);
+
   const Y = new THREE.Vector3(0, 1, 0);
   const dir = new THREE.Vector3();
-  if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad };
+  if (import.meta.env.DEV)
+    (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad, controller, lastPose: () => lastPose };
 
   const resize = () => {
     const w = Math.max(1, container.clientWidth);
@@ -206,49 +268,83 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
   resize();
   const ro = new ResizeObserver(resize);
   ro.observe(container);
+
   renderer.setAnimationLoop(() => {
     const t = opts.getTimeMs();
     const state = sceneStateAt(ix, t);
     updateBodies(bodies, state, handle);
-    const cam = overviewCamera(toScene(state.moonKm), state.sunDir);
-    handle.cameraWorld = cam.position;
-    const traj = opts.trajectory;
+    earthW = [0, 0, 0];
+    moonW = toScene(state.moonKm);
+    const siteKm = siteBody ? sitePositionKm(siteBody, state.moonKm, state.moonQuat) : null;
+    const input: DirectorInput = {
+      t,
+      moon: moonW,
+      sunDir: state.sunDir,
+      earthRadius: earthR,
+      moonRadius: moonR,
+      padUpAtLaunch,
+      moonNorth: rotate(state.moonQuat, [0, 0, 1]),
+      site: siteKm ? pointToScene(siteKm, state.moonKm) : moonW,
+    };
+    const pose =
+      (controller.mode === "manual" ? controller.manualPose(earthW, moonW) : null) ??
+      (tl ? (reduced?.matches ? reducedMotionPose(tl, input) : directorPose(tl, input)) : transitPose(input));
+    lastPose = pose;
+    handle.cameraWorld = pose.position;
+
     if (traj) {
-      // rocket: on the pad during the countdown, then the trajectory (T4.2.b; whole flight refined in T4.2.c)
+      // rocket: on the pad during the countdown, then the trajectory; after landing it stays on the site,
+      // which moves with the Moon
       const stage = launchStage(traj, t);
-      const p = pointToScene(launchPositionKm(traj, state.earthQuat, t), state.moonKm);
+      const km = t >= landingMs && siteKm ? siteKm : launchPositionKm(traj, state.earthQuat, t);
+      const p = pointToScene(km, state.moonKm);
       handle.world.set(rocket, p);
-      if (stage === "flight") {
-        const ahead = pointToScene(launchPositionKm(traj, state.earthQuat, t + 120_000), state.moonKm);
-        dir.set(ahead[0] - p[0], ahead[1] - p[1], ahead[2] - p[2]);
+      if (t >= landingMs) dir.set(input.site[0] - moonW[0], input.site[1] - moonW[1], input.site[2] - moonW[2]); // standing on the site
+      else if (stage === "flight") {
+        const next = pointToScene(launchPositionKm(traj, state.earthQuat, t + 120_000), state.moonKm);
+        dir.set(next[0] - p[0], next[1] - p[1], next[2] - p[2]);
       } else dir.set(p[0], p[1], p[2]); // standing up and climbing: along the local vertical
       if (dir.lengthSq() > 0) rocket.quaternion.setFromUnitVectors(Y, dir.normalize());
-      const dist = Math.hypot(p[0] - cam.position[0], p[1] - cam.position[1], p[2] - cam.position[2]);
+      const dist = Math.hypot(p[0] - pose.position[0], p[1] - pose.position[1], p[2] - pose.position[2]);
       rocket.scale.setScalar(apparentLength(dist, camera.fov, ROCKET_SCREEN_FRACTION));
       setPlume(plume, plumeIntensity(traj, t));
-      updateTrail(t, state.moonKm, p);
+      // the trail belongs to the flight: hidden once landed (its end stays in space while the Moon moves on)
+      flown.visible = ahead.visible = t < landingMs;
+      if (flown.visible) updateTrail(t, state.moonKm, p);
       // pad marker while the launch phase lasts
-      pad.visible = t < Date.parse(traj.phases.injection_utc);
+      pad.visible = t < parseInstant(traj.phases.injection_utc);
       if (pad.visible) handle.world.set(pad, pointToScene(padPositionKm(state.earthQuat), state.moonKm));
     }
     applyCameraRelative(handle);
-    camera.up.set(...cam.up);
-    camera.lookAt(cam.target[0] - cam.position[0], cam.target[1] - cam.position[1], cam.target[2] - cam.position[2]);
+    camera.up.set(...pose.up);
+    camera.lookAt(pose.target[0] - pose.position[0], pose.target[1] - pose.position[1], pose.target[2] - pose.position[2]);
     renderer.render(scene, camera);
   });
 
-  return () => {
-    ro.disconnect();
-    rendererManager.release();
-    scene.traverse((o) => {
-      const m = o as THREE.Mesh;
-      m.geometry?.dispose();
-      const mats = (Array.isArray(m.material) ? m.material : m.material ? [m.material] : []) as THREE.Material[];
-      for (const mat of mats) {
-        (mat as THREE.MeshStandardMaterial).map?.dispose();
-        mat.dispose();
-      }
-    });
-    scene.clear();
+  return {
+    resumeCamera() {
+      controller.resume();
+      opts.onCameraModeChange?.("director");
+    },
+    unmount() {
+      ro.disconnect();
+      canvas.removeEventListener("pointerdown", onDown);
+      canvas.removeEventListener("pointermove", onMove);
+      canvas.removeEventListener("pointerup", onUp);
+      canvas.removeEventListener("pointercancel", onUp);
+      canvas.removeEventListener("wheel", onWheel);
+      canvas.removeEventListener("keydown", onKey);
+      rendererManager.release();
+      scene.traverse((o) => {
+        const m = o as THREE.Mesh;
+        m.geometry?.dispose();
+        const mats = (Array.isArray(m.material) ? m.material : m.material ? [m.material] : []) as THREE.Material[];
+        for (const mat of mats) {
+          (mat as THREE.MeshStandardMaterial).map?.dispose();
+          mat.dispose();
+        }
+      });
+      scene.clear();
+    },
   };
 }

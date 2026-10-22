@@ -651,7 +651,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T4.3 Transición de zoom y terreno (spec 8.3)
 
-##### [ ] T4.3.a — Director de cámara Tierra → Luna → polo sur → sitio
+##### [x] T4.3.a — Director de cámara Tierra → Luna → polo sur → sitio
 - **Qué:** recorrido continuo por keyframes ligado a `missionPhase`, cancelable por el usuario, con variante de movimiento reducido.
 - **Archivos:** `web/src/scene3d/cameraDirector.ts`, `web/tests/camera.test.ts`
 - **Depende de:** T4.2.c · **Spec:** 8.3, 9 · **Decisiones:** — · **Est.:** 3 h · **Adelantable**

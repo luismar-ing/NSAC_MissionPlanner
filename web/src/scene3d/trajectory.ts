@@ -10,6 +10,7 @@
 import type { Trajectory } from "../lib/contract";
 import { parseInstant } from "../lib/contract";
 import type { Vec3 } from "./scale";
+import { conjugate, rotate, sceneStateAt, type EphemerisIndex } from "./ephemeris";
 
 function index(traj: Trajectory, s: number): number {
   // last k with t_s[k] <= s (binary search), kept in [0, n − 2]
@@ -73,4 +74,25 @@ export interface TrailStyle {
 /** Spec 9 / rule 2: REAL → solid trail; ILLUSTRATIVE → dashed trail with its label. */
 export function trailStyle(mode: Trajectory["mode"]): TrailStyle {
   return mode === "REAL" ? { dashed: false, label: false } : { dashed: true, label: true };
+}
+
+/* ------------------------------------------------------------------ the site after landing */
+
+
+/**
+ * Landing point in the Moon-fixed frame (MOON_ME, km from the Moon centre), from the trajectory's last point
+ * and the Moon at landing_utc. After landing the rocket stays there and moves with the Moon (translation and
+ * rotation), instead of staying at a fixed point in space while the Moon moves on (~3 600 km/h).
+ */
+export function siteBodyFixedKm(traj: Trajectory, ix: EphemerisIndex): Vec3 {
+  const s = sceneStateAt(ix, parseInstant(traj.phases.landing_utc));
+  const last = traj.pos_km[traj.pos_km.length - 1];
+  const rel: Vec3 = [last[0] - s.moonKm[0], last[1] - s.moonKm[1], last[2] - s.moonKm[2]];
+  return rotate(conjugate(s.moonQuat), rel);
+}
+
+/** Site position (km, J2000, Earth-centred) at the state's instant. */
+export function sitePositionKm(siteBody: Vec3, moonKm: Vec3, moonQuat: [number, number, number, number]): Vec3 {
+  const r = rotate(moonQuat, siteBody);
+  return [moonKm[0] + r[0], moonKm[1] + r[1], moonKm[2] + r[2]];
 }
