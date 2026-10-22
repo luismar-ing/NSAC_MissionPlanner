@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { openLive, panelSelector, playFrom, takeCollapseOrigin } from "../lib/modeTransition";
 import { loadPlanData, type PlanData } from "../lib/planData";
 import { sharedElevationScale } from "../lib/scale";
 import { CompareScrubber } from "../components/CompareScrubber";
@@ -41,6 +42,17 @@ export function Tray() {
   const scale = useMemo(() => sharedElevationScale(visible), [key]);
   const best = useMemo(() => bestBadges(visible.map((p) => p.metrics)), [key]);
 
+  // back from live mode: once the panels are in place, the selected one grows back out of the scene (FLIP)
+  const complete = visible.length === ids.length;
+  useLayoutEffect(() => {
+    if (!complete) return;
+    const from = takeCollapseOrigin();
+    const el = selectedPlanId ? document.querySelector<HTMLElement>(panelSelector(selectedPlanId)) : null;
+    if (!from || !el) return;
+    el.scrollIntoView?.({ block: "center" });
+    playFrom(el, from);
+  }, [complete]);
+
   if (!ids.length) return <p className="placeholder">{STRINGS.trayEmpty}</p>;
   return (
     <>
@@ -70,6 +82,7 @@ export function Tray() {
             best={best[i]}
             onSelect={() => selectPlan(p.plan.id)}
             onUnpin={() => unpinPlan(p.plan.id)}
+            onLive={() => openLive(p.plan.id)}
           />
         ))}
       </div>

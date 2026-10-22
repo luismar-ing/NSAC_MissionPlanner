@@ -1089,3 +1089,124 @@ button {
     transform: none;
   }
 }
+
+/* ------------------------------------------------------------------ compare ↔ live (T4.4.a) */
+
+.live-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 232px;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.live-main {
+  min-width: 0;
+}
+
+.live-head kbd {
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.scene-wrap {
+  will-change: transform;
+}
+
+.thumb-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.thumb-clock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+.thumb-clock .mono {
+  color: var(--color-text);
+}
+
+.thumb-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thumb {
+  display: grid;
+  grid-template-rows: auto 92px 40px auto;
+  gap: 6px;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.thumb-head {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.thumb-head .plan-site {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thumb-head .plan-meta {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.thumb-silhouette {
+  min-height: 0;
+}
+
+.thumb-score {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.thumb-score .mono {
+  color: var(--color-text);
+}
+
+.live-btn {
+  padding: 2px 10px;
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+}
+
+/* narrow screens: the strip becomes a scrollable row above the controls */
+@media (max-width: 960px) {
+  .live-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .thumb-list {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .thumb-list > li {
+    flex: 0 0 200px;
+  }
+}

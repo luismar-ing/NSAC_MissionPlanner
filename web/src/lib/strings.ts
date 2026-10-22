@@ -56,6 +56,8 @@ export const STRINGS = {
     aria: (site: string, date: string, L: number) => `Plan: ${site}, arrival ${date}, ${L}-day window`,
     illustrativeTitle: "The trajectory of this plan is ILLUSTRATIVE: simplified, computed with the real Moon position; not a real mission trajectory.",
     unpin: (site: string) => `Remove ${site} from the comparison`,
+    live: (site: string) => `Open ${site} in the 3D live view`,
+    liveShort: "3D",
     pinOneMore: "Pin at least one more plan to compare.",
     best: "Best",
     bestTitle: "Best value of this metric among the plans in the tray (ties share the badge).",
@@ -146,6 +148,12 @@ export const STRINGS = {
     cameraHelp: "3D scene of the selected plan. Drag, use the mouse wheel or the arrow keys and + / − to move the camera yourself.",
     guided: "Guided camera",
     arrived: (site: string) => `Arrived at ${site}. The horizon panorama and the site features are shown below the scene.`,
+  },
+  thumbs: {
+    aria: "Other pinned plans, at the same time since arrival as the live plan",
+    title: "Other plans · since arrival",
+    empty: "Pin more plans in the tray to compare them here.",
+    score: "Score",
   },
   scale: {
     notToScale: "Not to scale",

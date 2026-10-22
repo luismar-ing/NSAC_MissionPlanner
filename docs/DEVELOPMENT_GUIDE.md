@@ -671,7 +671,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T4.4 Modo comparar ↔ modo vivir (spec 8.0)
 
-##### [ ] T4.4.a — Transición entre modos
+##### [x] T4.4.a — Transición entre modos
 - **Qué:** el panel seleccionado se expande a la escena (200–400 ms) y los demás pasan a una franja de miniaturas 2D vivas y enlazadas; Esc o un botón vuelven a comparar.
 - **Archivos:** `web/src/views/LiveView.tsx`, `web/src/panels2d/ThumbnailStrip.tsx`
 - **Depende de:** T4.1.a, T3.3.e · **Spec:** 8.0, 9 · **Decisiones:** — · **Est.:** 2.5 h · **Adelantable**

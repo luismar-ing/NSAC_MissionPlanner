@@ -2037,3 +2037,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/views/useSiteData.ts` (hook compartido; `SiteSection.tsx` solo cambia para usarlo) y `web/tests/liveView.test.tsx`; `LiveStub.tsx` se elimina un paso antes de lo previsto (T4.4.a amplía `LiveView`).
 - **Problemas abiertos:** ninguno nuevo.
 - **Siguiente tarea:** T4.4.a.
+
+## 2026-10-22 · T4.4.a · Transición entre modos
+
+- **Tarea:** T4.4.a — Transición entre modos comparar ↔ vivir ([x]).
+- **Qué se hizo:**
+  - Cada panel de la bandeja tiene un botón **3D** («Open {site} in the 3D live view») que selecciona el plan y abre el modo vivir. La escena **crece desde el rectángulo del panel** (animación FLIP de 300 ms con la Web Animations API; sin animación si el usuario pide movimiento reducido). Al volver, el panel del plan seleccionado se desplaza a la vista y **crece desde el rectángulo de la escena** (otros 300 ms). Lógica en `web/src/lib/modeTransition.ts` (`openLive`, `closeLive`, `playFrom`).
+  - **Esc** o el botón «Back to compare» vuelven a comparar. El estado global no se toca: anclados, selección, ventana, restricciones, reloj relativo, exageración y reloj de misión. Si se vuelve a abrir el mismo plan, la misión sigue donde estaba; con otro plan empieza en el despegue.
+  - `web/src/panels2d/ThumbnailStrip.tsx`: en modo vivir, los **demás planes anclados** pasan a una franja de miniaturas 2D (silueta con Sol y Tierra, cinta de tiempo y score; SVG, sin WebGL), a la derecha de la escena (o en fila desplazable en pantallas estrechas). Siguen **vivas y enlazadas**: muestran su sitio en el mismo momento de la estancia que el plan en vivo («horas desde la llegada», el reloj relativo de la bandeja; antes del aterrizaje esperan en la llegada), con la misma escala vertical compartida y la exageración de la bandeja.
+  - `LiveView.tsx` reorganizado en escena + franja; «Open 3D view» de la sección del sitio usa la misma transición.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/modeTransition.test.tsx
+   ✓ a panel's 3D button opens live mode on that plan; the others become thumbnails; Esc and the button go back with the state kept
+   ✓ 10 round trips leave the state as it was
+   ✓ the thumbnails are linked: they follow the live plan's clock as hours since arrival (30 h → "Day 2, 06:00", muestra 60 en cada miniatura)
+  $ npm --prefix web test → Test Files 27 passed · Tests 175 passed · typecheck → exit 0
+  ```
+  En el navegador (3 planes anclados), contando los contextos con un envoltorio de `getContext`: tras **10 idas y vueltas** (botón 3D → Esc) hay **1 contexto WebGL**, el estado es idéntico y en modo comparar no queda ningún canvas WebGL en el DOM (el único canvas es el del calendario, Canvas 2D). La escena entra con una animación de 300 ms desde el panel (a 120 ms: `matrix(0.978, …, 1.042, …, −24)`) y al volver el panel de Malapert anima 300 ms, queda seleccionado y a la vista. Franja de miniaturas a la derecha a 1400 px; debajo a 774 px.
+- **Decisiones tomadas:** el modo vivir se abre con un botón 3D explícito en cada panel. Pulsar el título sigue solo seleccionando, para no perder el panorama de la vista de comparación (spec 8.1 dice que seleccionar dispara la transición; se separa en dos gestos y queda anotado). La franja muestra solo los otros planes (spec 8.0: «los demás»).
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/lib/modeTransition.ts`, `web/tests/modeTransition.test.tsx`, y cambios pequeños en `PlanPanel.tsx`, `Tray.tsx` y `SiteSection.tsx` (botón y animación de vuelta).
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.4.b.

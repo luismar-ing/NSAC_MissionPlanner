@@ -16,19 +16,21 @@ interface Props {
   best: Set<MetricKey>;
   onSelect(): void;
   onUnpin(): void;
+  onLive(): void; // open this plan in live mode (spec 8.0, 8.1)
 }
 
 /**
  * One comparison panel (spec 8.1). Identical format for every plan; the silhouette (T3.3.b), the timeline
  * (T3.3.c) and the metrics box (T3.3.d) fill the reserved slots.
  */
-export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration, compareTime, best, onSelect, onUnpin }: Props) {
+export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration, compareTime, best, onSelect, onUnpin, onLive }: Props) {
   const { plan, site } = data;
   return (
     <article
       className={`plan-panel${selected ? " selected" : ""}`}
       aria-label={STRINGS.panel.aria(site.name, plan.arrival_utc.slice(0, 10), plan.window_days)}
       data-testid="plan-panel"
+      data-plan-id={plan.id}
       data-scale={`${scale.minDeg}:${scale.maxDeg}`}
     >
       <header className="plan-panel-header">
@@ -43,6 +45,9 @@ export function PlanPanel({ data, scale, trajectoryMode, selected, exaggeration,
             ILLUSTRATIVE
           </span>
         )}
+        <button type="button" className="btn live-btn" onClick={onLive} aria-label={STRINGS.panel.live(site.name)} title={STRINGS.panel.live(site.name)}>
+          {STRINGS.panel.liveShort}
+        </button>
         <button type="button" className="icon-btn" onClick={onUnpin} aria-label={STRINGS.panel.unpin(site.name)}>
           ×
         </button>

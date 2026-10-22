@@ -1,4 +1,5 @@
 import { STRINGS } from "../lib/strings";
+import { openLive } from "../lib/modeTransition";
 import { useApp } from "../store/appStore";
 import { TimeControl } from "../components/TimeControl";
 import { Panorama } from "./Panorama";
@@ -12,7 +13,6 @@ import { useSiteData } from "./useSiteData";
 export function SiteSection() {
   const selectedPlanId = useApp((s) => s.selectedPlanId);
   const missionTime = useApp((s) => s.missionTime);
-  const setViewMode = useApp((s) => s.setViewMode);
   const { plan, site, pinned, error } = useSiteData();
 
   if (!selectedPlanId) return <p className="placeholder">{STRINGS.site.empty}</p>;
@@ -24,7 +24,7 @@ export function SiteSection() {
         <p>
           <strong>{plan.site.name}</strong> · {STRINGS.arrival} {plan.plan.arrival_utc.slice(0, 10)} · {STRINGS.windowDays(plan.plan.window_days)}
         </p>
-        <button type="button" className="btn" onClick={() => setViewMode("live")}>
+        <button type="button" className="btn" onClick={() => openLive(plan.plan.id)}>
           {STRINGS.live.open}
         </button>
       </div>
