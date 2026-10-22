@@ -46,6 +46,9 @@ export interface AppState {
   missionPhase: MissionPhase;
   missionTime: number | null; // absolute instant (epoch ms, UTC) of the selected plan's mission clock
   compareTime: number; // relative clock shared by the 2D panels: hours since arrival
+  // The two clocks are linked (spec 4.1: choosing a time in one view updates the others): while the mission
+  // clock is inside the selected plan's window, compareTime = hours since its arrival, and moving the tray
+  // clock moves the mission clock to the same moment of the selected plan's stay.
   exaggeration: number | null; // vertical exaggeration of the 2D silhouettes; null = fit the shared range
   setExaggeration(x: number | null): void;
   notice: string | null; // last user-facing message (e.g. tray full)
@@ -144,16 +147,26 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
       if (id === null) return set({ selectedPlanId: null, missionTime: null, missionPhase: "overview" });
       const plan = get().plansById.get(id);
       if (!plan) return set({ notice: `Unknown plan ${id}` });
+      // the new plan opens at the tray's moment of the stay (linked clocks), or at arrival if outside its window
+      const h = get().compareTime;
       set({
         selectedPlanId: id,
         selectedSite: plan.site_id,
         selectedWindow: plan.window_days,
-        missionTime: Date.parse(plan.arrival_utc),
+        missionTime: Date.parse(plan.arrival_utc) + (h < plan.window_days * 24 ? h * 3_600_000 : 0),
         missionPhase: "overview",
       });
     },
 
     selectSite(siteId) {
+      // choosing a site keeps the selected arrival date and window: the plan moves to the same cell of that
+      // site's row (every site x day x L combination exists, D6)
+      const st = get();
+      const sel = st.selectedPlanId ? st.plansById.get(st.selectedPlanId) : undefined;
+      if (siteId && sel && sel.site_id !== siteId) {
+        const id = siteId + sel.id.slice(sel.site_id.length);
+        if (st.plansById.has(id)) return st.selectPlan(id);
+      }
       set({ selectedSite: siteId });
     },
 
@@ -194,13 +207,21 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     },
 
     setMissionTime(ms) {
-      set({ missionTime: ms });
+      const plan = get().selectedPlanId ? get().plansById.get(get().selectedPlanId as string) : undefined;
+      const h = plan && ms !== null ? (ms - Date.parse(plan.arrival_utc)) / 3_600_000 : -1;
+      // inside the plan's window the tray follows (linked clocks); launch and transit leave it where it is
+      if (plan && h >= 0 && h <= plan.window_days * 24) set({ missionTime: ms, compareTime: h });
+      else set({ missionTime: ms });
     },
 
     setCompareTime(hours) {
       // Clamp to the longest window (spec 8.1: day and hour since arrival)
       const maxH = 24 * Math.max(...(get().manifest?.params.window_days ?? [14]));
-      set({ compareTime: Math.min(Math.max(hours, 0), maxH) });
+      const h = Math.min(Math.max(hours, 0), maxH);
+      const plan = get().selectedPlanId ? get().plansById.get(get().selectedPlanId as string) : undefined;
+      // the selected plan's clock follows while the tray time is inside its window (linked clocks)
+      if (plan && h <= plan.window_days * 24) set({ compareTime: h, missionTime: Date.parse(plan.arrival_utc) + h * 3_600_000 });
+      else set({ compareTime: h });
     },
 
     clearNotice() {

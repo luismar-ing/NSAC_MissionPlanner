@@ -45,6 +45,8 @@ export function Calendar() {
   const comparePlans = useApp((s) => s.comparePlans);
   const plansById = useApp((s) => s.plansById);
   const selectPlan = useApp((s) => s.selectPlan);
+  const selectedSite = useApp((s) => s.selectedSite);
+  const selectSite = useApp((s) => s.selectSite);
   const pinPlan = useApp((s) => s.pinPlan);
   const range = useApp((s) => s.selectedRange);
   const setRange = useApp((s) => s.setRange);
@@ -154,12 +156,18 @@ export function Calendar() {
         ctx.stroke();
         ctx.restore();
       }
-      ctx.fillStyle = COLORS.text;
-      ctx.font = `${FONT.size.md}px ${FONT.family}`;
-      ctx.textBaseline = "middle";
       const [, y] = cellRect(layout, s, 0);
       const name = sites.find((x) => x.id === index.siteIds[s])?.name ?? index.siteIds[s];
-      ctx.fillText(name.replace(" (Shackleton rim)", ""), 4, y + layout.rowH / 2, layout.labelW - 12);
+      // selected site (T5.1.a): a bar beside its name and bold text (shape and weight, not only colour)
+      const isSel = index.siteIds[s] === selectedSite;
+      if (isSel) {
+        ctx.fillStyle = COLORS.accent;
+        ctx.fillRect(0, y + 3, 3, layout.rowH - 6);
+      }
+      ctx.fillStyle = COLORS.text;
+      ctx.font = `${isSel ? 600 : 400} ${FONT.size.md}px ${FONT.family}`;
+      ctx.textBaseline = "middle";
+      ctx.fillText(name.replace(" (Shackleton rim)", ""), 8, y + layout.rowH / 2, layout.labelW - 16);
     }
     ctx.fillStyle = COLORS.textMuted;
     ctx.font = `${FONT.size.sm}px ${FONT.family}`;
@@ -217,7 +225,7 @@ export function Calendar() {
         canvas.dataset.lastFrameMs = (performance.now() - start).toFixed(1);
       });
     }
-  }, [layout, index, colors, mask, anyConstraint, mode, sites, range, selectedPlanId, comparePlans]);
+  }, [layout, index, colors, mask, anyConstraint, mode, sites, range, selectedPlanId, comparePlans, selectedSite]);
 
   const cellFromEvent = (e: React.MouseEvent<HTMLCanvasElement>): (Cell & { x: number; y: number }) | null => {
     if (!layout) return null;
@@ -325,6 +333,9 @@ export function Calendar() {
           role="img"
           aria-label={STRINGS.calendarAria(L)}
           data-testid="calendar-canvas"
+          data-selected-cell={selectedCell ? `${index?.siteIds[selectedCell.site]}:${selectedCell.day}` : ""}
+          data-pinned-cells={pinnedCells.length}
+          data-selected-site={selectedSite ?? ""}
           onMouseDown={onMouseDown}
           onMouseMove={onMove}
           onMouseUp={onMouseUp}
@@ -332,6 +343,26 @@ export function Calendar() {
           onDoubleClick={onDoubleClick}
           onKeyDown={onKeyDown}
         />
+        {/* the site names are drawn on the canvas; these buttons over them make each one selectable (T5.1.a) */}
+        {layout && index && (
+          <div className="calendar-site-buttons" style={{ top: layout.axisH, width: layout.labelW }}>
+            {index.siteIds.map((id, s) => {
+              const name = sites.find((x) => x.id === id)?.name ?? id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className="calendar-site-btn"
+                  style={{ top: s * (layout.rowH + layout.rowGap), height: layout.rowH }}
+                  aria-pressed={selectedSite === id}
+                  aria-label={STRINGS.pin.site(name)}
+                  title={STRINGS.pin.site(name)}
+                  onClick={() => selectSite(id)}
+                />
+              );
+            })}
+          </div>
+        )}
         {hover && hoverInfo?.m && (
           <div className="tooltip" style={{ left: hover.x + 14, top: hover.y + 14 }} role="status">
             <strong>{hoverInfo.site}</strong>

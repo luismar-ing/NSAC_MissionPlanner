@@ -1237,3 +1237,30 @@ button.thumb:focus-visible {
 .thumb-score {
   display: flex;
 }
+
+/* ------------------------------------------------------------------ site selection on the calendar (T5.1.a) */
+
+.calendar-site-buttons {
+  position: absolute;
+  left: 0;
+}
+
+.calendar-site-btn {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.calendar-site-btn:hover {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+}
+
+.calendar-site-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}

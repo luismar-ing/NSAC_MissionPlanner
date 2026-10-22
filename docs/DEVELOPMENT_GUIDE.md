@@ -700,7 +700,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T5.1 Enlace entre vistas y flujo de demo
 
-##### [ ] T5.1.a — Auditoría de vistas enlazadas
+##### [x] T5.1.a — Auditoría de vistas enlazadas
 - **Qué:** matriz vista × estado (plan, sitio, tiempo) y pruebas de integración que la cubren.
 - **Archivos:** `web/tests/integration.test.tsx`, `PROGRESS.md`
 - **Depende de:** T4.4.c · **Spec:** 4.1, 8 · **Decisiones:** — · **Est.:** 2 h

@@ -2,7 +2,7 @@
 /** T3.4: horizon panorama (level A). */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { DataStore } from "../src/lib/data";
 import { loadPlanData, type PlanData } from "../src/lib/planData";
@@ -124,7 +124,7 @@ describe("time control and coherence with the panels (T3.4.b)", () => {
     }
   });
 
-  it("the time control moves missionTime within the plan window and can match the tray clock", () => {
+  it("the time control moves missionTime within the plan window, and the tray clock follows (linked)", () => {
     const s = haworth.series;
     appStore.getState().selectPlan("haworth_20270309_7d");
     expect(appStore.getState().missionTime).toBe(s.startMs);
@@ -134,9 +134,10 @@ describe("time control and coherence with the panels (T3.4.b)", () => {
     fireEvent.change(slider, { target: { value: "25.5" } });
     expect(appStore.getState().missionTime).toBe(s.startMs + 25.5 * 3_600_000);
     expect(slider.getAttribute("aria-valuetext")).toBe("Day 2, 01:30");
-    appStore.getState().setCompareTime(70);
-    fireEvent.click(screen.getByRole("button", { name: "Match tray clock" }));
+    expect(appStore.getState().compareTime).toBe(25.5); // site clock -> tray clock
+    act(() => appStore.getState().setCompareTime(70)); // tray clock -> site clock
     expect(appStore.getState().missionTime).toBe(s.startMs + 70 * 3_600_000);
+    expect(slider.value).toBe("70");
     appStore.getState().setCompareTime(0);
     appStore.getState().selectPlan(null);
   });

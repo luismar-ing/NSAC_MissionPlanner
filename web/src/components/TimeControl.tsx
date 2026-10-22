@@ -13,7 +13,8 @@ const SPEEDS = [1, 6, 24] as const; // hours of mission per second
 
 /**
  * Time control of the site view (spec 8.4): scrubber and playback over the selected plan's window, bound to
- * missionTime, the clock the 3D scene will share in Phase 4. "Match tray" copies the tray's relative clock.
+ * missionTime, the clock the 3D scene shares. Inside the window the store keeps the tray's relative clock in
+ * step (linked clocks, T5.1.a), so this control and the tray scrubber move each other.
  */
 export function TimeControl({ startMs, windowDays, stepMin }: Props) {
   const missionTime = useApp((s) => s.missionTime) ?? startMs;
@@ -78,9 +79,6 @@ export function TimeControl({ startMs, windowDays, stepMin }: Props) {
           </button>
         ))}
       </div>
-      <button type="button" className="btn ghost" onClick={() => setMissionTime(clamp(startMs + appStore.getState().compareTime * 3_600_000))} title={STRINGS.timeControl.matchTitle}>
-        {STRINGS.timeControl.match}
-      </button>
     </div>
   );
 }

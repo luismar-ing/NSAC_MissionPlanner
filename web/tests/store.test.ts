@@ -54,16 +54,34 @@ describe("app store", () => {
     expect(store.getState().comparePlans).toEqual([...ids.slice(1, 5), ids[5]]);
   });
 
-  it("compareTime and missionTime are independent clocks", () => {
+  it("compareTime and missionTime are linked inside the selected plan's window (spec 4.1)", () => {
     store.getState().selectPlan("connecting_ridge_20270101_7d");
-    const mission = store.getState().missionTime;
-    store.getState().setCompareTime(36);
+    const arrival = Date.parse("2027-01-01T00:00:00Z");
+    store.getState().setCompareTime(36); // tray -> mission clock
     expect(store.getState().compareTime).toBe(36);
-    expect(store.getState().missionTime).toBe(mission);
-    store.getState().setMissionTime(Date.parse("2027-01-02T00:00:00Z"));
-    expect(store.getState().compareTime).toBe(36);
-    store.getState().setCompareTime(10_000); // clamped to the longest window (14 days)
+    expect(store.getState().missionTime).toBe(arrival + 36 * 3_600_000);
+    store.getState().setMissionTime(Date.parse("2027-01-02T00:00:00Z")); // mission clock -> tray
+    expect(store.getState().compareTime).toBe(24);
+    store.getState().setMissionTime(arrival - 40 * 3_600_000); // transit: the tray stays where it was
+    expect(store.getState().compareTime).toBe(24);
+    store.getState().setCompareTime(10_000); // clamped to the longest window (14 days), past this 7-day plan
     expect(store.getState().compareTime).toBe(14 * 24);
+    expect(store.getState().missionTime).toBe(arrival - 40 * 3_600_000); // outside its window: not moved
+    store.getState().setCompareTime(12);
+    store.getState().selectPlan("malapert_massif_20270101_7d"); // a newly selected plan opens at the tray's moment
+    expect(store.getState().missionTime).toBe(arrival + 12 * 3_600_000);
+    store.getState().setCompareTime(0);
+  });
+
+  it("choosing a site keeps the arrival date and window of the selected plan", () => {
+    store.getState().selectPlan("haworth_20270615_14d");
+    store.getState().selectSite("malapert_massif");
+    expect(store.getState().selectedPlanId).toBe("malapert_massif_20270615_14d");
+    expect(store.getState().selectedSite).toBe("malapert_massif");
+    store.getState().selectPlan(null);
+    store.getState().selectSite("haworth"); // no plan: only the site
+    expect(store.getState().selectedSite).toBe("haworth");
+    expect(store.getState().selectedPlanId).toBeNull();
   });
 
   it("constraints are optional and patchable", () => {

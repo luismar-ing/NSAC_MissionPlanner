@@ -50,6 +50,7 @@ export const STRINGS = {
       `Range: ${days} arrival day${days === 1 ? "" : "s"} × ${sites} site${sites === 1 ? "" : "s"} (${valid} valid)`,
     best: (n: number) => `Pin best ${n}`,
     clearRange: "Clear range",
+    site: (name: string) => `Select ${name} (keeps the selected arrival date and window)`,
     help: "Click a cell to select it · double-click or press Enter to pin · drag to select a range · arrow keys move the selection",
   },
   panel: {
@@ -115,8 +116,6 @@ export const STRINGS = {
     pause: "Pause the mission clock",
     speed: "Playback speed",
     speedLabel: (h: number) => `${h} h/s`,
-    match: "Match tray clock",
-    matchTitle: "Jump to the same time since arrival as the comparison tray",
   },
   sitePanel: {
     aria: (site: string) => `Site features: ${site}`,

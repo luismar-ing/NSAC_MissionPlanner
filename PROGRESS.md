@@ -2130,3 +2130,49 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   ```
 - **Problemas abiertos:** los de T4.3.b (cambio de curvatura visible durante el reescalado; costura tenue lod1/lod2) y el texto «Moon phase exact» del indicador de escala (T4.4.c). El panorama Nivel B, el mapa polar iluminado y otros extras siguen fuera de alcance.
 - **Siguiente tarea:** Fase 5, T5.1.a (tras la revisión humana del hito).
+
+## 2026-10-22 · T5.1.a · Auditoría de vistas enlazadas
+
+- **Tarea:** T5.1.a — Auditoría de vistas enlazadas ([x]).
+- **Qué se hizo:** se revisó qué vista escribe y qué vista lee cada parte del estado global (spec 8) frente al requisito de 4.1: «seleccionar plan, sitio o tiempo en una actualiza las demás». Salieron **tres huecos**, ya corregidos:
+  1. **Sitio sin enlace:** `selectedSite` existía en el store, pero ninguna vista lo leía ni lo escribía. Ahora, al pulsar el nombre de un sitio en el calendario (botones HTML accesibles sobre las etiquetas del canvas), se selecciona el sitio y el plan pasa a la **misma fecha de llegada y la misma L** en ese sitio (todas las combinaciones existen, D6). El calendario marca la fila con una barra y texto en negrita (forma y peso, no solo color).
+  2. **Relojes independientes:** el scrubber de la bandeja (`compareTime`, horas desde la llegada) y el control de tiempo del sitio o la misión (`missionTime`) solo se sincronizaban con el botón «Match tray clock». Ahora están **enlazados en el store**: mientras `missionTime` cae dentro de la ventana del plan seleccionado, `compareTime` = horas desde su llegada, y mover la bandeja mueve el reloj del plan. Un plan recién seleccionado se abre en el momento de la bandeja. En el despegue y el tránsito la bandeja no se mueve. Se quita el botón «Match tray clock», que ya no hace falta.
+  3. El canvas del calendario expone `data-selected-cell`, `data-pinned-cells` y `data-selected-site` para poder comprobar el enlace sin leer píxeles.
+- **Matriz vista × estado** (fila = vista donde se hace el cambio; columnas = lo que se actualiza; ✓ = cubierto por `web/tests/integration.test.tsx`):
+
+  | Origen → | Calendario | Bandeja | Sección del sitio (control de tiempo, panorama, panel) | Vista en vivo (escena, llegada, miniaturas) |
+  |---|---|---|---|---|
+  | **Plan** · clic en celda del calendario | celda marcada, sitio marcado ✓ | panel seleccionado ✓ | encabezado del plan ✓ | — |
+  | **Plan** · título del panel | celda y sitio ✓ | (origen) | encabezado ✓ | — |
+  | **Plan** · botón 3D / «Open 3D view» | — | — | — | se abre en ese plan ✓ ✓ |
+  | **Plan** · miniatura (en vivo) | celda tras Esc ✓ | panel seleccionado tras Esc ✓ | encabezado tras Esc ✓ | plan nuevo ✓ |
+  | **Anclados** · doble clic en el calendario | marcador ✓ | panel nuevo ✓ | — | miniatura nueva ✓ |
+  | **Anclados** · × del panel | marcador ✓ | (origen) | comparación del panel del sitio ✓ | — |
+  | **Sitio** · nombre en el calendario | fila marcada, celda en la misma fecha ✓ | panel seleccionado ✓ | sitio y fecha ✓ | — |
+  | **Sitio** · sin plan seleccionado | solo la fila ✓ | — | — | — |
+  | **Tiempo** · scrubber de la bandeja | — | todos los paneles ✓ | control de tiempo y panorama ✓ | — |
+  | **Tiempo** · control de tiempo del sitio | — | paneles y scrubber ✓ | panorama ✓ | — |
+  | **Tiempo** · controles de misión (en el sitio) | — | mismo momento tras Esc ✓ | — | panorama de llegada y miniaturas ✓ |
+  | **Tiempo** · controles de misión (tránsito) | — | no se mueve ✓ | — | — |
+  | **Ventana L** · botones del calendario | celda ✓ | — | encabezado con la nueva L ✓ | — |
+  | **Restricciones** · controles | celdas válidas (cuenta) ✓ | — | — | — |
+
+  La escena 3D lee `missionTime` en cada fotograma (`getTimeMs`); su enlace lo cubren `skycheck.test.ts`, `liveView.test.tsx` y `planSwitch.test.tsx`.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/integration.test.tsx --reporter=verbose → 14 passed (una prueba por celda de la matriz)
+  $ npm --prefix web test → Test Files 29 passed · Tests 194 passed (3 ejecuciones seguidas) · typecheck → exit 0
+  ```
+  Las pruebas de integración montan la app completa (`<App />`) con datos reales y hacen cada cambio desde la UI de la vista de origen: clic y doble clic en coordenadas reales de celdas del calendario, botones, sliders y Esc.
+
+  En el navegador:
+  - Haworth 2027-03-09 seleccionado → clic en «Malapert Massif» → plan `malapert_massif_20270309_7d`, celda `malapert_massif:67`. Scrubber de la bandeja a 30 h → `missionTime` = llegada + 30 h, control del sitio en 30 y panorama en la muestra 60.
+  - En la captura del calendario se ve la fila de Malapert con la barra y la negrita.
+  - Recarga, ida y vuelta al modo vivir con cambio de plan: **0 errores en la consola**. Los errores que aparecían antes eran restos del recargado en caliente de ediciones anteriores.
+- **Decisiones tomadas:**
+  - **Relojes enlazados** (antes independientes por diseño, T3.4.b). La spec 4.1 pide enlace y 8.4 pide que el control del panorama esté «sincronizado con el de la escena».
+  - Elegir un sitio conserva la fecha y la L.
+  - En el tránsito la bandeja conserva su hora (no hay «horas desde la llegada» negativas).
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/store/appStore.ts`, `web/src/views/Calendar.tsx`, `web/src/components/TimeControl.tsx` y los cambios en `tests/store.test.ts` y `tests/panorama.test.tsx` (la prueba de «relojes independientes» pasa a «relojes enlazados»). Son las correcciones de los huecos que encontró la auditoría.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T5.1.b.
