@@ -8,7 +8,10 @@
  */
 import * as THREE from "three";
 import { COLORS } from "../styles/tokens";
-import { RelativeOrigin } from "./scale";
+import type { SceneEphemeris } from "../lib/contract";
+import { createBodies, loadTextures, updateBodies } from "./bodies";
+import { indexEphemeris, sceneStateAt } from "./ephemeris";
+import { RelativeOrigin, toScene, type Vec3 } from "./scale";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -93,17 +96,50 @@ export function applyCameraRelative(h: SceneHandle): void {
   }
 }
 
+export interface MountOptions {
+  eph: SceneEphemeris;
+  /** missionTime (epoch ms, UTC), read every frame. */
+  getTimeMs(): number;
+  /** Base URL of the static files (import.meta.env.BASE_URL). */
+  baseUrl: string;
+}
+
+const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unit = (a: Vec3): Vec3 => {
+  const n = Math.hypot(...a) || 1;
+  return [a[0] / n, a[1] / n, a[2] / n];
+};
+
 /**
- * Mounts the live scene into `container` and returns the unmount function. For now the scene is empty
- * (the Earth, the Moon and the Sun arrive in T4.1.c); what matters here is the renderer lifecycle (T4.1.a)
- * and the scale / precision set-up (T4.1.b).
+ * Overview framing (until the camera director of T4.3.a): from above the Earth–Moon line, on the side of the
+ * orbit normal, looking at the midpoint, with celestial north up. Shows both bodies and the Moon's phase.
  */
-export function mountScene(container: HTMLElement): () => void {
+export function overviewCamera(moonScene: Vec3, sunDir: Vec3): { position: Vec3; target: Vec3; up: Vec3 } {
+  const d = Math.hypot(...moonScene);
+  const n = unit(cross(moonScene, sunDir));
+  const along = unit(moonScene);
+  const target: Vec3 = [moonScene[0] / 2, moonScene[1] / 2, moonScene[2] / 2];
+  const position: Vec3 = [0, 1, 2].map((i) => target[i] + n[i] * d * 1.15 - along[i] * d * 0.25) as Vec3;
+  const view = unit([target[0] - position[0], target[1] - position[1], target[2] - position[2]]);
+  const z: Vec3 = [0, 0, 1];
+  const dz = view[2];
+  const up: Vec3 = Math.abs(dz) > 0.98 ? [0, 1, 0] : unit([z[0] - dz * view[0], z[1] - dz * view[1], z[2] - dz * view[2]]);
+  return { position, target, up };
+}
+
+/**
+ * Mounts the live scene into `container` and returns the unmount function: the Earth, the Moon, the Sun and
+ * the stars at missionTime (T4.1.c), on the single renderer (T4.1.a) with camera-relative rendering (T4.1.b).
+ */
+export function mountScene(container: HTMLElement, opts: MountOptions): () => void {
   const renderer = rendererManager.acquire(container);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, CAMERA_NEAR, CAMERA_FAR);
   const handle: SceneHandle = { scene, camera, origin: new RelativeOrigin(), world: new Map(), cameraWorld: [0, 0, 10] };
-  if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle };
+  const ix = indexEphemeris(opts.eph);
+  const bodies = createBodies(scene);
+  loadTextures(bodies, opts.baseUrl, renderer instanceof THREE.WebGLRenderer ? renderer.capabilities.maxTextureSize : 4096);
+  if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix };
 
   const resize = () => {
     const w = Math.max(1, container.clientWidth);
@@ -117,13 +153,28 @@ export function mountScene(container: HTMLElement): () => void {
   const ro = new ResizeObserver(resize);
   ro.observe(container);
   renderer.setAnimationLoop(() => {
+    const state = sceneStateAt(ix, opts.getTimeMs());
+    updateBodies(bodies, state, handle);
+    const cam = overviewCamera(toScene(state.moonKm), state.sunDir);
+    handle.cameraWorld = cam.position;
     applyCameraRelative(handle);
+    camera.up.set(...cam.up);
+    camera.lookAt(cam.target[0] - cam.position[0], cam.target[1] - cam.position[1], cam.target[2] - cam.position[2]);
     renderer.render(scene, camera);
   });
 
   return () => {
     ro.disconnect();
     rendererManager.release();
+    scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      m.geometry?.dispose();
+      const mats = (Array.isArray(m.material) ? m.material : m.material ? [m.material] : []) as THREE.Material[];
+      for (const mat of mats) {
+        (mat as THREE.MeshStandardMaterial).map?.dispose();
+        mat.dispose();
+      }
+    });
     scene.clear();
   };
 }

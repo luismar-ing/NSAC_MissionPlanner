@@ -153,5 +153,5 @@ export const STRINGS = {
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:
-    "Data: NASA LRO LOLA (Barker et al. 2023), NAIF/SPICE (NASA JPL), validated against JPL Horizons; regions: USGS. Trajectories are ILLUSTRATIVE.",
+    "Data: NASA LRO LOLA (Barker et al. 2023), NAIF/SPICE (NASA JPL), validated against JPL Horizons; regions: USGS. Textures: NASA Scientific Visualization Studio (Blue Marble Next Generation, LRO LROC). Trajectories are ILLUSTRATIVE.",
 } as const;

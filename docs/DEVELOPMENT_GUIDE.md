@@ -617,7 +617,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.1.a · **Spec:** 5.9 · **Decisiones:** D8 · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba: el escalado conserva las direcciones (ángulo Sol–Luna–Tierra igual antes y después, error < 1e-9 rad); buffer logarítmico activo; revisión visual sin parpadeo de profundidad al acercarse.
 
-##### [ ] T4.1.c — Tierra, Luna, Sol y estrellas desde scene/ephemeris
+##### [x] T4.1.c — Tierra, Luna, Sol y estrellas desde scene/ephemeris
 - **Qué:** texturas convertidas a tamaños web, luz direccional y sprite del Sol, campo de estrellas; posiciones y orientación interpoladas (slerp) en `missionTime`; colores de los tokens.
 - **Archivos:** `web/src/scene3d/bodies.ts`, `web/src/scene3d/ephemeris.ts`, `web/public/textures/`
 - **Depende de:** T4.1.b, T0.2.f, T2.4.b · **Spec:** 8.2, 9, 5.8 · **Decisiones:** D13 · **Est.:** 3 h · **Adelantable**

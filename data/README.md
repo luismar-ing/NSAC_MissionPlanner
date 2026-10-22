@@ -51,6 +51,7 @@ Fuente: NASA Scientific Visualization Studio (SVS). Verificado el 2026-10-21 (UR
 Notas de la selección:
 - **Luna:** se usa la versión «poles» de 2019, que cubre las regiones polares; la escena hace zoom al polo sur. La versión 2025 (`lroc_color_16bit_srgb_4k.tif`, 59 MB) pesa 4,5 veces más. La textura es solo visual (la página lo advierte); la ciencia sale del DEM LOLA.
 - **Tierra:** el servidor original de Blue Marble NG (Visible Earth, NEO) redirige ahora a science.nasa.gov y no publica listados de archivos; SVS 3615 ofrece la Tierra equirectangular para envolver una esfera, con crédito BMNG.
+- **Conversión web (T4.1.c):** `python -m pipeline.textures` genera `web/public/textures/{earth,moon}_{4k,2k}.jpg` (JPEG calidad 85, 3,74 MB en total, determinista) y `textures.json` con tamaños, SHA-256 y créditos. Convención comprobada: longitud 0° en el centro, −180° a la izquierda, norte arriba.
 - **Presupuesto (D13 < 50 MB):** se reservan 10 MB para texturas web. Prueba de conversión a 4096 × 2048 JPEG calidad 85: Luna 1,55 MB + Tierra 1,54 MB = 3,09 MB. La conversión definitiva (y la de 2k para móvil) se hace en T4.1.c. Los originales de `data/textures/` no se publican.
 
 ## Regiones candidatas de Artemis III (T0.3.a) — descarga MANUAL

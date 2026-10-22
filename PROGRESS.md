@@ -1827,3 +1827,33 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguno. La forma de llevar los puntos de la trayectoria a la superficie de una Luna exagerada se resuelve en T4.2.c y T4.3.b.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.1.c.
+
+## 2026-10-22 · T4.1.c · Tierra, Luna, Sol y estrellas desde scene/ephemeris
+
+- **Tarea:** T4.1.c — Tierra, Luna, Sol y estrellas desde scene/ephemeris ([x]).
+- **Qué se hizo:**
+  - `pipeline/textures.py` (`python -m pipeline.textures`, comando nuevo en `CLAUDE.md`): convierte los originales de T0.2.f (NASA SVS, dominio público) a `web/public/textures/{earth,moon}_{4k,2k}.jpg`, JPEG calidad 85, 3,74 MB en total, con `textures.json` (tamaños, SHA-256 y créditos). Es determinista: al repetirlo salen los mismos bytes. Convención de los dos mapas, comprobada a ojo con miniaturas: longitud 0° en el centro (África; mares de la cara visible), −180° a la izquierda, norte arriba.
+  - `web/src/scene3d/ephemeris.ts`: estado de la escena en cualquier instante según el contrato §10. Posición de la Luna con Catmull-Rom, rotaciones con slerp, dirección del Sol con interpolación lineal renormalizada. Incluye `rotate`, `lonLat` y el rango cubierto.
+  - `web/src/scene3d/bodies.ts`: la Tierra (elipsoide con los radios del PCK) y la Luna con `MeshStandardMaterial` y textura, orientadas con los cuaterniones de los datos más un giro fijo de +90° sobre X (marco local de la esfera de three.js → marco fijo del cuerpo). Luz direccional a lo largo de `sun_dir`, un resplandor del Sol «en el infinito», luz ambiente muy tenue y un campo de estrellas **decorativo** (direcciones aleatorias con semilla fija; no es un catálogo). Las texturas son de 4k en escritorio y de 2k en pantallas pequeñas o GPU limitadas.
+  - `renderer.ts`: `mountScene(container, { eph, getTimeMs, baseUrl })` coloca los cuerpos en cada fotograma según `missionTime` y usa un encuadre de vista general provisional (desde encima de la línea Tierra–Luna) hasta el director de cámara de T4.3.a; al desmontar libera geometrías, materiales y texturas. `SceneHost` carga a la vez el chunk de three.js y `scene/ephemeris.json`.
+  - Créditos de las texturas en el pie de página (regla 12).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/bodies.test.ts --reporter=verbose
+  bodies: 1314 instants, max |phase angle scene − data| = 4.44e-16 rad
+  moon: sub-Earth point |lon| ≤ 7.76°, |lat| ≤ 6.85° (optical libration ≈ ±7.9° / ±6.7°)
+  earth: sub-solar point at 12:00 UTC |lon| ≤ 4.01° (equation of time ≤ ~4.1°), |lat| ≤ 23.44° (obliquity 23.44°)
+   ✓ reproduces the samples at their own instants
+   ✓ mid-hour Moon position lies between its neighbours, sun direction stays unit
+   ✓ phase angle: light direction vs Moon→Earth in the scene = the data, at every sampled instant
+   ✓ the Moon shows its near side to the Earth (sub-Earth point within the libration range)
+   ✓ the Earth's sub-solar point is near longitude 0 at 12:00 UTC and at the solar declination
+  $ npm --prefix web test → Tests 127 passed · typecheck → exit 0 · pytest → todo en verde
+  $ npm --prefix web run build → index 381.72 kB (sin cambios relevantes) · renderer (three.js + escena) 546.58 kB
+  ```
+  Las dos últimas pruebas comprueban a la vez los cuaterniones y la orientación de las texturas con hechos independientes: la Luna muestra la cara visible a la Tierra dentro de la libración, y el punto subsolar terrestre a las 12:00 UTC queda a ≤ 4° de Greenwich (ecuación del tiempo) y a la declinación solar (máx. 23,44° = oblicuidad).
+  En el navegador (llegada a Connecting Ridge, 2027-01-02): las texturas cargan, la Tierra y la Luna están iluminadas por el mismo lado y el ángulo de fase de la escena es de 115,7° (fracción iluminada vista desde la Tierra ≈ 0,28). La escena va a 60 fps. La comparación con fracciones de referencia de Horizons en fechas concretas queda para T4.4.c.
+- **Decisiones tomadas:** las estrellas son decorativas y deterministas, y se documenta que no son un catálogo. Ambiente al 4 % para que la cara nocturna no sea negro puro.
+- **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/bodies.test.ts` (la guía no nombra el archivo de prueba). La prueba de aislamiento de three.js (T4.1.a) se generaliza: recorre el grafo de imports estáticos desde `main.tsx` y comprueba que ningún módulo del shell 2D importa three.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.1.d.

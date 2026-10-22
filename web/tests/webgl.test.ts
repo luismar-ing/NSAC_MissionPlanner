@@ -65,11 +65,27 @@ describe("three.js stays out of the 2D shell", () => {
   const SRC = join(__dirname, "..", "src");
   const files = (dir: string): string[] =>
     readdirSync(dir).flatMap((n) => (statSync(join(dir, n)).isDirectory() ? files(join(dir, n)) : [join(dir, n)]));
-  it("only scene3d/ imports three, and SceneHost loads it with a dynamic import", () => {
-    const importers = files(SRC).filter((f) => /from ["']three["']/.test(readFileSync(f, "utf-8")));
-    expect(importers.map((f) => f.slice(SRC.length + 1).replace(/\\/g, "/"))).toEqual(["scene3d/renderer.ts"]);
-    const staticRendererImports = files(SRC).filter((f) => /from ["'][./]*scene3d\/renderer["']|from ["']\.\/renderer["']/.test(readFileSync(f, "utf-8")));
-    expect(staticRendererImports).toEqual([]);
+  it("three is imported only inside scene3d/, and nothing the 2D shell loads statically pulls it in", () => {
+    const rel = (f: string) => f.slice(SRC.length + 1).replace(/\\/g, "/");
+    const all = files(SRC).filter((f) => /\.(tsx?)$/.test(f));
+    const importers = all.filter((f) => /from ["']three["']/.test(readFileSync(f, "utf-8"))).map(rel);
+    expect(importers.every((f) => f.startsWith("scene3d/"))).toBe(true);
+    // static import graph from the entry point: none of its modules may import three
+    const seen = new Set<string>();
+    const visit = (file: string) => {
+      if (seen.has(file)) return;
+      seen.add(file);
+      const src = readFileSync(file, "utf-8");
+      for (const m of src.matchAll(/^import[^"']*from ["'](\.[^"']+)["']/gm)) {
+        const base = join(file, "..", m[1]);
+        const hit = [base, `${base}.ts`, `${base}.tsx`].find((c) => all.includes(c));
+        if (hit) visit(hit);
+      }
+    };
+    visit(join(SRC, "main.tsx"));
+    const shell = [...seen].map(rel);
+    expect(shell).toContain("scene3d/SceneHost.tsx");
+    expect(shell.filter((f) => importers.includes(f))).toEqual([]);
     expect(readFileSync(join(SRC, "scene3d", "SceneHost.tsx"), "utf-8")).toContain('import("./renderer")');
   });
 });

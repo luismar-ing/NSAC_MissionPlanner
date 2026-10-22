@@ -31,6 +31,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Efemérides de los sitios (1 año) / de escena | `.venv/Scripts/python -m pipeline.ephemeris` / `... --scene` (→ `pipeline/out/`) | disponible |
 | Trayectorias ILLUSTRATIVE | `.venv/Scripts/python -m pipeline.trajectory [--plot]` (→ `pipeline/out/trajectory/`) | disponible |
 | Características de los sitios | `.venv/Scripts/python -m pipeline.site_features` (`--fetch-gazetteer` para reconsultar el nomenclátor) | disponible |
+| Texturas web (Tierra y Luna) | `.venv/Scripts/python -m pipeline.textures` (data/textures/ → `web/public/textures/`) | disponible |
 | Terreno en LOD | `.venv/Scripts/python -m pipeline.terrain_lod` (→ `pipeline/out/terrain/`) | disponible |
 | Datos SYNTHETIC | — | omitido (A4): el front end usa los datos reales |
 | Correr el pipeline | `.venv/Scripts/python -m pipeline.build_all` (`--assemble` solo reensambla) → `web/public/data/` | disponible |

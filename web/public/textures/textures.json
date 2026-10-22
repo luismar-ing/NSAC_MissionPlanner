@@ -1,0 +1,45 @@
+{
+ "textures": {
+  "moon": {
+   "source": "lroc_color_poles_4k.tif",
+   "credit": "Moon: NASA's Scientific Visualization Studio, CGI Moon Kit (SVS 4720), LRO LROC color",
+   "files": {
+    "4k": {
+     "file": "moon_4k.jpg",
+     "width": 4096,
+     "height": 2048,
+     "bytes": 1445667,
+     "sha256": "479afcc22301f3994da3bd1bfb32fc42d4429cbb5c92b8570eec63f29f0fbfbe"
+    },
+    "2k": {
+     "file": "moon_2k.jpg",
+     "width": 2048,
+     "height": 1024,
+     "bytes": 363497,
+     "sha256": "883430c8bc71c240c24426f26d37a0fd17b3d47301c8b618ce37fba674e21bb9"
+    }
+   }
+  },
+  "earth": {
+   "source": "flat_earth_Largest_still.0330.jpg",
+   "credit": "Earth: NASA/GSFC Scientific Visualization Studio (SVS 3615); Blue Marble Next Generation courtesy of Reto Stöckli (NASA/GSFC) and NASA's Earth Observatory",
+   "files": {
+    "4k": {
+     "file": "earth_4k.jpg",
+     "width": 4096,
+     "height": 2048,
+     "bytes": 1472960,
+     "sha256": "1a3f76df2fcc8a9e1bec7a86f39b4eec00b39f1a63585cf9f5d0eb2836d636b7"
+    },
+    "2k": {
+     "file": "earth_2k.jpg",
+     "width": 2048,
+     "height": 1024,
+     "bytes": 458823,
+     "sha256": "547a7f4e312162558291aff22ef84498b5020782827717ef28137c6d63c7178c"
+    }
+   }
+  }
+ },
+ "convention": "equirectangular; lon 0 at centre, -180 at the left edge, north up"
+}
