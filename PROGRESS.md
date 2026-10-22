@@ -2338,3 +2338,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `lib/errors.ts`, `components/ErrorMessage.tsx`, `tests/errors.test.tsx` y `vite.config.ts`.
 - **Problemas abiertos:** ninguno nuevo.
 - **Siguiente tarea:** T5.2.c (auditoría de rendimiento).
+
+## 2026-10-22 · T5.2.c · Auditoría de rendimiento (8.7)
+
+- **Tarea:** T5.2.c — Auditoría de rendimiento ([x]).
+- **Qué se hizo:** se midió el build de producción frente a cada presupuesto de 8.7 y D13. Los resultados, el método y el detalle están en `docs/performance.md`. Dos scripts nuevos y reproducibles: `npm --prefix web run perf` (carga inicial con 3 perfiles de red y tiempos de actualización) y `npm --prefix web run fps` (fps de la escena 3D y contextos WebGL). Usan `puppeteer-core` con el Chrome instalado y necesitan `npm --prefix web run preview` en marcha. No hizo falta corregir nada: todo cabe con margen.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web run build → index 397.68 kB (gzip 122.86) · renderer 598.37 kB (gzip 153.44)
+  $ npm --prefix web run perf
+    carga del shell 2D (mediana de 3, caché fría): sin limitar 310 ms · 20 Mbit/s y 40 ms: 688 ms · igual sin compresión: 1577 ms (2132 KB)
+    restricción → calendario: 6.8 ms (máx. 9.7; siguiente fotograma 11.7) · scrubber → 5 paneles: 1.9 ms (máx. 3.5)
+  $ npm --prefix web run fps   (GPU: ANGLE Intel Iris Xe, D3D11; 1920×1080)
+    tránsito 6 h/s 59.8 fps · aproximación y zoom 1 h/s 60.0 fps · sitio con terreno 60.0 fps (p95 16.9 ms)
+    contextos WebGL tras 10 idas y vueltas: 1 · canvas WebGL en el DOM en modo comparar: 0
+  tamaños: series + ventanas 2.96 MB (< 15) · total dist/ 20.88 MB (< 50) · carga inicial 334 KB comprimidos
+  ```
+- **Decisiones tomadas:**
+  - «Conexión normal» = 20 Mbit/s de bajada, 5 de subida, 40 ms de latencia; se añade el peor caso sin compresión.
+  - Los fps se miden en Chrome headless sobre la GPU real. En el panel del navegador de la app de escritorio la ventana en segundo plano queda limitada a 30 fps (1 fps sin WebGL), así que esas cifras no son una medida válida. Queda anotado en `docs/performance.md`.
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `web/scripts/perf.mjs` y `web/scripts/fps.mjs`, y dos filas nuevas en la tabla de comandos de `CLAUDE.md`.
+- **Problemas abiertos:** ninguno. El chunk `renderer` supera el aviso de 500 KB de Vite, pero se carga bajo demanda.
+- **Siguiente tarea:** T5.2.d (móvil, recortable). T5.2.e es una revisión humana y quedará preparada.

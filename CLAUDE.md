@@ -44,6 +44,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Build | `npm --prefix web run build` | disponible |
 | Servir el build | `npm --prefix web run preview` (puerto 4173) | disponible |
 | Capturas 1920×1080 de cada vista | `npm --prefix web run screens` (con el servidor de desarrollo en marcha; Chrome o Edge instalado, `CHROME_PATH` para otro) → `docs/figures/screens/` | disponible |
+| Auditoría de rendimiento (8.7) | `npm --prefix web run perf` (carga y actualización) y `npm --prefix web run fps` (fps y contextos WebGL), con `npm --prefix web run preview` en marcha → resultados en `docs/performance.md` | disponible |
 
 Cuando una tarea cree o cambie un comando, actualiza esta tabla (T0.1.d la deja definitiva).
 

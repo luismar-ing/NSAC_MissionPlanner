@@ -732,7 +732,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T5.2.a · **Spec:** 9, 11 regla 11 · **Decisiones:** — · **Est.:** 2.5 h
 - **Aceptación:** contraste del texto sobre los fondos ≥ 4.5:1 (cálculo mostrado); con movimiento reducido no hay vuelos de cámara; un error de red simulado muestra un mensaje; revisión vista por vista del uso del color.
 
-##### [ ] T5.2.c — Auditoría de rendimiento (8.7)
+##### [x] T5.2.c — Auditoría de rendimiento (8.7)
 - **Qué:** medir y corregir.
 - **Archivos:** `docs/performance.md`
 - **Depende de:** T5.2.b · **Spec:** 8.7 · **Decisiones:** D13 · **Est.:** 2.5 h

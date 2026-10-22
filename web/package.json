@@ -9,7 +9,9 @@
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "screens": "node scripts/screens.mjs"
+    "screens": "node scripts/screens.mjs",
+    "perf": "node scripts/perf.mjs",
+    "fps": "node scripts/fps.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "5.3.0",
