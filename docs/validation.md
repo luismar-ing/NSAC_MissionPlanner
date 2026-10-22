@@ -3,6 +3,44 @@
 Spec 4.1 («validación contra una fuente de referencia documentada»), 5.7 y 10 (T1.1, T5.3).
 Este documento empieza en T1.1.a (método y referencias) y se completa en T1.1.d (tabla de errores), T2.1.c (fase lunar) y T5.3.a (versión final).
 
+## 0. Resumen (T5.3.a)
+
+<!-- validation_summary:start (generado por pipeline/tests/test_vs_horizons.py; no editar a mano) -->
+Generado el 2026-10-22 con `python -m pytest pipeline/tests/test_vs_horizons.py -v` (la fase lunar, con `pipeline/tests/test_scene.py`).
+
+**Referencia:** JPL Horizons (API `https://ssd.jpl.nasa.gov/api/horizons.api`), efemérides DE441. Consultas hechas el 2026-10-21 (2026-10-21T17:20:56Z a 2026-10-21T17:21:00Z); respuestas crudas en `pipeline/tests/reference/` (`python -m pipeline.horizons_fetch --check` las relee sin red).
+
+**PolePlanner:** SPICE (spiceypy), marco lunar MOON_ME, corrección LT+S, h_obs = 3 m (D12), altura de los sitios sobre la esfera de 1737,4 km.
+
+| Kernel | Función | sha256 (recalculado) | Frente a `data/README.md` |
+|---|---|---|---|
+| `naif0012.tls` | LSK (segundos intercalares) | `678e32bdb5a74411…` | ✓ coincide |
+| `pck00011.tpc` | PCK de texto (constantes, radios, IAU_EARTH) | `3dff7b1dbeceaa01…` | ✓ coincide |
+| `de440s.bsp` | SPK planetario DE440 | `c1c7feeab882263f…` | ✓ coincide |
+| `moon_pa_de440_200625.bpc` | PCK binario de orientación lunar (DE440) | `60cd55aa401ea2ea…` | ✓ coincide |
+| `moon_de440_250416.tf` | FK lunar (MOON_ME / MOON_PA) | `a47c71e9c9f33796…` | ✓ coincide |
+
+| Comprobación | Criterio | Resultado |
+|---|---|---|
+| Az/el del Sol y de la Tierra frente a Horizons: 5 sitios × 2 objetivos × 7 instantes de 2027 (§3) | < 0.05° (spec); < 1″ (prueba) | peor **0.0016″** (4.6e-07°) ✓ |
+| Control negativo: marco equivocado (MOON_PA) | la prueba debe detectarlo (> 10″) | 101.6″ ✓ |
+| Fase lunar y dirección del Sol de la escena frente a Horizons, 5 fechas (§4) | < 0.5 puntos de fracción iluminada; < 0.1° | peor diferencia de fracción iluminada **0.134 puntos** (criterio < 0.5); dirección del Sol **0.000000°** (criterio < 0.1°); posición de la Luna **0.07 km**. ✓ |
+| Fase lunar en la imagen renderizada (§5, T4.4.c) | coherente con la geometría dibujada | ≤ 0.21 puntos frente al trazado de rayos; ≤ 1 punto frente a Horizons por la Luna ×6 (D8) ✓ |
+| Escena 3D frente a las series 2D: elevación de la Tierra y del Sol en cada sitio (`web/tests/skycheck.test.ts`) | mismos ángulos | ≤ 0.005° (Tierra), ≤ 0.031° (Sol) ✓ |
+
+**Sanity checks de 5.7** sobre los datos publicados (`web/public/data/`, año completo cada 30 min), con los límites de elevación corregidos por latitud (§2):
+
+| Sitio | max \|el Sol\| ≤ límite | max \|el Tierra\| ≤ límite | Tierra: franja de azimut | max \|máscara del horizonte\| | Sol en el año | Banderas 0/1 y ventanas en rango |
+|---|---|---|---|---|---|---|
+| connecting_ridge | 2.09° ≤ 2.16° ✓ | 7.55° ≤ 8.06° ✓ | 15.4° < 40° ✓ | 3.85° < 10° ✓ | 95.1 % | ✓ |
+| haworth | 5.15° ≤ 5.24° ✓ | 10.07° ≤ 11.14° ✓ | 15.1° < 40° ✓ | 3.59° < 10° ✓ | 78.6 % | ✓ |
+| nobile_rim_1 | 6.31° ≤ 6.37° ✓ | 10.04° ≤ 12.27° ✓ | 16.1° < 40° ✓ | 3.76° < 10° ✓ | 71.1 % | ✓ |
+| malapert_massif | 5.54° ≤ 5.61° ✓ | 10.54° ≤ 11.51° ✓ | 15.5° < 40° ✓ | 3.08° < 10° ✓ | 76.5 % | ✓ |
+| de_gerlache_rim_2 | 2.92° ≤ 3.01° ✓ | 7.27° ≤ 8.91° ✓ | 15.1° < 40° ✓ | 3.51° < 10° ✓ | 87.8 % | ✓ |
+
+Control negativo de 5.7 (fondo del cráter Shackleton, permanentemente en sombra): Sol el **0.00 %** del año, frente a ≥ 71.1 % en los sitios de cresta ✓ (salida intermedia del pipeline, `pipeline/out/`).
+<!-- validation_summary:end -->
+
 ## 1. Método (T1.1.a, 2026-10-21)
 
 **Fuente:** JPL Horizons, API `https://ssd.jpl.nasa.gov/api/horizons.api` (documentación: https://ssd-api.jpl.nasa.gov/doc/horizons.html). Respuestas crudas guardadas en `pipeline/tests/reference/horizons_{sitio}_{sol|earth}.txt`, cada una precedida de sus parámetros exactos. Se regeneran con `python -m pipeline.horizons_fetch` (y `--check` para releerlas sin red).

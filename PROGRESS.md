@@ -2408,3 +2408,34 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   11. **Ritmo:** el guion de 6 pasos (T5.1.c) dura ~41 s de acciones; ¿hay tiempo para narrar dentro de los 2 minutos?
   12. **Paleta Quantum** (A6) en el proyector real: ¿algún ajuste de brillo o de tamaño de letra?
 - **Desbloqueo:** el humano confirma en el chat («T5.2.e: revisado» con sus comentarios); el feedback se copia aquí y se corrige lo que haga falta.
+
+## 2026-10-22 · T5.3.a · docs/validation.md final
+
+- **Tarea:** T5.3.a — `docs/validation.md` final ([x]).
+- **Qué se hizo:** nueva sección **§0. Resumen**, generada por `pipeline/tests/test_vs_horizons.py` (`test_write_validation_summary`) junto con la tabla de §3. Reúne en un sitio todo lo que pide la tarea:
+  - **referencia:** API de Horizons, DE441, **fecha de consulta** leída de las respuestas guardadas (2026-10-21, 17:20:56–17:21:00 UTC);
+  - **kernels:** su SHA-256 se **recalcula y se comprueba** contra `data/README.md` (la prueba falla si no coincide);
+  - **tabla de resultados frente a cada criterio:**
+    - az/el frente a Horizons, 70 comparaciones;
+    - control negativo con MOON_PA;
+    - fase lunar de la escena (línea tomada del bloque de §4);
+    - fase en la imagen (§5);
+    - escena 3D frente a series 2D;
+  - **sanity checks de 5.7**, calculados sobre los **datos publicados** (`web/public/data/`, versionados, no intermedios): por sitio, |el| máxima del Sol y de la Tierra frente al límite por latitud, franja de azimut de la Tierra, máscara del horizonte, % de Sol, banderas y ventanas en rango. Más el control del fondo del cráter Shackleton cuando existen las salidas del pipeline.
+- **Cómo se verificó:**
+  ```
+  $ .venv/Scripts/python -m pytest pipeline/tests/test_scene.py pipeline/tests/test_vs_horizons.py -v
+   … test_matches_horizons ×10 PASSED · test_wrong_frame_would_be_detected PASSED
+   test_write_validation_table PASSED · test_write_validation_summary PASSED   (18 passed)
+  segunda ejecución: docs/validation.md idéntico (regeneración estable)
+  $ .venv/Scripts/python -m pytest → 276 passed
+  ```
+  Resumen generado:
+  - **Horizons:** peor separación **0.0016″** (criterio 180″ = 0,05°; estricto 1″). Control MOON_PA 101,6″ (detectado).
+  - **Fase lunar:** 0,134 puntos y Sol 0,000000°.
+  - **Kernels:** 5/5 coinciden con `data/README.md`.
+  - **Sanity checks:** todos los sitios ✓. El de menos margen es Nobile Rim 1 (Sol 6,31° frente a 6,37°). Franja de azimut de la Tierra de 15–16°, máscara ≤ 3,85°, Sol 71–95 % del año. Fondo del cráter Shackleton: **0,00 %**.
+- **Decisiones tomadas:** los sanity checks del resumen usan los datos publicados para que el documento se pueda regenerar desde el repositorio. El control del fondo del cráter no se publica y sale de `pipeline/out/` si está.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T5.3.b (créditos en la interfaz y el README).

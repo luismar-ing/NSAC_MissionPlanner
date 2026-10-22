@@ -753,7 +753,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T5.3 Validación y atribuciones
 
-##### [ ] T5.3.a — docs/validation.md final
+##### [x] T5.3.a — docs/validation.md final
 - **Qué:** tabla de ≥ 5 instantes × 2 sitios (az/el del Sol y la Tierra) con errores < 0.05°, método, versiones de kernels, fecha de consulta a Horizons, fase lunar (T2.1.c) y resultados de los sanity checks de 5.7; regenerable.
 - **Archivos:** `docs/validation.md`
 - **Depende de:** T1.1.d, T2.1.c, T2.4.b · **Spec:** 4.1, 10 (T5.3) · **Decisiones:** — · **Est.:** 2 h
