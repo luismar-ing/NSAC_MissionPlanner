@@ -1,5 +1,7 @@
 import { STRINGS } from "../lib/strings";
 import { openLive } from "../lib/modeTransition";
+import { ErrorMessage } from "../components/ErrorMessage";
+import { describeError } from "../lib/errors";
 import { useApp } from "../store/appStore";
 import { TimeControl } from "../components/TimeControl";
 import { Panorama } from "./Panorama";
@@ -13,10 +15,10 @@ import { useSiteData } from "./useSiteData";
 export function SiteSection() {
   const selectedPlanId = useApp((s) => s.selectedPlanId);
   const missionTime = useApp((s) => s.missionTime);
-  const { plan, site, pinned, error } = useSiteData();
+  const { plan, site, pinned, error, retry } = useSiteData();
 
   if (!selectedPlanId) return <p className="placeholder">{STRINGS.site.empty}</p>;
-  if (error) return <p role="alert">{error}</p>;
+  if (error !== null) return <ErrorMessage what={STRINGS.errors.site} info={describeError(error)} onRetry={retry} />;
   if (!plan || !site || missionTime === null) return <p className="placeholder">{STRINGS.loading}</p>;
   return (
     <>

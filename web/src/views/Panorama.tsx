@@ -111,7 +111,7 @@ export function Panorama({ data, timeMs }: Props) {
                 </text>
               </g>
             ))}
-            <path d={trackPath(p, series.earthAz, series.earthEl, 1, from, to)} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.6} />
+            <path className="track-earth" d={trackPath(p, series.earthAz, series.earthEl, 1, from, to)} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.6} strokeDasharray="6 3" />
             <path d={trackPath(p, series.sunAz, series.sunEl, 1, from, to)} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.6} />
             <path d={silhouettePath(p, horizon.elev_deg, horizon.az_step_deg)} fill={COLORS.terrain} stroke={COLORS.textMuted} strokeOpacity={0.6} />
             {azTicks.map((a) => (

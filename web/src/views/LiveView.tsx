@@ -3,6 +3,8 @@ import { useApp } from "../store/appStore";
 import { STRINGS } from "../lib/strings";
 import { timelineOf, type MissionTimeline } from "../lib/mission";
 import { closeLive, playFrom, takeExpandOrigin } from "../lib/modeTransition";
+import { ErrorMessage } from "../components/ErrorMessage";
+import { describeError } from "../lib/errors";
 import { ThumbnailStrip } from "../panels2d/ThumbnailStrip";
 import { SceneHost } from "../scene3d/SceneHost";
 import { ScaleIndicator } from "../scene3d/ScaleIndicator";
@@ -93,14 +95,14 @@ export function LiveView() {
 /** Panorama and site features panel shown on arrival (spec 8.2 phase 4, 8.6), on the mission clock. */
 function ArrivalDock() {
   const missionTime = useApp((s) => s.missionTime);
-  const { plan, site, pinned, error } = useSiteData();
+  const { plan, site, pinned, error, retry } = useSiteData();
   return (
     <section className="live-site" data-testid="live-site" aria-labelledby="live-site-title">
       <h3 id="live-site-title" className="panel-title">
         {STRINGS.site.title}
       </h3>
-      {error && <p role="alert">{error}</p>}
-      {!error && (!plan || !site || missionTime === null) && <p className="placeholder">{STRINGS.loading}</p>}
+      {error !== null && <ErrorMessage what={STRINGS.errors.site} info={describeError(error)} onRetry={retry} />}
+      {error === null && (!plan || !site || missionTime === null) && <p className="placeholder">{STRINGS.loading}</p>}
       {plan && site && missionTime !== null && (
         <>
           <Panorama data={plan} timeMs={missionTime} />

@@ -74,7 +74,8 @@ export const HorizonSilhouette = memo(function HorizonSilhouette({ data, scale, 
               </g>
             ))}
             {/* tracks over the whole window */}
-            <path className="sil-track earth" d={paths.earth} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} />
+            {/* the Earth track is dashed and the Sun track solid: they differ by shape, not only colour (spec 9, T5.2.b) */}
+            <path className="sil-track earth" d={paths.earth} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} strokeDasharray="6 3" />
             <path className="sil-track sun" d={paths.sun} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.55} />
             {/* terrain on top of the tracks: a body behind the terrain is hidden by it, as in reality */}
             <path className="sil-terrain" d={paths.terrain} fill={COLORS.terrain} stroke={COLORS.borderStrong} strokeWidth={1} />

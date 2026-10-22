@@ -7,7 +7,8 @@ export interface SiteData {
   plan: PlanData | null; // selected plan with its series and horizon (null while loading or with no selection)
   site: { features: SiteFeatures; daily: Daily } | null;
   pinned: PlanData[]; // the plans in the tray, for the site panel's compact comparison
-  error: string | null;
+  error: unknown; // null when there is none
+  retry(): void;
 }
 
 /**
@@ -24,7 +25,8 @@ export function useSiteData(): SiteData {
   const [plan, setPlan] = useState<PlanData | null>(null);
   const [site, setSite] = useState<{ features: SiteFeatures; daily: Daily } | null>(null);
   const [pinned, setPinned] = useState<PlanData[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const p = selectedPlanId ? plansById.get(selectedPlanId) : undefined;
@@ -36,23 +38,27 @@ export function useSiteData(): SiteData {
         setPlan(d);
         setSite({ features, daily });
       })
-      .catch((e: Error) => alive && setError(e.message));
+      .catch((e: unknown) => alive && setError(e));
     return () => {
       alive = false;
     };
-  }, [selectedPlanId, plansById, sites, data]);
+  }, [selectedPlanId, plansById, sites, data, attempt]);
 
   useEffect(() => {
     let alive = true;
     Promise.all(comparePlans.map((id) => loadPlanData(data, plansById.get(id)!, sites)))
       .then((list) => alive && setPinned(list))
-      .catch((e: Error) => alive && setError(e.message));
+      .catch((e: unknown) => alive && setError(e));
     return () => {
       alive = false;
     };
-  }, [comparePlans, plansById, sites, data]);
+  }, [comparePlans, plansById, sites, data, attempt]);
 
   // a plan that is still loading after a change of selection is not shown as the new one
   const current = plan && plan.plan.id === selectedPlanId ? plan : null;
-  return { plan: current, site: current ? site : null, pinned, error };
+  const retry = () => {
+    setError(null);
+    setAttempt((n) => n + 1);
+  };
+  return { plan: current, site: current ? site : null, pinned, error, retry };
 }

@@ -2267,3 +2267,74 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** nueva dependencia de desarrollo `puppeteer-core` (fijada) y nuevo comando en `CLAUDE.md`. `TimeControl.tsx` y `CompareScrubber.tsx` cambian por la corrección del reloj. En `tests/planSwitch.test.tsx`, la prueba de cambio en reproducción arranca a mitad del tránsito, lejos de la cámara lenta.
 - **Problemas abiertos:** la costura tenue lod1/lod2 sigue visible con el Sol rasante (anotada en T4.3.b). Algunas etiquetas de la silueta (p. ej. «5°») pueden quedar bajo una trayectoria.
 - **Siguiente tarea:** T5.2.b.
+
+## 2026-10-22 · T5.2.b · Carga, errores, movimiento reducido y accesibilidad
+
+- **Tarea:** T5.2.b — Carga, errores, movimiento reducido y accesibilidad ([x]).
+- **Qué se hizo:**
+  - **Estados de error con mensaje claro y reintento** (`lib/errors.ts`, `components/ErrorMessage.tsx`). Cada error dice qué no se pudo cargar y qué hacer, y deja el detalle técnico (archivo y motivo) en letra pequeña. Un fallo de red ofrece «Try again». Un archivo dañado o incompatible no (fallaría igual) y avisa de que no se muestra nada inventado en su lugar (regla 1). Aplicado en:
+    - **arranque de la app:** antes mostraba el texto crudo;
+    - **calendario:** antes se quedaba en «Loading…» para siempre y dejaba una promesa rechazada sin capturar;
+    - **bandeja, sección del sitio y llegada en vivo;**
+    - **escena 3D:** antes cualquier fallo, también uno de red, decía «WebGL unavailable». Ahora distingue datos de WebGL.
+  - **Fallo encontrado al simular el error:** si fallaba la carga de otra L, el calendario seguía mostrando las celdas de la L anterior bajo el botón nuevo, con la cuenta «1825 of 1825 14-day plans». Ahora el índice viejo se descarta al cambiar de L y el canvas se oculta mientras no hay datos de la L elegida.
+  - **Movimiento reducido como opción** (spec 9 pide la opción además de respetar `prefers-reduced-motion`): interruptor «Reduce motion» en la cabecera (`reducedMotion` en el store; arranca con el ajuste del sistema). Lo respetan:
+    - el director de cámara: encuadres fijos por fase, sin vuelos;
+    - el cambio de plan: sin salto de cámara;
+    - la transición comparar ↔ vivir: sin FLIP;
+    - todo el CSS: transiciones y animaciones a 0 ms con `:root[data-reduced-motion="true"]`.
+  - **Contraste:** el texto de ayuda de una restricción desactivada se atenuaba al 45 % (2,18:1); ahora solo se atenúa el slider y el texto queda a 6,27:1.
+  - **Información solo por color:** las trayectorias del Sol y de la Tierra en siluetas y panorama se distinguían solo por color (blanco frente a verde, ~1,5:1 entre ellos). La de la Tierra pasa a discontinua.
+  - `vite.config.ts`: tiempo límite de prueba de 15 s, porque varias pruebas montan la app entera con datos reales y en paralelo pasaban de 5 s.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/errors.test.tsx
+   ✓ app start-up (core files) offline → message and 'Try again' (y el reintento carga)
+   ✓ the start-up error is rendered with a retry button
+   ✓ calendar: windows file offline → error with retry (sin celdas ni cuenta de otra L); retry recovers
+   ✓ tray: a plan's series answers 500 → error with retry; the panel appears after the retry
+   ✓ 3D view: scene data offline → 'Could not load the 3D scene data' (not a WebGL message), retry offered
+   ✓ a damaged file is reported without a retry (it would fail the same way) and nothing is invented
+   ✓ a header switch turns it on and off; the page carries the flag the CSS reads
+   ✓ with reduced motion the compare ↔ live expansion does not animate
+  $ npm --prefix web test → Test Files 30 passed · Tests 208 passed (4 ejecuciones seguidas) · typecheck → exit 0
+  $ npm --prefix web run screens → console: no errors or warnings
+  ```
+  **Contraste** (cálculo WCAG sobre la página real, en el navegador: todos los elementos con texto visibles, HTML y SVG, con el color y la opacidad efectivos sobre el fondo compuesto):
+
+  | Vista | Elementos con texto | Pares color/fondo | Peor par | < 4,5:1 |
+  |---|---|---|---|---|
+  | Comparar (restricciones activas, 3 planes, sitio) | 313 | 6 | gris secundario `#8E949A` / fondo `#0B0F14` = **6,27:1** | 0 (antes: ayuda desactivada 2,18:1) |
+  | Comparar (restricciones desactivadas) | 77 | 4 | 6,27:1 | 0 |
+  | En vivo, despegue | — | 4 | 6,27:1 (en reposo) | 0 |
+  | En vivo, sitio con panorama y panel | — | 4 | 6,27:1 | 0 |
+
+  Resto de pares: texto `#E6EDF3` / fondo 16,27:1; verde `#3DDC84` / fondo 10,77:1; fondo sobre verde (botones activos) 10,77:1. Durante los 300 ms de la animación de entrada la escena está al 60 % de opacidad (el verde baja a 4,46:1 un instante); en reposo, 10,77:1.
+
+  **Movimiento reducido** (navegador, interruptor activado, misión completa a 6 h/s, giro de la vista por fotograma):
+  - dentro de cada fase, como máximo 0,000° en el despegue, 0,030° en el tránsito y 0,057° en el aterrizaje (solo el movimiento propio de los cuerpos);
+  - cortes limpios en los cambios de fase: 99°, 132° y 113° en un fotograma, en lugar de un barrido;
+  - sin animación FLIP.
+
+  **Error de red simulado** (navegador, `fetch` de `windows/*_14d.json` rechazado): «Could not load the calendar. The data could not be downloaded: check the connection and try again», con el detalle «network error in windows/connecting_ridge_14d.json: Failed to fetch» y el botón «Try again». Sin celdas ni cuenta de la L anterior. Tras restaurar la red y pulsar el botón, el calendario carga: «1825 of 1825 3-day plans meet the constraints».
+
+  **Revisión del uso del color, vista por vista:**
+
+  | Vista | Qué se codifica | Además del color |
+  |---|---|---|
+  | Calendario | score (rampa de un solo tono) | leyenda con valores y tooltip con cifras |
+  | Calendario | celdas que no cumplen | atenuadas y con rayado diagonal |
+  | Calendario | anclado / seleccionado / sitio elegido | triángulo / marco blanco / barra y negrita |
+  | Bandeja | mejor por métrica | ★ y la palabra «Best» |
+  | Bandeja | panel seleccionado | borde más grueso y nombre en la sección del sitio |
+  | Silueta y panorama | Sol / Tierra | rayos frente a anillo; visible relleno, oculto hueco; trayectoria de la Tierra discontinua (**nuevo**) |
+  | Cinta | Sol / Tierra | carril superior / inferior con pie que lo dice; racha oscura con contorno discontinuo |
+  | Panorama | estado | «☀ Sunlit» / «○ In shadow», «● Earth link» / «○ No link» |
+  | Restricciones | desactivada | casilla y texto «off» |
+  | Controles | botón activo | relleno frente a contorno y `aria-pressed` |
+  | 3D | ILLUSTRATIVE / escala | texto de las etiquetas; estela discontinua |
+  | Errores | error | borde rojo y texto que lo explica (role=alert) |
+- **Decisiones tomadas:** el interruptor de movimiento reducido vive en la cabecera y arranca con el ajuste del sistema. Los errores de datos (no de red) no ofrecen reintento.
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `lib/errors.ts`, `components/ErrorMessage.tsx`, `tests/errors.test.tsx` y `vite.config.ts`.
+- **Problemas abiertos:** ninguno nuevo.
+- **Siguiente tarea:** T5.2.c (auditoría de rendimiento).

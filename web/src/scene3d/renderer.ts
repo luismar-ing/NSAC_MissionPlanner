@@ -127,6 +127,8 @@ export interface MountOptions {
   /** Site id and terrain loader (T4.3.b), called by distance during the final approach only. */
   siteId?: string;
   loadTerrain?(siteId: string, lod: number): Promise<TerrainData>;
+  /** Reduced motion (the app setting, which starts from prefers-reduced-motion): fixed framings, no flights. */
+  reducedMotion?(): boolean;
 }
 
 /** Real size of the rocket at the site, drawn at real local scale (λ = 1): ~100 m, a generic launcher. */
@@ -272,7 +274,8 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
 
   // camera director and user take-over (T4.3.a)
   const controller = new CameraController();
-  const reduced = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  const media = typeof window.matchMedia === "function" ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  const reduced = { get matches() { return opts.reducedMotion ? opts.reducedMotion() : (media?.matches ?? false); } };
   let lastPose: Pose | null = null;
   let earthW: Vec3 = [0, 0, 0];
   let moonW: Vec3 = [0, 0, 0];

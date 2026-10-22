@@ -3,6 +3,8 @@ import { openLive, panelSelector, playFrom, takeCollapseOrigin } from "../lib/mo
 import { loadPlanData, type PlanData } from "../lib/planData";
 import { sharedElevationScale } from "../lib/scale";
 import { CompareScrubber } from "../components/CompareScrubber";
+import { ErrorMessage } from "../components/ErrorMessage";
+import { describeError } from "../lib/errors";
 import { STRINGS } from "../lib/strings";
 import { bestBadges } from "../lib/why";
 import { useApp } from "../store/appStore";
@@ -22,7 +24,8 @@ export function Tray() {
   const setExaggeration = useApp((s) => s.setExaggeration);
   const compareTime = useApp((s) => s.compareTime);
   const [loaded, setLoaded] = useState<Record<string, PlanData>>({});
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -30,11 +33,11 @@ export function Tray() {
     if (!missing.length) return;
     Promise.all(missing.map((id) => loadPlanData(data, plansById.get(id)!, sites)))
       .then((list) => alive && setLoaded((prev) => ({ ...prev, ...Object.fromEntries(list.map((p) => [p.plan.id, p])) })))
-      .catch((e: Error) => alive && setError(e.message));
+      .catch((e: unknown) => alive && setError(e));
     return () => {
       alive = false;
     };
-  }, [ids, loaded, data, plansById, sites]);
+  }, [ids, loaded, data, plansById, sites, attempt]);
 
   const visible = ids.map((id) => loaded[id]).filter((p): p is PlanData => !!p);
   const key = visible.map((p) => p.plan.id).join(",");
@@ -57,7 +60,16 @@ export function Tray() {
   return (
     <>
       {ids.length === 1 && <p className="placeholder">{STRINGS.panel.pinOneMore}</p>}
-      {error && <p role="alert">{error}</p>}
+      {error !== null && (
+        <ErrorMessage
+          what={STRINGS.errors.plans}
+          info={describeError(error)}
+          onRetry={() => {
+            setError(null);
+            setAttempt((n) => n + 1);
+          }}
+        />
+      )}
       <div className="tray-toolbar">
         <CompareScrubber />
         <div className="segmented" role="group" aria-label={STRINGS.silhouette.exaggerationLabel}>

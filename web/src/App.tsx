@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { ErrorMessage } from "./components/ErrorMessage";
+import { describeError } from "./lib/errors";
 import { STRINGS } from "./lib/strings";
 import { appStore, useApp } from "./store/appStore";
 import { CompareView } from "./views/CompareView";
@@ -10,6 +12,13 @@ export function App() {
   const load = useApp((s) => s.load);
   const manifest = useApp((s) => s.manifest);
   const viewMode = useApp((s) => s.viewMode);
+  const reducedMotion = useApp((s) => s.reducedMotion);
+  const setReducedMotion = useApp((s) => s.setReducedMotion);
+
+  // the whole page follows the reduced-motion choice (CSS transitions and animations, see tokens.css)
+  useEffect(() => {
+    document.documentElement.dataset.reducedMotion = String(reducedMotion);
+  }, [reducedMotion]);
 
   useEffect(() => {
     void appStore.getState().loadCore(); // idempotent: StrictMode's double effect does not load twice
@@ -22,7 +31,12 @@ export function App() {
           {STRINGS.appTitle}
           <span className="app-subtitle">{STRINGS.appSubtitle}</span>
         </h1>
-        {manifest && <span className="data-badge">{STRINGS.dataBadge(manifest.data_status, manifest.data_version)}</span>}
+        <div className="header-tools">
+          <button type="button" className="btn ghost motion-toggle" aria-pressed={reducedMotion} title={STRINGS.motion.title} onClick={() => setReducedMotion(!reducedMotion)}>
+            <span aria-hidden="true">{reducedMotion ? "■" : "□"}</span> {STRINGS.motion.reduce}
+          </button>
+          {manifest && <span className="data-badge">{STRINGS.dataBadge(manifest.data_status, manifest.data_version)}</span>}
+        </div>
       </header>
       {(load.status === "idle" || load.status === "loading") && (
         <p className="state-message" aria-busy="true">
@@ -30,9 +44,9 @@ export function App() {
         </p>
       )}
       {load.status === "error" && (
-        <p className="state-message" role="alert">
-          {STRINGS.loadError} {load.message}
-        </p>
+        <div className="state-message">
+          <ErrorMessage what={STRINGS.loadError} info={describeError(load.error)} onRetry={() => void appStore.getState().loadCore()} />
+        </div>
       )}
       {load.status === "ready" && (viewMode === "live" ? <LiveView /> : <CompareView />)}
       <footer className="app-footer">{STRINGS.footerCredits}</footer>

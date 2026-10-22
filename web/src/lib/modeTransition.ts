@@ -14,7 +14,7 @@ export const TRANSITION_MS = MOTION.midMs;
 let expandFrom: DOMRect | null = null; // panel → scene
 let collapseFrom: DOMRect | null = null; // scene → panel
 
-const reducedMotion = () => typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reducedMotion = () => appStore.getState().reducedMotion; // app setting, initialised from the system one
 
 /** Selector of a plan's panel in the tray (plan ids are [a-z0-9_], see the data contract). */
 export const panelSelector = (planId: string) => `[data-plan-id="${planId}"]`;

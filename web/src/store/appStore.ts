@@ -23,7 +23,7 @@ export interface Constraints {
   minEarthH: number | null; // Z: earth_h_per_day_min ≥ Z
 }
 
-export type LoadStatus = { status: "idle" | "loading" | "ready" } | { status: "error"; message: string };
+export type LoadStatus = { status: "idle" | "loading" | "ready" } | { status: "error"; message: string; error: unknown };
 
 export interface AppState {
   data: DataStore;
@@ -40,6 +40,9 @@ export interface AppState {
   constraints: Constraints;
   viewMode: ViewMode;
   setViewMode(mode: ViewMode): void;
+  /** Reduced motion (spec 9, T5.2.b): no camera flights or animated transitions. Starts from the system setting. */
+  reducedMotion: boolean;
+  setReducedMotion(on: boolean): void;
   /** Scale the 3D scene is drawn at (spec 5.9): "space" (bodies ×6) or "local" (real size near the site). */
   sceneScale: "space" | "local";
   setSceneScale(s: "space" | "local"): void;
@@ -88,6 +91,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     selectedWindow: 7,
     constraints: { ...DEFAULT_CONSTRAINTS },
     viewMode: "compare",
+    reducedMotion: typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    setReducedMotion(on) {
+      set({ reducedMotion: on });
+    },
     sceneScale: "space",
     setSceneScale(s) {
       set({ sceneScale: s });
@@ -139,7 +146,7 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
           plansById: new Map(core.plans.map((p) => [p.id, p])),
         });
       } catch (e) {
-        set({ load: { status: "error", message: (e as Error).message } });
+        set({ load: { status: "error", message: (e as Error).message, error: e } });
       }
     },
 

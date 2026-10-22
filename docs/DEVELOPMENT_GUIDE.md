@@ -726,7 +726,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T5.1.c · **Spec:** 9, 8.7 · **Decisiones:** — · **Est.:** 3 h
 - **Aceptación:** capturas a 1920×1080 de cada vista guardadas y revisadas.
 
-##### [ ] T5.2.b — Carga, errores, movimiento reducido y accesibilidad
+##### [x] T5.2.b — Carga, errores, movimiento reducido y accesibilidad
 - **Qué:** estados de carga y error; opción de reducir movimiento (y respetar `prefers-reduced-motion`); nada que dependa solo del color; contraste.
 - **Archivos:** `web/src/**`
 - **Depende de:** T5.2.a · **Spec:** 9, 11 regla 11 · **Decisiones:** — · **Est.:** 2.5 h

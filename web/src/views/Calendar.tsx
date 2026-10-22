@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ErrorMessage } from "../components/ErrorMessage";
+import { describeError } from "../lib/errors";
 import { fmtMetric } from "../lib/why";
 import {
   arrivalDate,
@@ -56,6 +58,8 @@ export function Calendar() {
 
   const [mode, setMode] = useState<CalendarMode>("combined");
   const [index, setIndex] = useState<WindowIndex | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [attempt, setAttempt] = useState(0);
   const [width, setWidth] = useState(0);
   const [hover, setHover] = useState<(Cell & { x: number; y: number }) | null>(null);
   const dragFrom = useRef<Cell | null>(null);
@@ -65,11 +69,16 @@ export function Calendar() {
 
   useEffect(() => {
     let alive = true;
-    void loadWindows(L).then((idx) => alive && setIndex(idx));
+    setLoadError(null);
+    // never show one window length's cells (or count) under another's label while the new one loads or fails
+    setIndex((cur) => (cur && cur.windowDays === L ? cur : null));
+    loadWindows(L)
+      .then((idx) => alive && setIndex(idx))
+      .catch((e: unknown) => alive && setLoadError(e)); // never a silent "Loading…" forever (T5.2.b)
     return () => {
       alive = false;
     };
-  }, [L, loadWindows]);
+  }, [L, loadWindows, attempt]);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -327,13 +336,15 @@ export function Calendar() {
         <span className="pin-count">{STRINGS.pin.count(comparePlans.length, MAX_COMPARE)}</span>
       </div>
       <div ref={wrapRef} className="calendar-canvas-wrap">
-        {!index && <p className="placeholder">{STRINGS.loading}</p>}
+        {!index && !loadError && <p className="placeholder">{STRINGS.loading}</p>}
+        {loadError !== null && <ErrorMessage what={STRINGS.errors.calendar} info={describeError(loadError)} onRetry={() => setAttempt((n) => n + 1)} />}
         <canvas
           ref={canvasRef}
           tabIndex={0}
           role="img"
           aria-label={STRINGS.calendarAria(L)}
           data-testid="calendar-canvas"
+          style={index ? undefined : { display: "none" }} // no stale drawing while the new window length loads or fails
           data-selected-cell={selectedCell ? `${index?.siteIds[selectedCell.site]}:${selectedCell.day}` : ""}
           data-pinned-cells={pinnedCells.length}
           data-selected-site={selectedSite ?? ""}
