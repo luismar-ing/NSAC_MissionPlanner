@@ -2213,3 +2213,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra: `lib/constraints.ts` (filas originales en el índice), `MetricsBox.tsx`, `SitePanel.tsx`, `Calendar.tsx`, `ThumbnailStrip.tsx` y `strings.ts` (todos pasan a usar el formateador común). La prueba de 10 idas y vueltas (`modeTransition.test.tsx`) sube a 20 s porque con toda la suite en paralelo pasaba de 5 s.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T5.1.c (ensayo cronometrado del guion de demo).
+
+## 2026-10-22 · T5.1.c · Ensayo del flujo de demo (sección 12)
+
+- **Tarea:** T5.1.c — Ensayo cronometrado del guion de demo ([x]).
+- **Qué se hizo:** se recorrieron los 6 pasos del guion (spec 12) en el navegador a 1920×1080, con el servidor de desarrollo y la UI real (eventos de ratón y teclado sobre los controles: casillas y sliders de restricciones, doble clic en celdas del calendario, scrubber, botón 3D, ▶, scrubber de misión y Esc). Cada paso se cronometró frente a su presupuesto. Se capturaron `console.error`, `console.warn`, los errores no capturados y los rechazos de promesas desde la carga.
+- **Lista de comprobación** (2.ª ejecución; la 1.ª se descartó porque el panel del navegador estaba oculto durante el paso 4 y la animación no corría: 0 fps):
+
+  | Paso | Qué se hizo | Medido | Presupuesto | Resultado |
+  |---|---|---|---|---|
+  | 1 · Problema | pantalla inicial con el calendario de los 5 sitios | 4,0 s; shell listo en 0,8 s | 15 s | ✓ |
+  | 2 · Comparar en 2D | sol ≥ 80 % y oscuridad ≤ 24 h: 1224 de 1825 planes válidos, redibujo en 15 ms. Anclados con doble clic los mejores de 3 sitios (Connecting Ridge 01-10, Haworth 01-11, Nobile Rim 1 01-13). Scrubber de 0 a 48 h (actualización de los 3 paneles en 74 ms) | 10,7 s | 30 s | ✓ |
+  | 3 · Elegir | botón 3D del panel con insignia de mejor score: la escena crece y quedan 2 miniaturas | 2,1 s | 10 s | ✓ |
+  | 4 · Viaje en 3D | ▶ a 6 h/s: despegue → tránsito → aterrizaje → sitio; terreno cargado (polar, lod0–2), escala real (λ = 1), **59 fps** | 12,1 s | 35 s | ✓ |
+  | 5 · Sitio | aparecen el panorama y el panel; arrastrando el reloj 24 h, el panorama avanza (muestra 48) y la lectura del Sol y la Tierra cambia | 9,1 s | 20 s | ✓ |
+  | 6 · Cierre | pie con créditos (NASA LRO LOLA, NAIF/SPICE, «validated against JPL Horizons», USGS, NASA SVS), insignia «REAL data · 2c2f11dad7»; Esc vuelve a comparar | 1,6 s | 10 s | ✓ |
+  | **Total** | | **41,1 s** | **≤ 120 s** | ✓ |
+
+  Consola durante el ensayo: **0 errores, 0 avisos** (captura propia `[]`; en la consola del navegador, desde la recarga solo hay mensajes `debug`/`info` de Vite y React). Los errores antiguos de `ThumbnailStrip` que muestra el historial son del recargado en caliente de ediciones previas y no se reproducen al cargar.
+- **Decisiones tomadas:** el ensayo se hace con el servidor de desarrollo. El hito de la Fase 5 lo repetirá sobre el build (`npm --prefix web run preview`).
+- **Desviaciones de la spec / cambios en la guía:** ninguna. El «enlace compartible» del paso 6 es la URL pública, que llega con el despliegue (Fase 7).
+- **Problemas abiertos (para T5.2.a, pulido):** a 6 h/s el despegue dura 0,4 s en pantalla (de la cuenta atrás a la inyección) y apenas se ve. Propuesta: que la reproducción vaya a cámara lenta durante el ascenso, o arrancar a 1 h/s y acelerar tras la inyección.
+- **Siguiente tarea:** T5.2.a.

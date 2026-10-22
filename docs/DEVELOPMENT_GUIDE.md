@@ -712,7 +712,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T5.1.a · **Spec:** 8.1, 8.6 · **Decisiones:** — · **Est.:** 1.5 h
 - **Aceptación:** prueba con 3 planes: las cifras coinciden en las tres vistas.
 
-##### [ ] T5.1.c — Ensayo del flujo de demo (sección 12)
+##### [x] T5.1.c — Ensayo del flujo de demo (sección 12)
 - **Qué:** recorrer los 6 pasos del guion cronometrados.
 - **Archivos:** `PROGRESS.md`
 - **Depende de:** T5.1.b · **Spec:** 12, 10 (T5.1) · **Decisiones:** — · **Est.:** 1.5 h
