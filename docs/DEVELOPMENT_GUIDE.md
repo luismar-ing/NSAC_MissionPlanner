@@ -744,11 +744,12 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T5.2.b · **Spec:** 8.7 · **Decisiones:** — · **Est.:** 1.5 h
 - **Aceptación:** captura a 375×812 sin scroll horizontal de la página y con la bandeja deslizable.
 
-##### [ ] T5.2.e — Revisión visual con el humano
+##### [!] T5.2.e — Revisión visual con el humano
 - **Qué:** sesión de revisión en la pantalla o el proyector real; el agente prepara la lista de puntos a revisar.
 - **Archivos:** `PROGRESS.md`
 - **Depende de:** T5.2.c · **Spec:** 10 (T5.2) · **Decisiones:** — · **Est.:** 1 h · **Humano**
 - **Aceptación:** el humano confirma en el chat; su feedback queda en `PROGRESS.md`.
+- **Bloqueo:** espera la revisión del humano en la pantalla o el proyector real (lista de puntos en `PROGRESS.md`, entrada «T5.2.e · preparada»).
 
 ### T5.3 Validación y atribuciones
 

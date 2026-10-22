@@ -2388,3 +2388,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T5.2.e (revisión visual con el humano, preparada y marcada [!]); luego T5.3.a.
+
+## 2026-10-22 · T5.2.e · Revisión visual con el humano (preparada, [!])
+
+- **Tarea:** T5.2.e — Revisión visual con el humano ([!], espera confirmación en el chat).
+- **Qué se preparó:** lista de puntos para revisar en la pantalla o el proyector real. Las capturas de referencia están en `docs/figures/screens/` (01–08 a 1920×1080, 09–11 a 375×812) y se regeneran con `npm --prefix web run screens`.
+- **Cómo probarlo:** `npm --prefix web run build` y `npm --prefix web run preview`; abrir `http://localhost:4173/` en el portátil de la demo, a pantalla completa (F11) y, si se puede, conectado al proyector.
+- **Puntos a revisar** (anotar ✓ o comentario en cada uno):
+  1. **Legibilidad a distancia:** desde el fondo de la sala, ¿se leen los títulos, los nombres de sitio del calendario, las cifras grandes de la bandeja (sol % y score) y las etiquetas de las siluetas (≥ 12 px)?
+  2. **Contraste en el proyector:** los proyectores aclaran los negros. ¿Se distinguen el gris oscuro de la noche lunar en la cinta, el terreno de las siluetas y las celdas atenuadas del calendario?
+  3. **Sol frente a Tierra:** el Sol en blanco y la Tierra en verde (trayectoria discontinua). ¿Se distinguen sin explicación?
+  4. **Calendario:** con sol ≥ 80 % y oscuridad ≤ 24 h, ¿se ve de un vistazo dónde están las buenas fechas?
+  5. **Bandeja con 3 planes:** ¿se ve sin leer números qué plan tiene más Sol y menos oscuridad (spec 12, paso 2)?
+  6. **Transición a 3D** (botón 3D) y **vuelta con Esc:** ¿se entiende que el panel «se convierte» en la escena?
+  7. **Viaje 3D a 6 h/s:** despegue en cámara lenta (¿se ve el ascenso?), tránsito, aterrizaje y zoom continuo. ¿Algún salto o parpadeo? ¿Molesta el cambio de curvatura al pasar a escala real (anotado en T4.3.b)?
+  8. **Llegada:** el panorama y el panel aparecen bajo la escena más baja. ¿Se ven sin desplazarse demasiado en la pantalla de la demo?
+  9. **Etiquetas de honestidad:** ILLUSTRATIVE (despegue y trayectoria), «Not to scale» o «Real scale», «REAL data». ¿Se ven y se entienden?
+  10. **Movimiento reducido:** el interruptor de la cabecera hace que la cámara corte entre encuadres. ¿Resulta aceptable como alternativa?
+  11. **Ritmo:** el guion de 6 pasos (T5.1.c) dura ~41 s de acciones; ¿hay tiempo para narrar dentro de los 2 minutos?
+  12. **Paleta Quantum** (A6) en el proyector real: ¿algún ajuste de brillo o de tamaño de letra?
+- **Desbloqueo:** el humano confirma en el chat («T5.2.e: revisado» con sus comentarios); el feedback se copia aquí y se corrige lo que haga falta.
