@@ -150,6 +150,15 @@ export const STRINGS = {
     local: "Terrain and distances at their real size",
     detail: (km: number) => `1 scene unit = ${km} km. Sizes are enlarged so the bodies stay visible; positions are scaled uniformly, so every angle is exact (spec 5.9).`,
   },
+  mission: {
+    phases: { overview: "Overview", launch: "Launch", transit: "Transit", landing: "Landing", site: "At the site" } as Record<string, string>,
+    play: "Play the mission",
+    pause: "Pause the mission",
+    scrubber: "Mission time, from launch to the end of the stay",
+    jump: "Jump to",
+    speed: "Speed",
+    speedLabel: (h: number) => (h === 24 ? "1 d/s" : `${h} h/s`),
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

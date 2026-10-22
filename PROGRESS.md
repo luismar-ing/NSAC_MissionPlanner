@@ -1857,3 +1857,27 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/bodies.test.ts` (la guía no nombra el archivo de prueba). La prueba de aislamiento de three.js (T4.1.a) se generaliza: recorre el grafo de imports estáticos desde `main.tsx` y comprueba que ningún módulo del shell 2D importa three.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.1.d.
+
+## 2026-10-22 · T4.1.d · Controles de tiempo de misión
+
+- **Tarea:** T4.1.d — Controles de tiempo de misión ([x]).
+- **Qué se hizo:**
+  - `web/src/lib/mission.ts` (archivo extra, lógica sin React): línea de tiempo del plan a partir del archivo de trayectoria (contrato §11): despegue → inyección → llegada a la Luna → aterrizaje (= `arrival_utc`) → fin de la estancia (+ L días). Incluye `phaseAt`, `phaseStart`, `clampMission` y `missionClock` («T+ 2d 04:30» y la hora UTC).
+  - `web/src/scene3d/MissionControls.tsx`: reproducir/pausar, scrubber de toda la misión (pasos de 10 min), «Jump to» Launch / Transit / Landing / At the site, velocidad de 1 h/s, 6 h/s o 1 d/s, y el reloj de misión y la fase siempre visibles. Escribe `missionTime` y `missionPhase` en el store; la escena 3D lee `missionTime` en cada fotograma. Un plan recién seleccionado (fase «overview») empieza en el despegue; al volver a la vista viva el reloj sigue donde estaba.
+  - `LiveStub`: carga la trayectoria del plan para la línea de tiempo y muestra el indicador de escala solo en las fases 1 a 3 (spec 8.2).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/mission.test.tsx --reporter=verbose
+   ✓ runs from launch to the end of the stay, phases in order
+   ✓ phase at each boundary and inside each phase
+   ✓ clamps to the mission and formats the clock
+   ✓ a freshly selected plan starts at launch; each phase button jumps to its start     (criterio de aceptación)
+   ✓ the scrubber covers the whole mission and keeps the phase in step
+   ✓ re-entering the live view keeps the clock where it was
+  $ npm --prefix web test → Tests 133 passed · typecheck → exit 0
+  ```
+  En el navegador (Connecting Ridge, llegada 2027-01-02): al abrir, «Launch, T+ 0d 00:00, 2026-12-30 00:00 UTC», con el indicador de escala visible; tras 2 s a 6 h/s, «Transit, T+ 0d 11:58», y la Luna se ha movido 43,8 unidades = 43 800 km en 12 h (velocidad orbital ≈ 1 km/s); con «At the site», «T+ 3d 00:00, 2027-01-02 00:00 UTC» y el indicador de escala oculto. Corregido un fallo de maquetación: el `flex: 1 1 360px` del scrubber se convertía en 360 px de altura dentro de la columna de controles.
+- **Decisiones tomadas:** velocidades de 1 h/s, 6 h/s (tránsito de 3 días en 12 s) y 1 d/s. El salto a «At the site» va al instante del aterrizaje.
+- **Desviaciones de la spec / cambios en la guía:** archivo extra `web/src/lib/mission.ts`. La prueba es `mission.test.tsx` (necesita jsdom), no `.ts`.
+- **Problemas abiertos:** ninguno. T4.1 completo.
+- **Siguiente tarea:** T4.2.a.

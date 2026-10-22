@@ -989,3 +989,41 @@ button {
   font-family: var(--font-mono);
   color: var(--color-accent);
 }
+
+/* ------------------------------------------------------------------ mission controls (T4.1.d) */
+
+.mission-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.mission-clock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-md);
+  font-size: var(--font-lg);
+}
+
+.mission-phase {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.mission-clock .muted {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+.mission-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+}
+
+/* .scrubber grows along a row (flex: 1 1 360px); in this column that basis would become its height */
+.mission-controls .scrubber {
+  flex: none;
+}

@@ -623,7 +623,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.1.b, T0.2.f, T2.4.b · **Spec:** 8.2, 9, 5.8 · **Decisiones:** D13 · **Est.:** 3 h · **Adelantable**
 - **Aceptación:** prueba numérica: el ángulo de fase de los datos coincide con el de la escena (dirección de la luz frente a los vectores); revisión visual de la fase.
 
-##### [ ] T4.1.d — Controles de tiempo de misión
+##### [x] T4.1.d — Controles de tiempo de misión
 - **Qué:** reproducir/pausar, scrubber de la misión completa, saltar a una fase, velocidad; reloj de misión y fase siempre visibles; indicador de escala en las fases 1 a 3.
 - **Archivos:** `web/src/scene3d/MissionControls.tsx`, `web/tests/mission.test.ts`
 - **Depende de:** T4.1.c · **Spec:** 8.2, 9 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
