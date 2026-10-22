@@ -56,7 +56,8 @@ const open = async () => {
 describe("arrival at the site (spec 8.2 phase 4, 8.6)", () => {
   it("before landing: scene, scale indicator and ILLUSTRATIVE label, no panorama or site panel", async () => {
     await open();
-    expect(appStore.getState().missionPhase).toBe("launch");
+    // the controls start the mission in an effect right after they appear
+    await waitFor(() => expect(appStore.getState().missionPhase).toBe("launch"));
     expect(screen.queryByTestId("live-site")).toBeNull();
     expect(screen.getByTestId("illustrative-label")).toBeTruthy();
     for (const label of ["Transit", "Landing"]) {

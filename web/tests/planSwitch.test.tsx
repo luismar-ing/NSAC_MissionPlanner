@@ -118,6 +118,36 @@ describe("change of plan from a thumbnail (spec 8.0)", () => {
   });
 });
 
+describe("change of plan while the mission plays", () => {
+  it("keeps the time relative to arrival and keeps playing with the new plan (no clamp into the old mission)", async () => {
+    const st = appStore.getState();
+    st.selectPlan(A);
+    st.setViewMode("live");
+    render(<App />);
+    await screen.findByTestId("mission-controls");
+    fireEvent.click(screen.getByRole("button", { name: "Transit" }));
+    const planA = st.plansById.get(A)!;
+    const tlA = timelineOf(planA, await st.data.trajectory(planA.trajectory_id));
+    fireEvent.click(screen.getByRole("button", { name: "Play the mission" }));
+    await new Promise((r) => setTimeout(r, 200));
+    const rel = appStore.getState().missionTime! - tlA.landingMs;
+    expect(rel).toBeLessThan(0); // still in transit
+    fireEvent.click(within(screen.getByTestId("thumb-strip")).getByRole("button", { name: /Show Malapert Massif/ }));
+    await waitFor(() => expect(appStore.getState().selectedPlanId).toBe(B));
+    await new Promise((r) => setTimeout(r, 400)); // a few frames of playback on the new plan
+    const planB = st.plansById.get(B)!;
+    const tlB = timelineOf(planB, await st.data.trajectory(planB.trajectory_id));
+    const relB = appStore.getState().missionTime! - tlB.landingMs;
+    // 6 h of mission per second: after < 1 s of real time the clock has moved forward by a few hours at most
+    expect(relB).toBeGreaterThan(rel);
+    expect(relB - rel).toBeLessThan(6 * 3_600_000);
+    expect(appStore.getState().missionPhase).toBe("transit");
+    expect(screen.getByRole("button", { name: "Pause the mission" }).getAttribute("aria-pressed")).toBe("true"); // still playing
+    fireEvent.click(screen.getByRole("button", { name: "Pause the mission" }));
+    appStore.getState().setViewMode("compare");
+  });
+});
+
 /* ------------------------------------------------------------------ the camera hop */
 
 const sites = JSON.parse(readFileSync(join(DATA, "sites.json"), "utf-8")) as { id: string; lat: number; lon: number; elevation_m: number }[];

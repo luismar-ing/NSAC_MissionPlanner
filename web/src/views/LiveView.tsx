@@ -26,7 +26,7 @@ export function LiveView() {
   const missionPhase = useApp((s) => s.missionPhase);
   const sceneScale = useApp((s) => s.sceneScale);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
-  // timeline of the plan it was computed for: after a switch (T4.4.b) the old one is never shown with the new plan
+  // timeline and the plan it belongs to: after a switch (T4.4.b) the controls know when theirs is stale
   const [timeline, setTimeline] = useState<{ planId: string; tl: MissionTimeline } | null>(null);
   const atSite = missionPhase === "site";
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -78,7 +78,7 @@ export function LiveView() {
               </p>
             )}
           </div>
-          {timeline && timeline.planId === plan?.id && <MissionControls key={timeline.planId} timeline={timeline.tl} />}
+          {timeline && <MissionControls timeline={timeline.tl} planId={timeline.planId} />}
           <p className="visually-hidden" aria-live="polite">
             {atSite && site ? STRINGS.live.arrived(site.name) : ""}
           </p>

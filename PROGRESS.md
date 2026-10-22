@@ -2110,3 +2110,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna. La fracción iluminada que se ve en 3D se aparta hasta ~1 punto de la real por la exageración ×6 (D8). El ángulo de fase es exacto; queda documentado en `docs/validation.md` §5.
 - **Problemas abiertos:** el indicador de escala dice «Moon phase exact». El ángulo de fase lo es, pero la fracción visible de la Luna ×6 difiere hasta ~1 punto. Si se quiere precisar el texto, es tarea de T5 (pulido).
 - **Siguiente tarea:** Fase 4 cerrada → hito de demo de la Fase 4. Después, T5.1.a.
+
+## 2026-10-22 · Hito de demo · Fase 4 (escena 3D del plan seleccionado)
+
+- **Tarea:** hito de demo de la Fase 4 (todas las subtareas T4.1.a–T4.4.c en [x]).
+- **Qué se hizo:** se recorrió el guion del hito en el navegador con la UI real:
+  1. Anclar 2 planes (Haworth 2027-03-09 y Malapert Massif 2027-10-15).
+  2. Botón **3D** del panel de Haworth: la escena crece desde el panel.
+  3. **Reproducir** (6 h/s): la misión avanza al tránsito (T+1d).
+  4. Clic en la **miniatura** de Malapert: cambia el plan sin salir del modo vivir.
+  5. **Esc**: vuelta a comparar, con el panel de Malapert seleccionado.
+
+  Hubo 1 contexto WebGL en todo el recorrido y ninguno en el DOM en modo comparar.
+- **Fallo encontrado y corregido (T4.4.b):** al cambiar de plan **con la misión en reproducción**, el bucle de los controles viejos seguía un instante con la línea de tiempo del plan anterior. Acotaba el reloj del nuevo plan a la misión vieja y la reproducción se paraba. El caso: tránsito a −54 h del aterrizaje → sitio a +6 h. Ahora `MissionControls` recibe el plan al que pertenece su línea de tiempo, se salta los fotogramas en que el plan seleccionado es otro y sigue reproduciendo con el plan nuevo. Comprobado: −53,98 h → −48,18 h un segundo después (6 h/s), en tránsito y reproduciendo. Nueva prueba en `tests/planSwitch.test.tsx`, que falla sin la corrección. También se corrigió una carrera de la prueba `liveView` (leía la fase antes del efecto que la fija): 6 ejecuciones seguidas de la suite en verde.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test → Test Files 28 passed · Tests 179 passed (6 ejecuciones seguidas) · typecheck → exit 0
+  $ npm --prefix web run build → index 392.98 kB (gzip 121.23) · renderer 598.30 kB (gzip 153.40; three.js + escena, carga diferida)
+  ```
+- **Problemas abiertos:** los de T4.3.b (cambio de curvatura visible durante el reescalado; costura tenue lod1/lod2) y el texto «Moon phase exact» del indicador de escala (T4.4.c). El panorama Nivel B, el mapa polar iluminado y otros extras siguen fuera de alcance.
+- **Siguiente tarea:** Fase 5, T5.1.a (tras la revisión humana del hito).

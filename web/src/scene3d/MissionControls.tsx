@@ -10,8 +10,11 @@ const STEP_MIN = 10; // scrubber resolution
  * Mission time controls of the live view (spec 8.2): play / pause, scrubber over the whole mission (launch to
  * end of stay), jump to a phase, speed. The mission clock and the current phase are always visible.
  * Writes missionTime / missionPhase in the store; the 3D scene reads missionTime every frame.
+ * `planId` is the plan the timeline belongs to: right after a change of plan in live mode (T4.4.b) the new
+ * timeline arrives a moment later, and playback skips those frames instead of clamping the new plan's clock
+ * into the old mission; then it carries on with the new plan.
  */
-export function MissionControls({ timeline }: { timeline: MissionTimeline }) {
+export function MissionControls({ timeline, planId }: { timeline: MissionTimeline; planId?: string }) {
   const missionTime = useApp((s) => s.missionTime);
   const missionPhase = useApp((s) => s.missionPhase);
   const setMissionTime = useApp((s) => s.setMissionTime);
@@ -37,6 +40,11 @@ export function MissionControls({ timeline }: { timeline: MissionTimeline }) {
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
+      if (planId && appStore.getState().selectedPlanId !== planId) {
+        last = now; // stale timeline: wait for the new plan's
+        raf = requestAnimationFrame(tick);
+        return;
+      }
       const t = (appStore.getState().missionTime ?? timeline.startMs) + (now - last) * speed * 3600;
       last = now;
       if (t >= timeline.endMs) {
@@ -49,7 +57,7 @@ export function MissionControls({ timeline }: { timeline: MissionTimeline }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playing, speed, timeline]);
+  }, [playing, speed, timeline, planId]);
 
   const t = missionTime ?? timeline.startMs;
   const clock = missionClock(timeline, t);
