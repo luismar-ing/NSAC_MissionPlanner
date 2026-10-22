@@ -190,6 +190,18 @@ export const STRINGS = {
   },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
+  credits: {
+    open: "About & credits",
+    title: "About & credits",
+    close: "Close",
+    intro: "PolePlanner precomputes everything from public NASA data with a reproducible pipeline; the browser only filters and draws. Every Sun and Earth position is validated against JPL Horizons (docs/validation.md).",
+    data: "Data sources",
+    license: "Licence",
+    notData: "What is not real data",
+    software: "Software",
+    softwareNote: "Open-source libraries used, with the licence each package declares.",
+    softwareGroup: { app: "Web app", pipeline: "Data pipeline (offline)" } as Record<string, string>,
+  },
   footerCredits:
     "Data: NASA LRO LOLA (Barker et al. 2023), NAIF/SPICE (NASA JPL), validated against JPL Horizons; regions: USGS. Textures: NASA Scientific Visualization Studio (Blue Marble Next Generation, LRO LROC). Trajectories are ILLUSTRATIVE.",
 } as const;

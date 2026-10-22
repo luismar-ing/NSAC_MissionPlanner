@@ -759,7 +759,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T1.1.d, T2.1.c, T2.4.b · **Spec:** 4.1, 10 (T5.3) · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** tabla completa con salidas reales; `python -m pytest pipeline/tests/test_vs_horizons.py -v` la regenera y pasa.
 
-##### [ ] T5.3.b — Atribuciones y licencias en la interfaz y el README
+##### [x] T5.3.b — Atribuciones y licencias en la interfaz y el README
 - **Qué:** pantalla "About / Credits" con NASA/LOLA, NAIF/SPICE, JPL Horizons, texturas y cohete con su licencia; lo mismo en el README.
 - **Archivos:** `web/src/views/Credits.tsx`, `README.md`
 - **Depende de:** T5.2.a · **Spec:** 11 regla 12 · **Decisiones:** — · **Est.:** 1 h

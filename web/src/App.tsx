@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Credits } from "./views/Credits";
 import { ErrorMessage } from "./components/ErrorMessage";
 import { describeError } from "./lib/errors";
 import { STRINGS } from "./lib/strings";
@@ -14,6 +15,7 @@ export function App() {
   const viewMode = useApp((s) => s.viewMode);
   const reducedMotion = useApp((s) => s.reducedMotion);
   const setReducedMotion = useApp((s) => s.setReducedMotion);
+  const [creditsOpen, setCreditsOpen] = useState(false);
 
   // the whole page follows the reduced-motion choice (CSS transitions and animations, see tokens.css)
   useEffect(() => {
@@ -49,7 +51,13 @@ export function App() {
         </div>
       )}
       {load.status === "ready" && (viewMode === "live" ? <LiveView /> : <CompareView />)}
-      <footer className="app-footer">{STRINGS.footerCredits}</footer>
+      <footer className="app-footer">
+        <span>{STRINGS.footerCredits}</span>{" "}
+        <button type="button" className="link-btn" onClick={() => setCreditsOpen(true)}>
+          {STRINGS.credits.open}
+        </button>
+      </footer>
+      {creditsOpen && <Credits onClose={() => setCreditsOpen(false)} />}
     </div>
   );
 }

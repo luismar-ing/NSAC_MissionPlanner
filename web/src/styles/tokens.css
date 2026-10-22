@@ -1435,3 +1435,95 @@ input[type="range"] {
     min-width: 0;
   }
 }
+
+/* ------------------------------------------------------------------ about & credits (T5.3.b) */
+
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.credits-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--space-md);
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+}
+
+.credits {
+  width: min(960px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  background: var(--color-bg);
+}
+
+.credits:focus {
+  outline: none;
+}
+
+.credits-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.credits h3 {
+  margin-top: var(--space-lg);
+}
+
+.credits .muted {
+  color: var(--color-text-muted);
+}
+
+.credits-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-left: 1.1em;
+}
+
+.credits-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.credits-links {
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+
+.credits a {
+  color: var(--color-accent);
+}
+
+.credits-software {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.credits-software caption {
+  text-align: left;
+  font-weight: 600;
+  padding-bottom: var(--space-xs);
+}
+
+.credits-software th,
+.credits-software td {
+  padding: 2px var(--space-sm) 2px 0;
+  text-align: left;
+  font-weight: 400;
+}

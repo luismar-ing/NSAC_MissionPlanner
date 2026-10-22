@@ -2439,3 +2439,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T5.3.b (créditos en la interfaz y el README).
+
+## 2026-10-22 · T5.3.b · Atribuciones y licencias en la interfaz y el README
+
+- **Tarea:** T5.3.b — Atribuciones y licencias ([x]).
+- **Qué se hizo:**
+  - **Pantalla «About & credits»** (`web/src/views/Credits.tsx`): diálogo modal que se abre desde el pie de página. Recibe el foco al abrirse y se cierra con Esc o con «Close»; en la vista en vivo, Esc cierra solo el diálogo. Incluye:
+    - **cada fuente de datos** con su uso, quién la publica, la cita, los archivos exactos, los enlaces y la licencia: LOLA/PGDA (Barker et al. 2023), los 5 kernels NAIF/SPICE, JPL Horizons, las dos publicaciones de USGS (McClernan 2024), el nomenclátor IAU/USGS y las dos texturas de NASA SVS (con la advertencia «optimized for aesthetics, not science» y el crédito a Reto Stockli por Blue Marble NG);
+    - **qué no son datos reales:** trayectorias ILLUSTRATIVE, el cohete (modelo procedural propio, sin recursos externos) y la escala ×6;
+    - **las licencias del software:** las del front end leídas de cada `package.json` y las del pipeline de los metadatos de los paquetes de Python.
+  - Lista única en `web/src/lib/credits.ts`.
+  - **README:** la sección «Data sources & credits» pasa a ser una tabla con las mismas fuentes, enlaces y licencias, más el software. Se quita el pendiente «Rocket model: to be added» y se actualiza el estado del proyecto.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/credits.test.tsx --reporter=verbose
+  data/README.md: 11 source URLs
+   ✓ every source URL of data/README.md is on the credits screen, as a link
+   ✓ every source URL of data/README.md is in the README
+   ✓ Esc and the button close the dialog; Esc does not also leave the live view
+   ✓ the software versions shown are the installed ones (package.json y pipeline/requirements.txt)
+  $ npm --prefix web test → Test Files 31 passed · Tests 213 passed (2 ejecuciones) · typecheck → exit 0
+  ```
+  En el navegador, el diálogo se abre desde el pie y muestra cada fuente con sus enlaces.
+- **Decisiones tomadas:** los créditos van en un diálogo, no en una vista nueva, para no perder el estado de comparar o vivir. Las versiones del software se comprueban en una prueba para que no se queden desfasadas.
+- **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/lib/credits.ts` y `web/tests/credits.test.tsx`.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** la Fase 5 solo espera T5.2.e (revisión visual con el humano). Después, el hito de la Fase 5.
