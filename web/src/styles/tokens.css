@@ -959,3 +959,33 @@ button {
   margin: 0;
   color: var(--color-text-muted);
 }
+
+/* ------------------------------------------------------------------ scale indicator (T4.1.b) */
+
+.scene-wrap {
+  position: relative;
+}
+
+.scale-indicator {
+  position: absolute;
+  left: var(--space-md);
+  bottom: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: calc(100% - 2 * var(--space-md));
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  pointer-events: auto;
+  cursor: help;
+}
+
+.scale-indicator-tag {
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+}

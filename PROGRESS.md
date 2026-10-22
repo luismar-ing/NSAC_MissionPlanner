@@ -1801,3 +1801,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos provisionales `LiveStub.tsx` y botón «Open 3D view» (ver arriba). Vite avisa de que el chunk de three.js pasa de 500 kB; es esperable (three.js completo) y se carga solo en la vista 3D.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.1.b.
+
+## 2026-10-22 · T4.1.b · Modo de escala, render relativo a la cámara y buffer logarítmico
+
+- **Tarea:** T4.1.b — Modo de escala, render relativo a la cámara y buffer logarítmico ([x]).
+- **Qué se hizo:**
+  - `web/src/scene3d/scale.ts`: modo de escala de D8. 1 unidad de escena = 1000 km, aplicado de forma **uniforme** a todas las posiciones (semejanza), así que todos los ángulos se conservan exactos: dirección del Sol, fase de la Luna, orientaciones. La Tierra y la Luna se dibujan ×6 (`SPACE_SCALE`); `LOCAL_SCALE` (×1) es la escala real del zoom final (T4.3.b). Radios del PCK `pck00011.tpc`: Tierra 6378.1366 / 6356.7519 km (BODY399_RADII), Luna 1737.4 km (BODY301_RADII, la misma esfera del DEM). `RelativeOrigin` es el origen flotante para el render relativo a la cámara. También `angleBetween` y `phaseAngle` (ángulo Sol–Luna–Tierra).
+  - `web/src/scene3d/renderer.ts`: `logarithmicDepthBuffer: true`; cámara con near = 1e-6 (1 mm) y far = 1e7 unidades (10 millones de km); `SceneHandle` con las posiciones de mundo en float64 y `applyCameraRelative`, que en cada fotograma pone la cámara en el origen y los objetos en `mundo − cámara`. Un gancho de depuración `window.__pp3d`, solo en desarrollo, para las comprobaciones en el navegador.
+  - `web/src/scene3d/ScaleIndicator.tsx`: aviso siempre visible sobre la escena: «Not to scale · Earth and Moon drawn 6× larger · distances, Sun direction and Moon phase exact», con el detalle en un tooltip; en escala local dice «Real scale».
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/scale.test.ts --reporter=verbose
+  scale: 9192 samples, max |Δ phase angle| = 4.44e-16 rad, max |Δ elongation| = 4.44e-16 rad     (criterio < 1e-9)
+  precision: float32 error 2.52e-15 units camera-relative vs 4.57e-6 absolute                      (1 m de la cámara, junto a la Luna)
+   ✓ Sun–Moon–Earth angle identical before and after scaling, every hourly sample of the scene
+   ✓ phase angle sanity: full Moon ≈ 0°, new Moon ≈ 180°, and the year covers both
+   ✓ bodies exaggerated by the fixed D8 factor in space, real size at the site
+   ✓ a point 1 m from a camera near the Moon survives float32; the absolute coordinate would not
+   ✓ each frame the camera sits at the origin and objects at world − camera
+   ✓ the renderer is created with a logarithmic depth buffer
+  $ npm --prefix web test → Tests 122 passed · typecheck → exit 0
+  ```
+  En el navegador: `renderer.capabilities.logarithmicDepthBuffer = true`, near 1e-6, far 1e7. Prueba de parpadeo de profundidad: dos esferas del tamaño real de la Luna en su posición (−321, 168, 67 unidades), separadas **1 m**, con la cámara a 100 m de la superficie, renderizadas a una textura de 200×200: mirando hacia abajo, 40 000 píxeles de la esfera exterior y **0** de la interior; en vista rasante, 19 115 y **0**. Sin fugas, así que no hay parpadeo. El indicador de escala se ve sobre la escena.
+- **Decisiones tomadas:** factor de exageración ×6 (Tierra ≈ 38 unidades, Luna ≈ 10, a ~384 unidades de distancia). Escalado uniforme en lugar de una compresión no lineal de distancias, porque conserva todos los ángulos, no solo los vistos desde la Tierra.
+- **Desviaciones de la spec / cambios en la guía:** ninguno. La forma de llevar los puntos de la trayectoria a la superficie de una Luna exagerada se resuelve en T4.2.c y T4.3.b.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.1.c.

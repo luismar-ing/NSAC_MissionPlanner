@@ -1,6 +1,8 @@
 import { useApp } from "../store/appStore";
 import { STRINGS } from "../lib/strings";
 import { SceneHost } from "../scene3d/SceneHost";
+import { ScaleIndicator } from "../scene3d/ScaleIndicator";
+import { SPACE_SCALE } from "../scene3d/scale";
 
 /**
  * Provisional live view (T4.1.a): the 3D scene of the selected plan and a way back to compare mode.
@@ -20,7 +22,10 @@ export function LiveStub() {
           {STRINGS.live.back}
         </button>
       </div>
-      <SceneHost />
+      <div className="scene-wrap">
+        <SceneHost />
+        <ScaleIndicator mode={SPACE_SCALE} />
+      </div>
     </section>
   );
 }

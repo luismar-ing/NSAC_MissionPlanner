@@ -143,6 +143,13 @@ export const STRINGS = {
     error: "The 3D scene could not be started (WebGL unavailable). The 2D comparison still works.",
     title: (site: string) => `Live view · ${site}`,
   },
+  scale: {
+    notToScale: "Not to scale",
+    realScale: "Real scale",
+    exaggerated: (f: number) => `Earth and Moon drawn ${f}× larger · distances, Sun direction and Moon phase exact`,
+    local: "Terrain and distances at their real size",
+    detail: (km: number) => `1 scene unit = ${km} km. Sizes are enlarged so the bodies stay visible; positions are scaled uniformly, so every angle is exact (spec 5.9).`,
+  },
   trayTitle: "Comparison tray",
   trayEmpty: "Pin 2 to 5 plans from the calendar to compare them side by side.",
   footerCredits:

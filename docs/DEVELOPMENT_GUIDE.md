@@ -611,7 +611,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T3.1.b · **Spec:** 2, 7, 8.7, 11 regla 7 · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** tras alternar de modo 10 veces existe exactamente 1 contexto WebGL (prueba en navegador); la salida de `npm --prefix web run build` muestra three.js en un chunk separado del inicial.
 
-##### [ ] T4.1.b — Modo de escala, render relativo a la cámara y buffer logarítmico
+##### [x] T4.1.b — Modo de escala, render relativo a la cámara y buffer logarítmico
 - **Qué:** modo de escala de D8 (cuerpos y distancias, direcciones angulares correctas) e indicador de escala; render relativo a la cámara; `logarithmicDepthBuffer`.
 - **Archivos:** `web/src/scene3d/scale.ts`, `web/src/scene3d/ScaleIndicator.tsx`, `web/tests/scale.test.ts`
 - **Depende de:** T4.1.a · **Spec:** 5.9 · **Decisiones:** D8 · **Est.:** 3 h · **Adelantable**

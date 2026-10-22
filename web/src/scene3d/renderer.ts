@@ -8,6 +8,7 @@
  */
 import * as THREE from "three";
 import { COLORS } from "../styles/tokens";
+import { RelativeOrigin } from "./scale";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -55,7 +56,8 @@ export function createRendererManager<R extends RendererLike>(factory: () => R):
 }
 
 function createWebGLRenderer(): THREE.WebGLRenderer {
-  const r = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  // logarithmic depth buffer (spec 5.9): depth precision from metres at the site to Earth–Moon distance
+  const r = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance", logarithmicDepthBuffer: true });
   r.outputColorSpace = THREE.SRGBColorSpace;
   r.setClearColor(COLORS.bg, 1);
   r.domElement.dataset.webgl = "poleplanner"; // lets the browser checks find the one canvas
@@ -66,15 +68,42 @@ function createWebGLRenderer(): THREE.WebGLRenderer {
 /** The app-wide manager (one per page). */
 export const rendererManager = createRendererManager(createWebGLRenderer);
 
+/** Near/far planes in scene units (1 unit = 1000 km): 1 mm to 10 million km, usable thanks to the log depth. */
+export const CAMERA_NEAR = 1e-6;
+export const CAMERA_FAR = 1e7;
+
+export interface SceneHandle {
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  /** Camera-relative rendering: world positions (float64) are placed at `world − origin` each frame. */
+  origin: RelativeOrigin;
+  /** World positions of the scene objects (float64); the render loop turns them into camera-relative ones. */
+  world: Map<THREE.Object3D, [number, number, number]>;
+  /** Camera position in world units (float64); the THREE camera itself stays at the origin. */
+  cameraWorld: [number, number, number];
+}
+
+/** Each frame: the camera becomes the origin, objects move to their camera-relative positions. */
+export function applyCameraRelative(h: SceneHandle): void {
+  h.origin.setOrigin(h.cameraWorld);
+  h.camera.position.set(0, 0, 0);
+  for (const [obj, p] of h.world) {
+    const [x, y, z] = h.origin.relative(p);
+    obj.position.set(x, y, z);
+  }
+}
+
 /**
  * Mounts the live scene into `container` and returns the unmount function. For now the scene is empty
- * (the Earth, the Moon and the Sun arrive in T4.1.c); what matters here is the renderer lifecycle.
+ * (the Earth, the Moon and the Sun arrive in T4.1.c); what matters here is the renderer lifecycle (T4.1.a)
+ * and the scale / precision set-up (T4.1.b).
  */
 export function mountScene(container: HTMLElement): () => void {
   const renderer = rendererManager.acquire(container);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-  camera.position.set(0, 0, 10);
+  const camera = new THREE.PerspectiveCamera(45, 1, CAMERA_NEAR, CAMERA_FAR);
+  const handle: SceneHandle = { scene, camera, origin: new RelativeOrigin(), world: new Map(), cameraWorld: [0, 0, 10] };
+  if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle };
 
   const resize = () => {
     const w = Math.max(1, container.clientWidth);
@@ -87,7 +116,10 @@ export function mountScene(container: HTMLElement): () => void {
   resize();
   const ro = new ResizeObserver(resize);
   ro.observe(container);
-  renderer.setAnimationLoop(() => renderer.render(scene, camera));
+  renderer.setAnimationLoop(() => {
+    applyCameraRelative(handle);
+    renderer.render(scene, camera);
+  });
 
   return () => {
     ro.disconnect();
