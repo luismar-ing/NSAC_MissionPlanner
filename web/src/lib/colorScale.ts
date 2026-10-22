@@ -50,10 +50,20 @@ const mix = (a: Lab, b: Lab, t: number): Lab => [a[0] + (b[0] - a[0]) * t, a[1] 
 export function rampLut(mode: CalendarMode, steps = 256): string[] {
   const hue = hexToOklab(COLORS[MODE_HUE[mode]]);
   const low = mix(hexToOklab(COLORS.panelRaised), hue, 0.12);
-  return Array.from({ length: steps }, (_, i) => {
+  const out: string[] = [];
+  let prevL = -Infinity;
+  for (let i = 0; i < steps; i++) {
     const [r, g, b] = oklabToRgb(mix(low, hue, i / (steps - 1)));
-    return `rgb(${r},${g},${b})`;
-  });
+    // rounding to 8-bit sRGB can make a step a hair darker than the previous one (seen with the green
+    // ramp): reuse the previous colour then, so lightness never decreases (spec 9, sequential ramps)
+    const L = hexToOklab(`#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`)[0];
+    if (L < prevL && out.length) out.push(out[out.length - 1]);
+    else {
+      out.push(`rgb(${r},${g},${b})`);
+      prevL = L;
+    }
+  }
+  return out;
 }
 
 /** OKLab lightness of each LUT entry (used by tests: must increase monotonically). */

@@ -10,8 +10,8 @@ interface Props {
   compareTime: number; // hours since arrival
 }
 
-// two lanes: Sun on top, Earth below. A lit lane takes the colour of the state (orange = Sun only,
-// blue = Earth only, green = both), so the state reads by position as well as by colour (spec 9).
+// two lanes: Sun on top (white light), Earth below (green). Each lane has its own colour, so "both" is simply
+// both lanes lit and the state reads by position as well as by colour (spec 9, palette A6).
 const LANE_SUN = { y: 2, h: 15 };
 const LANE_EARTH = { y: 19, h: 15 };
 const LABEL_Y = 50;
@@ -44,44 +44,44 @@ export const TimeRibbon = memo(function TimeRibbon({ series, compareTime }: Prop
     <div ref={ref} className="ribbon" data-testid="ribbon" data-dark-start={dark?.start} data-dark-h={darkH}>
       {w > 0 && (
         <svg width={w} height={56} role="img" aria-label={label}>
-          <rect x={0} y={LANE_SUN.y} width={w} height={LANE_EARTH.y + LANE_EARTH.h - LANE_SUN.y} fill={COLORS.dark} />
+          <rect className="rib-bg" x={0} y={LANE_SUN.y} width={w} height={LANE_EARTH.y + LANE_EARTH.h - LANE_SUN.y} fill={COLORS.dark} />
           {runs.map((r) => {
-            const fill = r.state === "both" ? COLORS.both : r.state === "sun" ? COLORS.sun : COLORS.earth;
             const sun = r.state === "both" || r.state === "sun";
             const earth = r.state === "both" || r.state === "earth";
             const rx = x(r.start);
             const rw = Math.max(0.5, x(r.end) - rx);
             return (
-              <g key={r.start} data-state={r.state}>
-                {sun && <rect x={rx} y={LANE_SUN.y} width={rw} height={LANE_SUN.h} fill={fill} />}
-                {earth && <rect x={rx} y={LANE_EARTH.y} width={rw} height={LANE_EARTH.h} fill={fill} />}
+              <g key={r.start} className={`rib-run ${r.state}`} data-state={r.state}>
+                {sun && <rect x={rx} y={LANE_SUN.y} width={rw} height={LANE_SUN.h} fill={COLORS.sun} />}
+                {earth && <rect x={rx} y={LANE_EARTH.y} width={rw} height={LANE_EARTH.h} fill={COLORS.earth} />}
               </g>
             );
           })}
           {/* day boundaries */}
           {Array.from({ length: days + 1 }, (_, d) => (
-            <line key={d} x1={x((d * 1440) / series.stepMin)} x2={x((d * 1440) / series.stepMin)} y1={LANE_SUN.y} y2={LANE_EARTH.y + LANE_EARTH.h + 3} stroke={COLORS.bg} strokeWidth={1} />
+            <line className="rib-day" key={d} x1={x((d * 1440) / series.stepMin)} x2={x((d * 1440) / series.stepMin)} y1={LANE_SUN.y} y2={LANE_EARTH.y + LANE_EARTH.h + 3} stroke={COLORS.bg} strokeWidth={1} />
           ))}
           {/* longest dark stretch: dashed outline over both lanes, plus its length */}
           {dark && (
             <rect
+              className="rib-dark"
               data-testid="longest-dark"
               x={x(dark.start) + 0.75}
               y={LANE_SUN.y - 1}
               width={Math.max(2, x(dark.end) - x(dark.start) - 1.5)}
               height={LANE_EARTH.y + LANE_EARTH.h - LANE_SUN.y + 2}
               fill="none"
-              stroke={COLORS.focus}
+              stroke={COLORS.textMuted}
               strokeWidth={1.5}
               strokeDasharray="4 2"
             />
           )}
           {/* compareTime cursor */}
-          <line x1={x(Math.min(k + 0.5, series.n))} x2={x(Math.min(k + 0.5, series.n))} y1={0} y2={LANE_EARTH.y + LANE_EARTH.h + 2} stroke={COLORS.text} strokeWidth={1.5} />
-          <text x={2} y={LABEL_Y} fill={COLORS.textMuted} fontSize={10}>
+          <line className="rib-cursor" x1={x(Math.min(k + 0.5, series.n))} x2={x(Math.min(k + 0.5, series.n))} y1={0} y2={LANE_EARTH.y + LANE_EARTH.h + 2} stroke={COLORS.text} strokeWidth={1.5} />
+          <text className="rib-label" x={2} y={LABEL_Y} fill={COLORS.textMuted} fontSize={10}>
             {STRINGS.ribbon.lanes}
           </text>
-          <text x={w - 2} y={LABEL_Y} textAnchor="end" fill={COLORS.text} fontSize={10}>
+          <text className="rib-label strong" x={w - 2} y={LABEL_Y} textAnchor="end" fill={COLORS.text} fontSize={10}>
             {dark ? STRINGS.ribbon.longest(darkH) : STRINGS.ribbon.noDark}
           </text>
         </svg>

@@ -36,9 +36,11 @@ export function CompareView() {
         </div>
       </section>
       <section className="panel tray-area" aria-labelledby="tray-title">
-        <h2 id="tray-title" className="panel-title">
-          {STRINGS.trayTitle}
-        </h2>
+        <div className="tray-head">
+          <h2 id="tray-title" className="panel-title">
+            {STRINGS.trayTitle}
+          </h2>
+        </div>
         <Tray />
       </section>
       <section className="panel site-area" aria-labelledby="site-title">

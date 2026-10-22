@@ -1743,3 +1743,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - Carga del shell 2D (build de producción, local): 356–517 ms.
 - **Problemas abiertos para el humano:** D1 y D11 siguen pendientes (no bloquean la Fase 4). A5 sigue revisable. «Pin best 3» tiende a elegir planes que empatan en todo (score saturado, T1.4.d): mejora opcional anotada en T3.3.d.
 - **Siguiente tarea:** Fase 4 (T4.1.a, escena 3D).
+
+## 2026-10-22 · UI · Rediseño Quantum (decisión A6)
+
+- **Tarea:** rediseño de la capa visual pedido por el humano (fuera de la guía; sin cambios de lógica ni de datos).
+- **Proceso:** se propusieron variantes aplicadas solo a la tarjeta «Comparison tray» con un selector temporal: primero Nebula, Aurora y Orbit (demasiado parecidas, según el humano); luego Editorial, Bento y Apollo (gustó la estructura de Apollo); luego Apollo, Nebula y Aurora con esa estructura; por último «Quantum», con una paleta de seis colores dada por el humano. El humano eligió Quantum.
+- **Qué se hizo:**
+  - `web/src/styles/tokens.ts`: paleta Quantum como tokens base (fondo `#0B0F14`, verde `#3DDC84`, texto `#E6EDF3`, grises `#8E949A` / `#575D62` / `#373B40`), nuevos tokens `accent` y `borderStrong`, y tipografía Geist / Geist Mono (`@fontsource-variable/geist` y `geist-mono` 5.3.0, licencia SIL OFL, autoalojadas: funcionan sin red). Sustituye los colores de la spec 9.
+  - Papeles: el Sol se dibuja en blanco (luz) y la Tierra en verde; la cinta de tiempo colorea cada carril (arriba Sol, abajo Tierra), así «ambos» no necesita un tercer color. El gris medio (2.9:1) solo se usa en bordes. `danger` es el único color fuera de la paleta (errores).
+  - `web/src/styles/tokens.css`: estilo mínimo en toda la app (paneles con borde fino en vez de relleno, controles activos en verde, foco verde). En la bandeja, la estructura «Apollo»: planes numerados (01, 02…), cabecera con línea fina, Sunlight % y Score como mosaicos grandes y el resto de métricas como filas.
+  - Componentes (solo presentación): clases CSS en los elementos SVG de la silueta y la cinta; cinta coloreada por carril; contorno de la racha de oscuridad en gris claro; contorno del rango del calendario en texto claro (el verde desaparecía sobre celdas verdes); borde del terreno en gris medio. Leyenda de la cinta sin mención de color («Top: Sun · Bottom: Earth»).
+  - `web/src/lib/colorScale.ts`: la rampa verde perdía 0.0004 de luminosidad en un paso por el redondeo a 8 bits; ahora un paso que saldría más oscuro repite el color anterior (luminosidad siempre creciente).
+  - Eliminados el selector temporal, las variantes descartadas y sus fuentes.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test   → Tests 112 passed
+    tokens.test.ts: uses the six Quantum colours (decision A6); only `danger` lies outside them
+    calendar.test.ts: las tres rampas siguen siendo monótonas en luminosidad
+  $ npm --prefix web run typecheck → exit 0
+  $ npm --prefix web run build     → OK (JS 377 kB, 116 kB con gzip; fuentes latinas ~52 kB descargadas)
+  ```
+  Validador de paleta: Sol (blanco) frente a Tierra (verde), ΔE 15.3 con daltonismo y 23.4 normal. Contraste del texto: claro 16.3:1, gris claro 6.3:1, verde 10.8:1; texto oscuro sobre verde (botón activo) 10.8:1.
+  En el navegador: cabecera, restricciones, calendario (modos combinado, energía en blanco, comunicaciones; atenuado y rayado con restricciones activas), bandeja con 3 planes, panorama y panel del sitio con el estilo nuevo. Scrubber con 3 paneles: render + layout mediana 8.8 ms, máx. 21.2 ms; redibujado del calendario 6.2 ms. A 774 px de ancho, `scrollWidth` 759 (sin scroll horizontal). Consola sin errores tras recargar.
+- **Decisiones tomadas:** A6 en `docs/DECISIONS.md`.
+- **Desviaciones de la spec / cambios en la guía:** los colores de la spec 9 se sustituyen por la paleta Quantum (A6). El resto de la spec 9 (Sol y Tierra distinguibles, estado con forma además de color, contraste, movimiento reducido) se mantiene.
+- **Problemas abiertos:** en Quantum el verde marca a la vez la Tierra y la selección / «Best»; se distinguen por la forma (insignia con estrella y texto), pero un acento propio requeriría un séptimo color.
+- **Siguiente tarea:** Fase 4 (T4.1.a), cuando el humano lo indique.

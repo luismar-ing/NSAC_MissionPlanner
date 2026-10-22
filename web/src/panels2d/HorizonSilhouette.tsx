@@ -67,29 +67,29 @@ export const HorizonSilhouette = memo(function HorizonSilhouette({ data, scale, 
             {/* sky grid: horizon line, elevation ticks every 5°, cardinal directions */}
             {Array.from({ length: Math.floor(p.maxEl / 5) - Math.ceil(p.minEl / 5) + 1 }, (_, i) => (Math.ceil(p.minEl / 5) + i) * 5).map((e) => (
               <g key={e}>
-                <line x1={0} x2={w} y1={elToY(p, e)} y2={elToY(p, e)} stroke={COLORS.border} strokeWidth={1} strokeDasharray={e === 0 ? "4 3" : undefined} />
-                <text x={4} y={elToY(p, e) - 3} fill={COLORS.textMuted} fontSize={10}>
+                <line className={e === 0 ? "sil-grid sil-horizon" : "sil-grid"} x1={0} x2={w} y1={elToY(p, e)} y2={elToY(p, e)} stroke={COLORS.border} strokeWidth={1} strokeDasharray={e === 0 ? "4 3" : undefined} />
+                <text className="sil-label" x={4} y={elToY(p, e) - 3} fill={COLORS.textMuted} fontSize={10}>
                   {e}°
                 </text>
               </g>
             ))}
             {/* tracks over the whole window */}
-            <path d={paths.earth} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} />
-            <path d={paths.sun} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.55} />
+            <path className="sil-track earth" d={paths.earth} fill="none" stroke={COLORS.earth} strokeWidth={1.5} strokeOpacity={0.55} />
+            <path className="sil-track sun" d={paths.sun} fill="none" stroke={COLORS.sun} strokeWidth={1.5} strokeOpacity={0.55} />
             {/* terrain on top of the tracks: a body behind the terrain is hidden by it, as in reality */}
-            <path d={paths.terrain} fill={COLORS.terrain} stroke={COLORS.textMuted} strokeWidth={1} strokeOpacity={0.6} />
+            <path className="sil-terrain" d={paths.terrain} fill={COLORS.terrain} stroke={COLORS.borderStrong} strokeWidth={1} />
             {/* cardinal directions and the actual vertical exaggeration, above the terrain */}
             {CARDINALS.map(([az, label]) => (
-              <text key={label} x={Math.min(w - 10, azToX(p, az) + 3)} y={h - 4} fill={COLORS.text} fontSize={11}>
+              <text className="sil-cardinal" key={label} x={Math.min(w - 10, azToX(p, az) + 3)} y={h - 4} fill={COLORS.text} fontSize={11}>
                 {label}
               </text>
             ))}
-            <text x={w - 4} y={12} textAnchor="end" fill={COLORS.textMuted} fontSize={10} data-testid="exaggeration">
+            <text className="sil-label" x={w - 4} y={12} textAnchor="end" fill={COLORS.textMuted} fontSize={10} data-testid="exaggeration">
               {STRINGS.silhouette.shown(exaggerationOf(p))}
             </text>
             {/* bodies at compareTime */}
             {over ? (
-              <text x={w / 2} y={h / 2} textAnchor="middle" fill={COLORS.textMuted} fontSize={12}>
+              <text className="sil-label" x={w / 2} y={h / 2} textAnchor="middle" fill={COLORS.textMuted} fontSize={12}>
                 {STRINGS.scrubber.after}
               </text>
             ) : (
@@ -108,20 +108,20 @@ export const HorizonSilhouette = memo(function HorizonSilhouette({ data, scale, 
 function Sun({ x, y, azel, visible }: { x: number; y: number; azel: [number, number]; visible: boolean }) {
   const rays = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4);
   return (
-    <g data-testid="sun-marker" data-az={azel[0]} data-el={azel[1]} data-visible={visible} transform={`translate(${x},${y})`}>
+    <g className="body-marker sun" data-testid="sun-marker" data-az={azel[0]} data-el={azel[1]} data-visible={visible} transform={`translate(${x},${y})`}>
       {rays.map((a) => (
-        <line key={a} x1={Math.cos(a) * 7} y1={Math.sin(a) * 7} x2={Math.cos(a) * 10} y2={Math.sin(a) * 10} stroke={COLORS.sun} strokeWidth={1.5} />
+        <line className="sun-ray" key={a} x1={Math.cos(a) * 7} y1={Math.sin(a) * 7} x2={Math.cos(a) * 10} y2={Math.sin(a) * 10} stroke={COLORS.sun} strokeWidth={1.5} />
       ))}
-      <circle r={5} fill={visible ? COLORS.sun : COLORS.bg} stroke={COLORS.sun} strokeWidth={2} />
+      <circle className="body-disc" r={5} fill={visible ? COLORS.sun : COLORS.bg} stroke={COLORS.sun} strokeWidth={2} />
     </g>
   );
 }
 
 function Earth({ x, y, azel, visible }: { x: number; y: number; azel: [number, number]; visible: boolean }) {
   return (
-    <g data-testid="earth-marker" data-az={azel[0]} data-el={azel[1]} data-visible={visible} transform={`translate(${x},${y})`}>
-      <circle r={9} fill="none" stroke={COLORS.earth} strokeWidth={1} strokeOpacity={0.7} />
-      <circle r={5.5} fill={visible ? COLORS.earth : COLORS.bg} stroke={COLORS.earth} strokeWidth={2} />
+    <g className="body-marker earth" data-testid="earth-marker" data-az={azel[0]} data-el={azel[1]} data-visible={visible} transform={`translate(${x},${y})`}>
+      <circle className="earth-ring" r={9} fill="none" stroke={COLORS.earth} strokeWidth={1} strokeOpacity={0.7} />
+      <circle className="body-disc" r={5.5} fill={visible ? COLORS.earth : COLORS.bg} stroke={COLORS.earth} strokeWidth={2} />
     </g>
   );
 }

@@ -1,4 +1,4 @@
-/** T3.1.c: tokens are the single source of colour; spec 9 colours are kept as given. */
+/** T3.1.c: tokens are the single source of colour. Palette "Quantum" (decision A6) replaces the spec 9 colours. */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -10,8 +10,11 @@ const files = (dir: string): string[] =>
   readdirSync(dir).flatMap((n) => (statSync(join(dir, n)).isDirectory() ? files(join(dir, n)) : [join(dir, n)]));
 
 describe("design tokens (spec 9)", () => {
-  it("keeps the seven spec colours", () => {
-    expect(COLORS).toMatchObject({ bg: "#0b0f1a", panel: "#121a2b", sun: "#ffb347", earth: "#4aa3ff", dark: "#1a2238", both: "#9be3a6", text: "#e6edf7" });
+  it("uses the six Quantum colours (decision A6); only `danger` lies outside them", () => {
+    const palette = ["#0B0F14", "#3DDC84", "#E6EDF3", "#8E949A", "#575D62", "#373B40"];
+    expect(COLORS).toMatchObject({ bg: "#0B0F14", sun: "#E6EDF3", earth: "#3DDC84", text: "#E6EDF3", textMuted: "#8E949A", border: "#373B40" });
+    const outside = Object.entries(COLORS).filter(([, v]) => !palette.includes(v)).map(([k]) => k);
+    expect(outside).toEqual(["danger"]);
   });
 
   it("no hex colour appears outside styles/tokens.ts", () => {

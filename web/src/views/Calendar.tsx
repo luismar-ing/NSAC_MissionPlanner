@@ -176,7 +176,7 @@ export function Calendar() {
       const [x1, y1, w1, h1] = cellRect(layout, range.site1, range.day1);
       ctx.save();
       ctx.setLineDash([5, 3]);
-      ctx.strokeStyle = COLORS.focus;
+      ctx.strokeStyle = COLORS.text;
       ctx.lineWidth = 2;
       ctx.strokeRect(x0 - 1, y0 - 1, x1 + w1 - x0 + 2, y1 + h1 - y0 + 2);
       ctx.restore();

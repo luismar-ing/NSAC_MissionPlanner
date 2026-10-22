@@ -68,7 +68,7 @@ export const STRINGS = {
     times: (x: number) => `×${x}`,
   },
   ribbon: {
-    lanes: "Top: Sun · Bottom: Earth · green = both",
+    lanes: "Top: Sun · Bottom: Earth",
     longest: (h: number) => `Longest dark: ${h.toFixed(1)} h`,
     noDark: "No dark stretch",
     aria: (h: number, at: string) =>
