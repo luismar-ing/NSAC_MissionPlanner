@@ -1062,7 +1062,7 @@ button {
 
 /* at the site the scene gives room to the panorama, so its sky is in view together with the 3D one */
 .scene-host {
-  transition: height 300ms ease;
+  transition: height var(--motion-mid) ease;
 }
 
 .live-area.at-site .scene-host {
@@ -1076,7 +1076,7 @@ button {
   margin-top: var(--space-lg);
   padding-top: var(--space-md);
   border-top: 1px solid var(--color-border);
-  animation: live-site-in 300ms ease both;
+  animation: live-site-in var(--motion-mid) ease both;
 }
 
 @keyframes live-site-in {
@@ -1263,4 +1263,47 @@ button.thumb:focus-visible {
 .calendar-site-btn:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
+}
+
+/* ------------------------------------------------------------------ projector polish (T5.2.a) */
+
+/* identical panels (spec 8.1): every row starts at the same height in every panel, whatever the length of
+   its metrics box, so the shared vertical axis of the silhouettes lines up across the tray */
+.plan-panel {
+  align-content: start;
+}
+
+/* chart text readable from the back of a room: at least 12 px (the SVG attributes say 10–11) */
+.silhouette .sil-label,
+.ribbon .rib-label,
+.panorama-canvas text {
+  font-size: 12px;
+}
+
+.silhouette .sil-cardinal {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* thumbnails are small multiples: no axis labels or captions (the full panels carry them), so nothing
+   collides; the ribbon row fits its two lanes */
+.thumb {
+  grid-template-rows: auto 92px 36px auto;
+}
+
+.thumb .sil-label,
+.thumb .rib-label {
+  display: none;
+}
+
+.thumb .ribbon {
+  overflow: hidden;
+}
+
+.mission-slow {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 6px;
+  padding: 0 6px;
 }

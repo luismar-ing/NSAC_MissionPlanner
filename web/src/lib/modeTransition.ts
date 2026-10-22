@@ -6,9 +6,10 @@
  */
 import { sceneBridge } from "../scene3d/bridge";
 import { appStore } from "../store/appStore";
+import { MOTION } from "../styles/tokens";
 import { clampMission, phaseAt, timelineOf } from "./mission";
 
-export const TRANSITION_MS = 300;
+export const TRANSITION_MS = MOTION.midMs;
 
 let expandFrom: DOMRect | null = null; // panel → scene
 let collapseFrom: DOMRect | null = null; // scene → panel

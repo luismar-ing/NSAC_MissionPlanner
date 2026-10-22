@@ -69,3 +69,20 @@ export function missionClock(tl: MissionTimeline, t: number): { elapsed: string;
   const mm = String(min % 60).padStart(2, "0");
   return { elapsed: `T+ ${d}d ${hh}:${mm}`, utc };
 }
+
+/**
+ * Slow motion around launch (T5.2.a). At the usual 6 h/s the countdown and the lift-off would last a fraction
+ * of a second on screen, so playback runs at LAUNCH_SLOW_RATE (mission seconds per real second) until launch_utc
+ * and then speeds up exponentially to the chosen speed over LAUNCH_RAMP_MS of mission time. Rates are mission
+ * milliseconds per real millisecond; slower chosen speeds are never slowed further.
+ */
+export const LAUNCH_SLOW_RATE = 300; // 5 minutes of mission per second: the 5-minute countdown takes 1 s
+export const LAUNCH_RAMP_MS = 30 * 60_000;
+
+export function playbackRate(tl: MissionTimeline, t: number, hoursPerSecond: number): number {
+  const full = hoursPerSecond * 3600;
+  if (full <= LAUNCH_SLOW_RATE) return full;
+  if (t < tl.launchMs) return LAUNCH_SLOW_RATE;
+  const u = (t - tl.launchMs) / LAUNCH_RAMP_MS;
+  return u >= 1 ? full : LAUNCH_SLOW_RATE * (full / LAUNCH_SLOW_RATE) ** u;
+}

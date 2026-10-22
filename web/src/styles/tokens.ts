@@ -39,7 +39,7 @@ export const FONT = {
   size: { sm: 14, md: 16, lg: 20, xl: 28, xxl: 36 },
 } as const;
 
-export const MOTION = { fastMs: 200, slowMs: 400 } as const; // spec 9: 200–400 ms UI transitions
+export const MOTION = { fastMs: 200, midMs: 300, slowMs: 400 } as const; // spec 9: 200–400 ms UI transitions
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 
@@ -52,6 +52,7 @@ export function cssVariables(): Record<string, string> {
   vars["--font-family"] = FONT.family;
   vars["--font-mono"] = FONT.mono;
   vars["--motion-fast"] = `${MOTION.fastMs}ms`;
+  vars["--motion-mid"] = `${MOTION.midMs}ms`;
   vars["--motion-slow"] = `${MOTION.slowMs}ms`;
   return vars;
 }

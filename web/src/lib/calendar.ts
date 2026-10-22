@@ -17,7 +17,8 @@ export interface CalendarLayout {
 }
 
 export function makeLayout(width: number, nSites: number, nDays: number): CalendarLayout {
-  return { width, labelW: Math.min(220, Math.max(130, width * 0.14)), axisH: 22, rowH: 26, rowGap: 2, nSites, nDays };
+  // rows tall enough to read from a distance (projector, T5.2.a); 5 sites stay under 220 px
+  return { width, labelW: Math.min(220, Math.max(130, width * 0.14)), axisH: 22, rowH: 36, rowGap: 3, nSites, nDays };
 }
 
 export const plotWidth = (l: CalendarLayout) => l.width - l.labelW;

@@ -720,7 +720,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T5.2 Pulido visual, accesibilidad y rendimiento
 
-##### [ ] T5.2.a — Pulido visual para proyector
+##### [x] T5.2.a — Pulido visual para proyector
 - **Qué:** paleta, tipografía, jerarquía y transiciones de 200 a 400 ms.
 - **Archivos:** `web/src/styles/**`, `docs/figures/screens/*.png`
 - **Depende de:** T5.1.c · **Spec:** 9, 8.7 · **Decisiones:** — · **Est.:** 3 h

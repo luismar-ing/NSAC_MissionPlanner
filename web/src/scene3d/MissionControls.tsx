@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { clampMission, missionClock, phaseAt, phaseStart, PLAY_PHASES, type MissionTimeline } from "../lib/mission";
+import { clampMission, missionClock, phaseAt, phaseStart, playbackRate, PLAY_PHASES, type MissionTimeline } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { appStore, useApp } from "../store/appStore";
 
@@ -38,14 +38,21 @@ export function MissionControls({ timeline, planId }: { timeline: MissionTimelin
   useEffect(() => {
     if (!playing) return;
     let raf = 0;
-    let last = performance.now();
+    // the first frame only sets the time origin: frame timestamps and performance.now() need not share a clock
+    let last: number | null = null;
     const tick = (now: number) => {
+      if (last === null) {
+        last = now;
+        raf = requestAnimationFrame(tick);
+        return;
+      }
       if (planId && appStore.getState().selectedPlanId !== planId) {
         last = now; // stale timeline: wait for the new plan's
         raf = requestAnimationFrame(tick);
         return;
       }
-      const t = (appStore.getState().missionTime ?? timeline.startMs) + (now - last) * speed * 3600;
+      const cur = appStore.getState().missionTime ?? timeline.startMs;
+      const t = cur + (now - last) * playbackRate(timeline, cur, speed); // slow motion around launch (T5.2.a)
       last = now;
       if (t >= timeline.endMs) {
         go(timeline.endMs);
@@ -72,6 +79,11 @@ export function MissionControls({ timeline, planId }: { timeline: MissionTimelin
         </span>
         <span className="mono">{clock.elapsed}</span>
         <span className="mono muted">{clock.utc}</span>
+        {playing && playbackRate(timeline, t, speed) < speed * 3600 && (
+          <span className="mission-slow" data-testid="slow-motion">
+            {STRINGS.mission.slow}
+          </span>
+        )}
       </div>
       <div className="scrubber">
         <button

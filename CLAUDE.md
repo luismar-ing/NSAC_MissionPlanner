@@ -43,6 +43,7 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 | Tipos | `npm --prefix web run typecheck` | disponible |
 | Build | `npm --prefix web run build` | disponible |
 | Servir el build | `npm --prefix web run preview` (puerto 4173) | disponible |
+| Capturas 1920×1080 de cada vista | `npm --prefix web run screens` (con el servidor de desarrollo en marcha; Chrome o Edge instalado, `CHROME_PATH` para otro) → `docs/figures/screens/` | disponible |
 
 Cuando una tarea cree o cambie un comando, actualiza esta tabla (T0.1.d la deja definitiva).
 

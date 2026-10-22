@@ -42,8 +42,14 @@ export function CompareScrubber() {
   useEffect(() => {
     if (!playing) return;
     let raf = 0;
-    let last = performance.now();
+    // the first frame only sets the time origin: frame timestamps and performance.now() need not share a clock
+    let last: number | null = null;
     const tick = (now: number) => {
+      if (last === null) {
+        last = now;
+        raf = requestAnimationFrame(tick);
+        return;
+      }
       const st = appStore.getState();
       const next = st.compareTime + ((now - last) / 1000) * PLAY_H_PER_S;
       last = now;

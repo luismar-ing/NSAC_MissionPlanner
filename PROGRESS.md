@@ -2235,3 +2235,35 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna. El «enlace compartible» del paso 6 es la URL pública, que llega con el despliegue (Fase 7).
 - **Problemas abiertos (para T5.2.a, pulido):** a 6 h/s el despegue dura 0,4 s en pantalla (de la cuenta atrás a la inyección) y apenas se ve. Propuesta: que la reproducción vaya a cámara lenta durante el ascenso, o arrancar a 1 h/s y acelerar tras la inyección.
 - **Siguiente tarea:** T5.2.a.
+
+## 2026-10-22 · T5.2.a · Pulido visual para proyector
+
+- **Tarea:** T5.2.a — Pulido visual para proyector ([x]).
+- **Qué se hizo:**
+  - **Capturas reproducibles a 1920×1080:** `npm --prefix web run screens` (`web/scripts/screens.mjs`, con `puppeteer-core` 25.12.0 fijado y el Chrome o Edge instalado, sin descargar navegadores). Recorre el flujo de demo y guarda 8 capturas en `docs/figures/screens/`: búsqueda, bandeja, sitio, y vista en vivo en despegue, tránsito, aterrizaje, sitio y paneles del sitio.
+  - **Revisión de las capturas y correcciones:**
+    1. **Paneles desalineados:** en la bandeja, la silueta de Haworth quedaba 14 px más abajo que las otras, porque la fila se estiraba al tener un recuadro de métricas más corto. `align-content: start` hace que todas las filas empiecen a la misma altura y el eje vertical compartido se lee de un vistazo (spec 8.1: paneles idénticos).
+    2. **Miniaturas:** «Score» se montaba sobre el pie de la cinta, y «10°» y «vertical ×9.6» se cortaban o tapaban el marcador de la Tierra. Ahora las miniaturas no llevan etiquetas de ejes ni pies (las llevan los paneles completos) y la fila de la cinta mide lo que sus dos carriles.
+    3. **Texto de las gráficas:** de 10–11 px a ≥ 12 px (cardinales a 13 px en negrita) en siluetas, cinta y panorama.
+    4. **Calendario:** filas de 26 a 36 px; ocupa el hueco vacío que quedaba debajo y se lee de lejos.
+    5. **Despegue en cámara lenta** (hallazgo de T5.1.c): a 6 h/s el despegue duraba 0,4 s en pantalla. `playbackRate` (`lib/mission.ts`) reproduce a 300 s de misión por segundo hasta `launch_utc` y acelera de forma exponencial hasta la velocidad elegida durante los 30 min siguientes. En pantalla, con la etiqueta «Slow motion around launch» mientras dura: cuenta atrás 1,0 s, despegue 1,4 s y vuelo completo 14,3 s (antes 12,0 s).
+    6. **Transiciones:** token `--motion-mid` (300 ms) junto a los de 200 y 400 ms. La transición comparar ↔ vivir, la sección de llegada y la altura de la escena lo usan, en lugar de valores fijos.
+    7. **Favicon:** faltaba y el navegador daba un 404 en cada carga (un error rojo en la consola durante la demo). Se añade `web/public/favicon.svg` con la paleta.
+  - **Fallo encontrado al probar:** los tres bucles de reproducción (misión, sitio y bandeja) tomaban el origen de tiempos de `performance.now()` y luego usaban la marca del fotograma, que no tiene por qué compartir reloj (en jsdom, el primer paso fue de −4,7 s: −28 h de misión a 6 h/s). Ahora el primer fotograma solo fija el origen.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web run screens → 8 capturas en docs/figures/screens/ · console: no errors or warnings
+  $ npx vitest run tests/mission.test.tsx
+  playback at 6 h/s: countdown 1.0 s, first 30 min after launch 1.4 s, launch to landing 14.3 s (was 12.0 s)
+   ✓ slow before launch, continuous ramp to full speed (< 20 % por minuto de misión)
+  $ npm --prefix web test → Test Files 29 passed · Tests 200 passed (3 ejecuciones seguidas) · typecheck → exit 0
+  ```
+  - **Capturas antes y después:** se revisaron una a una. Las siluetas de los 3 paneles quedan a la misma altura (y = 211 px), las miniaturas sin solapes y el calendario sin hueco.
+  - **Navegador:** al reproducir desde la cuenta atrás, el paso a tránsito llega a los **3,1 s** (antes 0,4 s), con la etiqueta de cámara lenta visible solo durante el despegue.
+- **Decisiones tomadas:**
+  - El despegue se ve en cámara lenta automática, indicada en pantalla para que el salto de velocidad sea honesto.
+  - Las capturas se generan con Chrome headless (reproducible, resolución real) y no con el panel del navegador, que escala la imagen.
+  - El despegue ocurre en el lado nocturno de la Tierra (plataforma genérica en lon 0 a las 00:01 UTC). Se deja así: moverlo exigiría cambiar las trayectorias del pipeline.
+- **Desviaciones de la spec / cambios en la guía:** nueva dependencia de desarrollo `puppeteer-core` (fijada) y nuevo comando en `CLAUDE.md`. `TimeControl.tsx` y `CompareScrubber.tsx` cambian por la corrección del reloj. En `tests/planSwitch.test.tsx`, la prueba de cambio en reproducción arranca a mitad del tránsito, lejos de la cámara lenta.
+- **Problemas abiertos:** la costura tenue lod1/lod2 sigue visible con el Sol rasante (anotada en T4.3.b). Algunas etiquetas de la silueta (p. ej. «5°») pueden quedar bajo una trayectoria.
+- **Siguiente tarea:** T5.2.b.

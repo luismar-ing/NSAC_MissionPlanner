@@ -125,9 +125,11 @@ describe("change of plan while the mission plays", () => {
     st.setViewMode("live");
     render(<App />);
     await screen.findByTestId("mission-controls");
-    fireEvent.click(screen.getByRole("button", { name: "Transit" }));
     const planA = st.plansById.get(A)!;
     const tlA = timelineOf(planA, await st.data.trajectory(planA.trajectory_id));
+    // mid-transit, 40 h before landing (well away from the slow motion around launch)
+    fireEvent.change(screen.getByRole("slider", { name: /mission time/i }), { target: { value: String((tlA.landingMs - 40 * 3_600_000 - tlA.startMs) / 60_000) } });
+    expect(appStore.getState().missionPhase).toBe("transit");
     fireEvent.click(screen.getByRole("button", { name: "Play the mission" }));
     await new Promise((r) => setTimeout(r, 200));
     const rel = appStore.getState().missionTime! - tlA.landingMs;

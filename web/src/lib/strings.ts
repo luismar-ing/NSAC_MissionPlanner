@@ -165,6 +165,7 @@ export const STRINGS = {
     detail: (km: number) => `1 scene unit = ${km} km. Sizes are enlarged so the bodies stay visible; positions are scaled uniformly, so every angle is exact (spec 5.9).`,
   },
   mission: {
+    slow: "Slow motion around launch",
     phases: { overview: "Overview", launch: "Launch", transit: "Transit", landing: "Landing", site: "At the site" } as Record<string, string>,
     play: "Play the mission",
     pause: "Pause the mission",

@@ -29,8 +29,14 @@ export function TimeControl({ startMs, windowDays, stepMin }: Props) {
   useEffect(() => {
     if (!playing) return;
     let raf = 0;
-    let last = performance.now();
+    // the first frame only sets the time origin: frame timestamps and performance.now() need not share a clock
+    let last: number | null = null;
     const tick = (now: number) => {
+      if (last === null) {
+        last = now;
+        raf = requestAnimationFrame(tick);
+        return;
+      }
       const t = (appStore.getState().missionTime ?? startMs) + (now - last) * speed * 3600; // ms of mission
       last = now;
       if (t >= endMs) {
