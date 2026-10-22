@@ -1351,3 +1351,87 @@ button.thumb:focus-visible {
   color: var(--color-text-muted);
   overflow-wrap: anywhere;
 }
+
+/* ------------------------------------------------------------------ narrow screens (T5.2.d, spec 8.7) */
+
+/* grid children default to min-width: auto, so their content (canvas, slider rows, badges) could hold the page
+   wider than the screen: every layout column may shrink, and wide content scrolls inside its own box */
+.app {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app > *,
+.search-area > *,
+.live-body > *,
+.panel {
+  min-width: 0;
+}
+
+.header-tools {
+  flex-wrap: wrap;
+}
+
+.calendar-controls {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .app-title {
+    font-size: var(--font-xl);
+  }
+
+  .data-badge {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .panel {
+    padding: var(--space-md);
+  }
+
+  /* the swipeable tray: one panel and a peek of the next */
+  .tray-grid {
+    grid-auto-columns: 88%;
+  }
+
+  .mission-row,
+  .tray-toolbar {
+    flex-wrap: wrap;
+  }
+}
+
+input[type="range"] {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+@media (max-width: 600px) {
+  /* scrubbers: the buttons on one line, the slider on its own full-width line */
+  .scrubber {
+    flex-wrap: wrap;
+  }
+
+  .scrubber input[type="range"] {
+    order: 10;
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .scrubber-value {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  /* panel header: the plan's name and date on their own line, badges and buttons below */
+  .plan-panel-header {
+    flex-wrap: wrap;
+  }
+
+  .plan-panel-title {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}

@@ -2360,3 +2360,31 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `web/scripts/perf.mjs` y `web/scripts/fps.mjs`, y dos filas nuevas en la tabla de comandos de `CLAUDE.md`.
 - **Problemas abiertos:** ninguno. El chunk `renderer` supera el aviso de 500 KB de Vite, pero se carga bajo demanda.
 - **Siguiente tarea:** T5.2.d (móvil, recortable). T5.2.e es una revisión humana y quedará preparada.
+
+## 2026-10-22 · T5.2.d · Móvil razonable
+
+- **Tarea:** T5.2.d — (Recortable) Móvil razonable ([x]).
+- **Qué se hizo:**
+  - **Scroll horizontal de la página:** a 375 px la página medía 492 px. Los hijos de un grid tienen `min-width: auto` por defecto, así que el contenido (canvas, filas de sliders, insignias) ensanchaba las columnas. Ahora las columnas de `.app`, `.search-area` y `.live-body` y los paneles pueden encogerse (`minmax(0, 1fr)`, `min-width: 0`), y lo ancho se desplaza dentro de su propia caja.
+  - **≤ 600 px:**
+    - la cabecera, los controles del calendario y la barra de la bandeja pasan a varias líneas;
+    - los scrubbers ponen los botones en una línea y el slider ocupa la siguiente entera (la fila del scrubber de la bandeja medía 357 px en 325);
+    - la cabecera de cada panel lleva el nombre y la fecha en su propia línea (antes «Ha…» y la fecha partida palabra a palabra);
+    - la bandeja deslizable muestra un panel al 88 % y asoma el siguiente.
+  - Los sliders pierden el margen lateral del navegador (2 px de desborde).
+  - `npm --prefix web run screens` añade tres capturas de teléfono (375×812, táctil): `09-phone-search`, `10-phone-tray-swiped` y `11-phone-live`. El script comprueba el ancho de la página en cada una y desliza la bandeja como lo haría un dedo.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web run screens
+  saved 09-phone-search.png · page 375px in a 375px viewport
+  tray swipe: scrollLeft 0 → 302 (scrollable true, snap x mandatory)
+  saved 10-phone-tray-swiped.png · page 375px in a 375px viewport
+  saved 11-phone-live.png · page 375px in a 375px viewport
+  console: no errors or warnings
+  $ npm --prefix web test → Test Files 30 passed · Tests 208 passed (2 ejecuciones) · typecheck → exit 0
+  ```
+  Revisión visual de las tres capturas de teléfono. Las capturas de escritorio (01–08) se regeneraron y no cambian: las reglas nuevas solo actúan por debajo de 600 px, salvo el `min-width: 0`, que no altera el ancho de escritorio.
+- **Decisiones tomadas:** en el teléfono, la bandeja se desliza con *snap* por panel y se ve un trozo del siguiente como pista.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T5.2.e (revisión visual con el humano, preparada y marcada [!]); luego T5.3.a.

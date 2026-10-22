@@ -104,5 +104,45 @@ await sleep(2000);
 await shot("07-live-site");
 await shot("08-live-site-panels", ".live-site");
 
+// ---------------------------------------------------------------- phone, 375×812 (T5.2.d): no horizontal page scroll
+const phone = await browser.newPage();
+await phone.setViewport({ width: 375, height: 812, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+phone.on("pageerror", (e) => errors.push(String(e)));
+await phone.goto(URL_, { waitUntil: "networkidle0" });
+await phone.waitForSelector('[data-testid="calendar-canvas"]');
+await phone.evaluate(async (plans) => {
+  const url = performance.getEntriesByType("resource").map((e) => e.name).filter((n) => n.includes("/src/store/appStore.ts")).pop();
+  const { appStore } = await import(url);
+  const st = appStore.getState();
+  for (const id of plans) st.pinPlan(id);
+  st.selectPlan(plans[1]);
+}, PLANS);
+await phone.waitForFunction(() => document.querySelectorAll('[data-testid="plan-panel"]').length === 3);
+await sleep(800);
+const pageWidth = () => phone.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
+const phoneShot = async (name, selector) => {
+  await phone.evaluate((sel) => (sel ? document.querySelector(sel).scrollIntoView({ block: "start" }) : window.scrollTo(0, 0)), selector);
+  await sleep(500);
+  await phone.screenshot({ path: join(OUT, `${name}.png`) });
+  const w = await pageWidth();
+  console.log(`saved ${name}.png · page ${w.page}px in a ${w.viewport}px viewport${w.page > w.viewport ? "  ← HORIZONTAL SCROLL" : ""}`);
+};
+await phoneShot("09-phone-search");
+// the tray swipes sideways: scroll it to the second panel as a finger would
+const swipe = await phone.evaluate(async () => {
+  const g = document.querySelector('[data-testid="tray-grid"]');
+  g.scrollIntoView({ block: "start" });
+  const before = g.scrollLeft;
+  g.scrollTo({ left: g.children[1].offsetLeft - g.offsetLeft, behavior: "instant" });
+  await new Promise((r) => setTimeout(r, 300));
+  return { before, after: g.scrollLeft, scrollable: g.scrollWidth > g.clientWidth, snap: getComputedStyle(g).scrollSnapType };
+});
+console.log(`tray swipe: scrollLeft ${swipe.before} → ${swipe.after} (scrollable ${swipe.scrollable}, snap ${swipe.snap})`);
+await phoneShot("10-phone-tray-swiped", ".tray-area");
+await phone.click(`[data-plan-id="${PLANS[1]}"] .live-btn`);
+await phone.waitForFunction(() => document.querySelector('[data-testid="scene-host"]')?.dataset.status === "ready");
+await sleep(2500);
+await phoneShot("11-phone-live");
+
 await browser.close();
 console.log(errors.length ? `console errors/warnings:\n${errors.join("\n")}` : "console: no errors or warnings");

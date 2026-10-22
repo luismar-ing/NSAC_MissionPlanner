@@ -738,7 +738,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T5.2.b · **Spec:** 8.7 · **Decisiones:** D13 · **Est.:** 2.5 h
 - **Aceptación:** tabla con medidas reales: carga inicial < 3 s, series < 15 MB, total < D13, actualización < 100 ms, 60 fps en escena y zoom, 1 contexto WebGL.
 
-##### [ ] T5.2.d — (Recortable) Móvil razonable
+##### [x] T5.2.d — (Recortable) Móvil razonable
 - **Qué:** bandeja deslizable y disposición usable en pantallas estrechas.
 - **Archivos:** `web/src/styles/**`
 - **Depende de:** T5.2.b · **Spec:** 8.7 · **Decisiones:** — · **Est.:** 1.5 h
