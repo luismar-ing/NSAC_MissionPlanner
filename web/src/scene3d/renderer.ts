@@ -8,10 +8,12 @@
  */
 import * as THREE from "three";
 import { COLORS } from "../styles/tokens";
-import type { SceneEphemeris } from "../lib/contract";
+import type { SceneEphemeris, Trajectory } from "../lib/contract";
+import { launchPositionKm, launchStage, padPositionKm, plumeIntensity } from "./launch";
+import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
 import { indexEphemeris, sceneStateAt } from "./ephemeris";
-import { RelativeOrigin, toScene, type Vec3 } from "./scale";
+import { pointToScene, RelativeOrigin, toScene, type Vec3 } from "./scale";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -102,6 +104,8 @@ export interface MountOptions {
   getTimeMs(): number;
   /** Base URL of the static files (import.meta.env.BASE_URL). */
   baseUrl: string;
+  /** Trajectory of the selected plan (launch, ascent and flight of the rocket); null hides the rocket. */
+  trajectory: Trajectory | null;
 }
 
 const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -139,7 +143,17 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
   const ix = indexEphemeris(opts.eph);
   const bodies = createBodies(scene);
   loadTextures(bodies, opts.baseUrl, renderer instanceof THREE.WebGLRenderer ? renderer.capabilities.maxTextureSize : 4096);
-  if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix };
+  const rocket = createRocket();
+  const plume = createPlume();
+  rocket.add(plume);
+  const pad = new THREE.Sprite(new THREE.SpriteMaterial({ color: COLORS.accent, sizeAttenuation: false, depthTest: false }));
+  pad.name = "launch-pad";
+  pad.scale.set(0.012, 0.012, 1);
+  scene.add(rocket, pad);
+  rocket.visible = pad.visible = opts.trajectory !== null;
+  const Y = new THREE.Vector3(0, 1, 0);
+  const dir = new THREE.Vector3();
+  if (import.meta.env.DEV) (window as unknown as { __pp3d?: unknown }).__pp3d = { THREE, renderer, ...handle, handle, bodies, ix, rocket, pad };
 
   const resize = () => {
     const w = Math.max(1, container.clientWidth);
@@ -153,10 +167,29 @@ export function mountScene(container: HTMLElement, opts: MountOptions): () => vo
   const ro = new ResizeObserver(resize);
   ro.observe(container);
   renderer.setAnimationLoop(() => {
-    const state = sceneStateAt(ix, opts.getTimeMs());
+    const t = opts.getTimeMs();
+    const state = sceneStateAt(ix, t);
     updateBodies(bodies, state, handle);
     const cam = overviewCamera(toScene(state.moonKm), state.sunDir);
     handle.cameraWorld = cam.position;
+    const traj = opts.trajectory;
+    if (traj) {
+      // rocket: on the pad during the countdown, then the trajectory (T4.2.b; whole flight refined in T4.2.c)
+      const stage = launchStage(traj, t);
+      const p = pointToScene(launchPositionKm(traj, state.earthQuat, t), state.moonKm);
+      handle.world.set(rocket, p);
+      if (stage === "flight") {
+        const ahead = pointToScene(launchPositionKm(traj, state.earthQuat, t + 120_000), state.moonKm);
+        dir.set(ahead[0] - p[0], ahead[1] - p[1], ahead[2] - p[2]);
+      } else dir.set(p[0], p[1], p[2]); // standing up and climbing: along the local vertical
+      if (dir.lengthSq() > 0) rocket.quaternion.setFromUnitVectors(Y, dir.normalize());
+      const dist = Math.hypot(p[0] - cam.position[0], p[1] - cam.position[1], p[2] - cam.position[2]);
+      rocket.scale.setScalar(apparentLength(dist, camera.fov, ROCKET_SCREEN_FRACTION));
+      setPlume(plume, plumeIntensity(traj, t));
+      // pad marker while the launch phase lasts
+      pad.visible = t < Date.parse(traj.phases.injection_utc);
+      if (pad.visible) handle.world.set(pad, pointToScene(padPositionKm(state.earthQuat), state.moonKm));
+    }
     applyCameraRelative(handle);
     camera.up.set(...cam.up);
     camera.lookAt(cam.target[0] - cam.position[0], cam.target[1] - cam.position[1], cam.target[2] - cam.position[2]);

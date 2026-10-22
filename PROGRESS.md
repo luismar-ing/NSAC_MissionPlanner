@@ -1900,3 +1900,30 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/rocket.test.ts`. El cohete se añade a la escena y sigue la trayectoria en T4.2.b y T4.2.c.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.2.b.
+
+## 2026-10-22 · T4.2.b · Despegue ilustrativo
+
+- **Tarea:** T4.2.b — Despegue ilustrativo ([x]).
+- **Qué se hizo:**
+  - `web/src/scene3d/launch.ts`: despegue ILLUSTRATIVE (D8: mínimo). La plataforma es la misma plataforma genérica de `pipeline/trajectory.py` (latitud 0°, longitud 0°, radio ecuatorial; **no es un puerto espacial real**) y gira con la Tierra (IAU_EARTH). Cuenta atrás de 5 min con el cohete de pie en la plataforma, encendido en los últimos 10 s y ascenso con penacho durante los 10 min de ascenso radial que ya trae el archivo de trayectoria; después, vuelo por la trayectoria (aquí con interpolación lineal; T4.2.c la afina). Funciones: `padPositionKm`, `launchStage`, `plumeIntensity` y `launchPositionKm`.
+  - `web/src/lib/mission.ts`: la línea de tiempo empieza en la cuenta atrás (`startMs = launch − 5 min`; nuevo campo `launchMs`). El reloj muestra «T− 05:00 … T− 00:01» y luego «T+ 0d 00:00».
+  - `web/src/scene3d/scale.ts`: `exaggerateNear` / `pointToScene`, un empuje radial cerca de la Tierra y de la Luna para que la superficie real caiga sobre la superficie dibujada (×6). Conserva la dirección desde el centro, es monótono y se anula exactamente a 30 radios; con escala real (×1) es la identidad. Lo usarán la trayectoria (T4.2.c) y el aterrizaje (T4.3).
+  - `web/src/scene3d/rocket.ts`: penacho (cono aditivo con el color de luz de los tokens). `renderer.ts`: cohete, penacho y marcador de la plataforma en cada fotograma; orientado según la vertical local durante la cuenta atrás y el ascenso, y según la dirección de avance en vuelo.
+  - Etiqueta sobre la escena (regla 2): «ILLUSTRATIVE · Launch from a generic pad and simplified trajectory, computed with the real Moon position», en las fases 1 a 3.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/launch.test.ts --reporter=verbose
+  launch: 30 plans, max |pad(launch_utc) − trajectory[0]| = 79.9 m        (criterio de continuidad; umbral 1 km)
+   ✓ at launch_utc the pad is the trajectory's first point (sample of plans, every site)
+   ✓ then follows the trajectory samples exactly, and ends at its last point
+   ✓ during the countdown the rocket stands on the pad, which turns with the Earth (≈ 139 km en 5 min en el ecuador)
+   ✓ stages and plume: countdown, ignition in the last 10 s, ascent, then flight
+   ✓ puts the true surface on the drawn surface and keeps the direction from the centre
+   ✓ is monotonic along a radius and the identity beyond the cut-off
+  $ npm --prefix web test → Tests 141 passed · typecheck → exit 0
+  ```
+  En el navegador: al abrir, «Launch · T− 05:00 · 2026-12-29 23:55 UTC», con el cohete de pie sobre el marcador verde de la plataforma, en la superficie dibujada (radio 38,269 unidades = 6 × 6,378); etiqueta ILLUSTRATIVE visible. En T+ 0d 00:05 el cohete sube (radio 38,306) con el penacho encendido.
+- **Decisiones tomadas:** cuenta atrás de 5 min, que hace que la vista de misión empiece en T− 05:00. El ascenso se toma del propio archivo de trayectoria para que no haya dos versiones del despegue.
+- **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/launch.test.ts`; `mission.test.tsx` ajustado a la cuenta atrás.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.2.c.

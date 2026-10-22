@@ -14,14 +14,16 @@ export function SceneHost() {
     let unmount: (() => void) | null = null;
     let cancelled = false;
     const st = appStore.getState();
-    Promise.all([import("./renderer"), st.data.scene()])
-      .then(([{ mountScene }, eph]) => {
+    const plan = st.selectedPlanId ? st.plansById.get(st.selectedPlanId) : undefined;
+    Promise.all([import("./renderer"), st.data.scene(), plan ? st.data.trajectory(plan.trajectory_id) : Promise.resolve(null)])
+      .then(([{ mountScene }, eph, trajectory]) => {
         if (cancelled || !ref.current) return;
         const fallback = Date.parse(eph.start_utc);
         unmount = mountScene(ref.current, {
           eph,
           getTimeMs: () => appStore.getState().missionTime ?? fallback,
           baseUrl: import.meta.env.BASE_URL,
+          trajectory,
         });
         setStatus("ready");
       })

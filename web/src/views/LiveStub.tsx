@@ -17,6 +17,7 @@ export function LiveStub() {
   const plan = useApp((s) => (s.selectedPlanId ? s.plansById.get(s.selectedPlanId) : undefined));
   const site = useApp((s) => s.sites.find((x) => x.id === plan?.site_id));
   const missionPhase = useApp((s) => s.missionPhase);
+  const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
   const [timeline, setTimeline] = useState<MissionTimeline | null>(null);
 
   useEffect(() => {
@@ -42,6 +43,12 @@ export function LiveStub() {
         <SceneHost />
         {/* spec 8.2: the scale indicator is shown in phases 1 to 3 (launch, transit, landing) */}
         {missionPhase !== "site" && <ScaleIndicator mode={SPACE_SCALE} />}
+        {/* rule 2: a launch / trajectory that is not real is labelled ILLUSTRATIVE wherever it is shown */}
+        {trajectoryMode === "ILLUSTRATIVE" && missionPhase !== "site" && (
+          <p className="scene-badge" data-testid="illustrative-label" title={STRINGS.panel.illustrativeTitle}>
+            <span className="badge illustrative">ILLUSTRATIVE</span> {STRINGS.live.illustrative}
+          </p>
+        )}
       </div>
       {timeline && <MissionControls timeline={timeline} />}
     </section>

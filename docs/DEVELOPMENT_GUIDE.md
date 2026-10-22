@@ -637,7 +637,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.1.c · **Spec:** 6, 11 regla 12 · **Decisiones:** D8 · **Est.:** 1.5 h · **Adelantable**
 - **Aceptación:** licencia registrada si es externo; visible con la escala exagerada documentada (revisión visual).
 
-##### [ ] T4.2.b — Despegue ilustrativo
+##### [x] T4.2.b — Despegue ilustrativo
 - **Qué:** ascenso desde una plataforma genérica que se funde con la trayectoria; etiqueta ILLUSTRATIVE.
 - **Archivos:** `web/src/scene3d/launch.ts`
 - **Depende de:** T4.2.a · **Spec:** 5.8, 8.2 · **Decisiones:** D8 · **Est.:** 2 h · **Adelantable**

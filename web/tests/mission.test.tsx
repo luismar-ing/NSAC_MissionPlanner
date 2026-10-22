@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import type { Plan, Trajectory } from "../src/lib/contract";
-import { clampMission, missionClock, phaseAt, phaseStart, PLAY_PHASES, timelineOf, type MissionTimeline } from "../src/lib/mission";
+import { clampMission, missionClock, phaseAt, phaseStart, PLAY_PHASES, PRELAUNCH_MS, timelineOf, type MissionTimeline } from "../src/lib/mission";
 import { MissionControls } from "../src/scene3d/MissionControls";
 import { appStore } from "../src/store/appStore";
 
@@ -34,10 +34,11 @@ afterEach(cleanup);
 
 describe("mission timeline (spec 5.8)", () => {
   it("runs from launch to the end of the stay, phases in order", () => {
-    expect(new Date(tl.startMs).toISOString()).toBe(plan.launch_utc.replace("Z", ".000Z"));
+    expect(new Date(tl.launchMs).toISOString()).toBe(plan.launch_utc.replace("Z", ".000Z"));
+    expect(tl.launchMs - tl.startMs).toBe(PRELAUNCH_MS); // illustrative countdown on the pad (T4.2.b)
     expect(new Date(tl.landingMs).toISOString()).toBe(plan.arrival_utc.replace("Z", ".000Z"));
     expect(tl.endMs - tl.landingMs).toBe(plan.window_days * 86_400_000);
-    expect(tl.startMs).toBeLessThanOrEqual(tl.injectionMs);
+    expect(tl.launchMs).toBeLessThanOrEqual(tl.injectionMs);
     expect(tl.injectionMs).toBeLessThanOrEqual(tl.lunarArrivalMs);
     expect(tl.lunarArrivalMs).toBeLessThanOrEqual(tl.landingMs);
   });
@@ -55,8 +56,11 @@ describe("mission timeline (spec 5.8)", () => {
   it("clamps to the mission and formats the clock", () => {
     expect(clampMission(tl, tl.startMs - 1e9)).toBe(tl.startMs);
     expect(clampMission(tl, tl.endMs + 1e9)).toBe(tl.endMs);
-    const c = missionClock(tl, tl.startMs + (2 * 1440 + 4 * 60 + 30) * 60_000);
+    const c = missionClock(tl, tl.launchMs + (2 * 1440 + 4 * 60 + 30) * 60_000);
     expect(c.elapsed).toBe("T+ 2d 04:30");
+    expect(missionClock(tl, tl.startMs).elapsed).toBe("T− 05:00");
+    expect(missionClock(tl, tl.launchMs - 30_000).elapsed).toBe("T− 00:30");
+    expect(missionClock(tl, tl.launchMs).elapsed).toBe("T+ 0d 00:00");
     expect(missionClock(tl, tl.landingMs).utc).toBe(`${plan.arrival_utc.slice(0, 10)} 00:00 UTC`);
   });
 });

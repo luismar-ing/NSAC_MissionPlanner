@@ -67,3 +67,27 @@ export function apparentLength(distance: number, fovDeg: number, fraction: numbe
 
 /** Default apparent size of the rocket: 8 % of the view height (6 % read as a needle in review). */
 export const ROCKET_SCREEN_FRACTION = 0.08;
+
+/**
+ * Exhaust plume (illustrative): a soft cone below the nozzle, pointing −Y, scaled by `setPlume`. Additive and
+ * self-lit, in the Sun/light colour of the tokens.
+ */
+export function createPlume(): THREE.Mesh {
+  // ConeGeometry is centred with its apex at +h/2: flip it (apex down) and shift it so the wide end sits at
+  // the nozzle exit (y = 0) and the apex at y = −0.35
+  const geo = new THREE.ConeGeometry(0.045, 0.35, 24, 1, true);
+  geo.rotateX(Math.PI);
+  geo.translate(0, -0.175, 0);
+  const mat = new THREE.MeshBasicMaterial({ color: COLORS.sun, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const plume = new THREE.Mesh(geo, mat);
+  plume.name = "plume";
+  plume.visible = false;
+  return plume;
+}
+
+/** Plume on/off and length from an intensity 0–1 (launch.ts plumeIntensity). */
+export function setPlume(plume: THREE.Mesh, intensity: number): void {
+  plume.visible = intensity > 0.01;
+  plume.scale.set(1, 0.4 + 0.6 * intensity, 1);
+  (plume.material as THREE.MeshBasicMaterial).opacity = 0.3 + 0.55 * intensity;
+}

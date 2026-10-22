@@ -82,3 +82,39 @@ export class RelativeOrigin {
 export function scaleSummary(mode: ScaleMode): { exaggerated: boolean; factor: number } {
   return { exaggerated: mode.bodyExaggeration !== 1, factor: mode.bodyExaggeration };
 }
+
+/**
+ * Near-body mapping for points (rocket, trail): the bodies are drawn `E` times larger, so a point at the true
+ * surface would be inside the drawn sphere. Along the radius from the body centre, r → r + (E − 1)·R·w(r),
+ * with w = 1 at the surface and decaying to exactly 0 at `CUTOFF_RADII` radii, so:
+ *  - the true surface lands on the drawn surface (r = R → E·R) and altitudes are kept near it;
+ *  - the direction from the body centre is unchanged (radial map), and far away nothing moves;
+ *  - the map is monotonic (decay length > (E − 1)·R), so the order along a path is kept.
+ * With E = 1 (real local scale) it is the identity.
+ */
+export const DECAY_RADII = 8;
+export const CUTOFF_RADII = 30;
+
+function smoothstep(x: number): number {
+  const t = Math.min(1, Math.max(0, x));
+  return t * t * (3 - 2 * t);
+}
+
+export function exaggerateNear(p: Vec3, center: Vec3, radius: number, E: number): Vec3 {
+  if (E === 1) return p;
+  const d = sub(p, center);
+  const r = norm(d);
+  if (r === 0 || r >= CUTOFF_RADII * radius) return p;
+  const w = Math.exp(-Math.max(0, r - radius) / (DECAY_RADII * radius)) * (1 - smoothstep((r - radius) / ((CUTOFF_RADII - 1) * radius)));
+  const r2 = r + (E - 1) * radius * Math.min(1, w);
+  const k = r2 / r;
+  return [center[0] + d[0] * k, center[1] + d[1] * k, center[2] + d[2] * k];
+}
+
+/** A point in km (J2000, Earth-centred) → scene units, pushed out near the Earth and near the Moon. */
+export function pointToScene(km: Vec3, moonKm: Vec3, mode: ScaleMode = SPACE_SCALE): Vec3 {
+  const E = mode.bodyExaggeration;
+  const p = toScene(km, mode);
+  const nearEarth = exaggerateNear(p, [0, 0, 0], EARTH_RADII_KM.equatorial / mode.kmPerUnit, E);
+  return exaggerateNear(nearEarth, toScene(moonKm, mode), MOON_RADIUS_KM / mode.kmPerUnit, E);
+}
