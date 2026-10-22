@@ -11,6 +11,9 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { App } from "../src/App";
 import { cellRect, makeLayout } from "../src/lib/calendar";
 import { timelineOf } from "../src/lib/mission";
+import { loadPlanData } from "../src/lib/planData";
+import { longestZeroRun } from "../src/lib/ribbon";
+import { fmtMetric, METRICS, num, round, type MetricKey } from "../src/lib/why";
 import { appStore, DEFAULT_CONSTRAINTS } from "../src/store/appStore";
 
 // the WebGL scene has its own tests; here it is a stub that still registers the plan-switch bridge
@@ -273,4 +276,86 @@ describe("window length and constraints", () => {
     await waitFor(() => expect(Number(/^(\d+)/.exec(screen.getByText(/plans meet the constraints/).textContent!)![1])).toBeLessThan(total));
     expect(appStore.getState().validCount!.valid).toBeLessThan(total);
   });
+});
+
+/* ------------------------------------------------------------------ T5.1.b: the same figures in every view */
+
+describe("same figures in every view (T5.1.b)", () => {
+  // two plans whose exact decimals sit on a rounding half (score 0.975, sunlight 68.45) and an ordinary one
+  const P = ["connecting_ridge_20270304_7d", "connecting_ridge_20270318_7d", A];
+
+  it("the shared rounding is half up on the decimal value", () => {
+    expect(round(0.745, 2)).toBe("0.75");
+    expect(round(0.975, 2)).toBe("0.98");
+    expect(round(68.45, 1)).toBe("68.5");
+    expect(round(43.15, 1)).toBe("43.2");
+    expect(round(1, 2)).toBe("1.00");
+    expect(round(0.04999, 1)).toBe("0.0");
+    expect(num(100)).toBe("100");
+    expect(num(68.45)).toBe("68.5");
+    expect(fmtMetric("score", 0.975)).toBe("0.98");
+  });
+
+  it("3 plans: tray box, site panel, comparison table, calendar tooltip, ribbon and why text agree", async () => {
+    await renderApp(P);
+    for (const id of P) {
+      const rows = await appStore.getState().data.windows(plan(id).site_id, 7);
+      const row = rows.rows.find((r) => r.start === plan(id).arrival_utc)!;
+      const expected = Object.fromEntries(METRICS.map(({ key }) => [key, fmtMetric(key, row[key])])) as Record<MetricKey, string>;
+
+      // tray: metrics box
+      const box = within(panelOf(id)).getByTestId("metrics-box");
+      for (const { key } of METRICS) expect(box.querySelector(`[data-metric="${key}"] .metric-value`)!.textContent, `${id} tray ${key}`).toBe(expected[key]);
+      // tray: time ribbon's longest dark = the metric
+      const ribbonText = within(panelOf(id)).getByText(/Longest dark:|No dark stretch/).textContent!;
+      expect(ribbonText, `${id} ribbon`).toBe(row.longest_dark_h === 0 ? "No dark stretch" : `Longest dark: ${expected.longest_dark_h} h`);
+
+      // site panel: metrics list and the "this plan" row of the comparison table
+      act(() => appStore.getState().selectPlan(id));
+      const sitePanel = await screen.findByLabelText(new RegExp(`Site features: ${plan(id).site_id === "haworth" ? "Haworth" : "Connecting Ridge"}`));
+      await waitFor(() => expect(sitePanel.closest("section")!.ownerDocument.querySelector(".site-heading")!.textContent).toContain(plan(id).arrival_utc.slice(0, 10)));
+      for (const { key } of METRICS) expect(sitePanel.querySelector(`[data-key="${key}"] dd`)!.textContent, `${id} site ${key}`).toBe(expected[key]);
+      const thisRow = within(screen.getByTestId("site-compare")).getAllByRole("row").find((r) => r.className === "this-plan")!;
+      expect([...thisRow.querySelectorAll("td")].map((td) => td.textContent)).toEqual([expected.sun_pct, expected.longest_dark_h, expected.earth_h_min, expected.score]);
+
+      // calendar: hover tooltip of the plan's cell
+      fireEvent.mouseMove(canvas(), cellPoint(plan(id).site_id, plan(id).arrival_utc));
+      await waitFor(() => expect(document.querySelector(".calendar .tooltip")).not.toBeNull());
+      const tipText = document.querySelector(".calendar .tooltip")!.textContent!;
+      expect(tipText).toContain(plan(id).arrival_utc.slice(0, 10)); // the tooltip is for this plan's cell
+      expect(tipText, `${id} calendar`).toContain(`Sunlight ${expected.sun_pct} %`);
+      expect(tipText).toContain(`Longest dark ${expected.longest_dark_h} h`);
+      expect(tipText).toContain(`Earth ${expected.earth_h_mean} h/day (min ${expected.earth_h_min})`);
+      expect(tipText).toContain(`Score ${expected.score}`);
+      fireEvent.mouseLeave(canvas());
+
+      // why text: every number it quotes is one of the box's figures (same rounding)
+      const why = within(panelOf(id)).getByTestId("why").textContent!;
+      const quoted = [...why.matchAll(/(\d+(?:\.\d+)?)(?=% sunlight| h| \))|\((\d\.\d\d)\)/g)].map((m) => m[1] ?? m[2]);
+      const shown = new Set(Object.values(expected).flatMap((v) => [v, v.replace(/\.0$/, "")]));
+      for (const q of quoted) expect(shown.has(q), `${id} why "${why}" quotes ${q}`).toBe(true);
+    }
+    // the edge cases really are shown rounded half up
+    expect(within(panelOf(P[0])).getByTestId("metrics-box").querySelector('[data-metric="score"] .metric-value')!.textContent).toBe("0.98");
+    expect(within(panelOf(P[1])).getByTestId("metrics-box").querySelector('[data-metric="sun_pct"] .metric-value')!.textContent).toBe("68.5");
+  });
+
+  it("the ribbon's longest dark equals longest_dark_h for every 7-day plan of every site", async () => {
+    const st = appStore.getState();
+    let n = 0;
+    const bad: string[] = [];
+    for (const site of st.sites) {
+      const rows = (await st.data.windows(site.id, 7)).rows;
+      for (const r of rows) {
+        const id = `${site.id}_${r.start.slice(0, 10).replace(/-/g, "")}_7d`;
+        const pd = await loadPlanData(st.data, plan(id), st.sites);
+        const run = longestZeroRun(pd.series.sunVis);
+        const h = run ? ((run.end - run.start) * pd.series.stepMin) / 60 : 0;
+        if (round(h, 1) !== fmtMetric("longest_dark_h", r.longest_dark_h)) bad.push(`${id}: ribbon ${h} vs ${r.longest_dark_h}`);
+        n++;
+      }
+    }
+    console.log(`ribbon vs metric: ${n} plans, ${bad.length} mismatches`);
+    expect(bad).toEqual([]);
+  }, 60_000);
 });

@@ -16,6 +16,8 @@ export interface WindowIndex {
   nDays: number;
   firstArrival: string; // YYYY-MM-DD
   metrics: Record<Metric, Float32Array>;
+  /** The rows as loaded (float64): what the views DISPLAY. Float32 is only for the fast constraint mask. */
+  rows: Record<string, WindowRow[]>;
 }
 
 export function meetsConstraints(row: Pick<WindowRow, "sun_pct" | "longest_dark_h" | "earth_h_min">, c: Constraints): boolean {
@@ -38,7 +40,7 @@ export function buildWindowIndex(windowDays: number, rowsBySite: Record<string, 
       for (const m of METRICS) metrics[m][s * nDays + d] = r[m];
     });
   });
-  return { windowDays, siteIds, nDays, firstArrival: rowsBySite[siteIds[0]][0].start.slice(0, 10), metrics };
+  return { windowDays, siteIds, nDays, firstArrival: rowsBySite[siteIds[0]][0].start.slice(0, 10), metrics, rows: rowsBySite };
 }
 
 /** 1 where the window meets the constraints, laid out like the metrics ([site][day]). */
@@ -61,12 +63,13 @@ export function dayIndex(index: WindowIndex, arrival: string): number {
 }
 
 /** Metrics of one cell (site, arrival day), or null outside the range. */
+/** Metrics of one cell for display: from the loaded rows (float64), so they match the tray and the site panel. */
 export function lookup(index: WindowIndex, siteId: string, arrival: string): Record<Metric, number> | null {
   const s = index.siteIds.indexOf(siteId);
   const d = dayIndex(index, arrival);
   if (s < 0 || d < 0 || d >= index.nDays) return null;
-  const k = s * index.nDays + d;
-  return Object.fromEntries(METRICS.map((m) => [m, index.metrics[m][k]])) as Record<Metric, number>;
+  const row = index.rows[siteId][d];
+  return Object.fromEntries(METRICS.map((m) => [m, row[m]])) as Record<Metric, number>;
 }
 
 /** Number of valid cells (handy for the UI and for tests). */

@@ -706,7 +706,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.4.c · **Spec:** 4.1, 8 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** las pruebas de integración pasan para cada celda de la matriz; la matriz queda en `PROGRESS.md`.
 
-##### [ ] T5.1.b — Textos "why" y coherencia de métricas
+##### [x] T5.1.b — Textos "why" y coherencia de métricas
 - **Qué:** las mismas cifras en el panel 2D, el panel del sitio y el calendario; textos revisados.
 - **Archivos:** `web/src/lib/why.ts`, `web/tests/integration.test.tsx`
 - **Depende de:** T5.1.a · **Spec:** 8.1, 8.6 · **Decisiones:** — · **Est.:** 1.5 h

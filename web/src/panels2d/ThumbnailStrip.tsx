@@ -4,6 +4,7 @@ import { relativeLabel } from "../lib/ribbon";
 import { sharedElevationScale } from "../lib/scale";
 import { STRINGS } from "../lib/strings";
 import { switchLivePlan } from "../lib/modeTransition";
+import { fmtMetric } from "../lib/why";
 import { useApp } from "../store/appStore";
 import { HorizonSilhouette } from "./HorizonSilhouette";
 import { TimeRibbon } from "./TimeRibbon";
@@ -80,7 +81,7 @@ export function ThumbnailStrip() {
               </span>
               <TimeRibbon series={p.series} compareTime={hours} />
               <span className="thumb-score">
-                {STRINGS.thumbs.score} <span className="mono">{p.metrics.score.toFixed(2)}</span>
+                {STRINGS.thumbs.score} <span className="mono">{fmtMetric("score", p.metrics.score)}</span>
               </span>
             </button>
           </li>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { fmtMetric } from "../lib/why";
 import {
   arrivalDate,
   bestInRange,
@@ -369,10 +370,10 @@ export function Calendar() {
             <span>
               {STRINGS.arrival} {hoverInfo.date} · {STRINGS.windowDays(L)}
             </span>
-            <span>{STRINGS.fmt.sun(hoverInfo.m.sun_pct)}</span>
-            <span>{STRINGS.fmt.dark(hoverInfo.m.longest_dark_h)}</span>
-            <span>{STRINGS.fmt.earth(hoverInfo.m.earth_h_min, hoverInfo.m.earth_h_mean)}</span>
-            <span>{STRINGS.fmt.score(hoverInfo.m.score)}</span>
+            <span>{STRINGS.fmt.sun(fmtMetric("sun_pct", hoverInfo.m.sun_pct))}</span>
+            <span>{STRINGS.fmt.dark(fmtMetric("longest_dark_h", hoverInfo.m.longest_dark_h))}</span>
+            <span>{STRINGS.fmt.earth(fmtMetric("earth_h_min", hoverInfo.m.earth_h_min), fmtMetric("earth_h_mean", hoverInfo.m.earth_h_mean))}</span>
+            <span>{STRINGS.fmt.score(fmtMetric("score", hoverInfo.m.score))}</span>
           </div>
         )}
       </div>

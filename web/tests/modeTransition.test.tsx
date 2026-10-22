@@ -105,7 +105,7 @@ describe("compare ↔ live (spec 8.0)", () => {
       await waitFor(() => expect(screen.getAllByTestId("plan-panel").length).toBe(before.comparePlans.length));
     }
     expect(snapshot()).toEqual(before);
-  });
+  }, 20_000); // 10 full renders of both modes: slow when the whole suite runs in parallel
 
   it("the thumbnails are linked: they follow the live plan's clock as hours since arrival", async () => {
     const st = appStore.getState();

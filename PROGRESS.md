@@ -2176,3 +2176,40 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/store/appStore.ts`, `web/src/views/Calendar.tsx`, `web/src/components/TimeControl.tsx` y los cambios en `tests/store.test.ts` y `tests/panorama.test.tsx` (la prueba de «relojes independientes» pasa a «relojes enlazados»). Son las correcciones de los huecos que encontró la auditoría.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T5.1.b.
+
+## 2026-10-22 · T5.1.b · Textos «why» y coherencia de métricas
+
+- **Tarea:** T5.1.b — Textos «why» y coherencia de métricas ([x]).
+- **Qué se hizo:**
+  - **Cifras distintas entre vistas (corregido).** Se revisaron los 32 850 valores mostrados (5 sitios × 365 llegadas × 3 L × 6 métricas) y aparecieron dos fuentes de discrepancia:
+    1. El calendario guardaba las métricas en Float32 (para la máscara rápida) y el tooltip las mostraba desde ahí. **118 valores** salían con otra última cifra que en la bandeja o el panel del sitio (p. ej. 68.45 → «68.4» frente a «68.5»). Ahora el tooltip lee las filas originales (float64, `WindowIndex.rows`); la máscara sigue en Float32.
+    2. Había tres redondeos distintos: `toFixed`, `Math.round` en el «why» y las cadenas del calendario. `toFixed` además redondea a la baja decimales exactos como 0.745 o 0.975, porque su doble binario queda justo por debajo de la mitad (**87 valores** del «why» distintos del recuadro). Ahora hay **un solo formateador**, `round` / `fmtMetric` en `lib/why.ts`, con redondeo a la mitad hacia arriba sobre el valor decimal. Lo usan el recuadro de métricas, el panel del sitio y su tabla de comparación, el tooltip del calendario, las miniaturas, la cinta («Longest dark») y el texto «why».
+  - **Textos «why» revisados.** Un «mejor» solo es el mejor entre los planes comparados, y algunas frases lo vendían como virtud absoluta o se contradecían. Ahora:
+    - un valor débil se dice como mejor relativo: «the most sunlight (10.1%)», «the shortest dark stretch (151 h)», «the shortest comm blackout (87 h)», «the most Earth time on its worst day (9.5 h)»;
+    - «only» se reserva para oscuridades ≤ 24 h;
+    - «comm gaps under X h» pasa a «comm gaps of at most X h»;
+    - «longest dark 0 h» pasa a «no dark stretch»;
+    - «Earth drops to 0 h» pasa a «Earth is out of view for at least one whole day»;
+    - el aviso «Watch out: X h without Sun» ya no repite la oscuridad cuando es la fortaleza citada.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/integration.test.tsx tests/why.test.ts --reporter=verbose
+   ✓ the shared rounding is half up on the decimal value (0.745→0.75, 0.975→0.98, 68.45→68.5, 43.15→43.2)
+   ✓ 3 plans: tray box, site panel, comparison table, calendar tooltip, ribbon and why text agree
+     (connecting_ridge_20270304_7d score 0.975, connecting_ridge_20270318_7d sunlight 68.45, haworth_20270309_7d)
+  ribbon vs metric: 1825 plans, 0 mismatches
+   ✓ the ribbon's longest dark equals longest_dark_h for every 7-day plan of every site
+   ✓ states a weak best value as a relative best, and does not repeat it as a caveat
+   ✓ cites the plan's real figures for every window of the data (sin «only» en oscuridades largas, ≤ 1 aviso)
+  $ npm --prefix web test → Test Files 29 passed · Tests 198 passed (3 ejecuciones seguidas) · typecheck → exit 0
+  ```
+  En el navegador, con 3 planes anclados, Connecting Ridge 2027-03-04 muestra lo mismo en las tres vistas:
+  - **Bandeja:** sun 100.0, dark 0.0, Earth 22.0 / 10.0, gap 14.0, score 0.98.
+  - **Panel del sitio:** los mismos valores.
+  - **Tooltip del calendario:** «Sunlight 100.0 % · Longest dark 0.0 h · Earth 22.0 h/day (min 10.0) · Score 0.98».
+
+  El plan con 68.45 % de sol muestra 68.5.
+- **Decisiones tomadas:** redondeo a la mitad hacia arriba sobre el decimal (el que espera quien lee) en toda la interfaz. Umbrales del «why»: sol ≥ 50 %, oscuridad ≤ 24 h, Tierra ≥ 12 h el peor día y hueco de comunicación ≤ 24 h para hablar de fortaleza; por debajo, mejor relativo.
+- **Desviaciones de la spec / cambios en la guía:** archivos extra: `lib/constraints.ts` (filas originales en el índice), `MetricsBox.tsx`, `SitePanel.tsx`, `Calendar.tsx`, `ThumbnailStrip.tsx` y `strings.ts` (todos pasan a usar el formateador común). La prueba de 10 idas y vueltas (`modeTransition.test.tsx`) sube a 20 s porque con toda la suite en paralelo pasaba de 5 s.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T5.1.c (ensayo cronometrado del guion de demo).

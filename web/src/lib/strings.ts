@@ -2,6 +2,7 @@
  * All user-facing text, in English (decision D2). Kept in one module so the UI can be translated later
  * (spec 9) without touching components.
  */
+import { round } from "./why";
 export const STRINGS = {
   appTitle: "PolePlanner",
   appSubtitle: "Lunar south pole landing planner",
@@ -28,10 +29,11 @@ export const STRINGS = {
   calendarAria: (L: number) => `Arrival calendar heatmap, ${L}-day windows: one row per site, one column per arrival day`,
   arrival: "Arrival",
   fmt: {
-    sun: (v: number) => `Sunlight ${v.toFixed(1)} %`,
-    dark: (v: number) => `Longest dark ${v.toFixed(1)} h`,
-    earth: (min: number, mean: number) => `Earth ${mean.toFixed(1)} h/day (min ${min.toFixed(1)})`,
-    score: (v: number) => `Score ${v.toFixed(2)}`,
+    // values arrive already formatted by fmtMetric (lib/why.ts), the one formatter shared by every view
+    sun: (v: string) => `Sunlight ${v} %`,
+    dark: (v: string) => `Longest dark ${v} h`,
+    earth: (min: string, mean: string) => `Earth ${mean} h/day (min ${min})`,
+    score: (v: string) => `Score ${v}`,
   },
   constraints: {
     sun: "Minimum sunlight",
@@ -72,10 +74,10 @@ export const STRINGS = {
   },
   ribbon: {
     lanes: "Top: Sun · Bottom: Earth",
-    longest: (h: number) => `Longest dark: ${h.toFixed(1)} h`,
+    longest: (h: number) => `Longest dark: ${round(h, 1)} h`,
     noDark: "No dark stretch",
     aria: (h: number, at: string) =>
-      `Time ribbon: Sun on the top lane, Earth on the bottom lane. Longest dark stretch ${h.toFixed(1)} h, starting ${at}.`,
+      `Time ribbon: Sun on the top lane, Earth on the bottom lane. Longest dark stretch ${round(h, 1)} h, starting ${at}.`,
     ariaNoDark: "Time ribbon: Sun on the top lane, Earth on the bottom lane. The Sun is never lost in this window.",
   },
   scrubber: {

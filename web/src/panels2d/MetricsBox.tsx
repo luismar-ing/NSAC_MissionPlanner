@@ -1,7 +1,7 @@
 import { memo } from "react";
 import type { WindowRow } from "../lib/contract";
 import { STRINGS } from "../lib/strings";
-import { METRICS, whyText, type MetricKey } from "../lib/why";
+import { fmtMetric, METRICS, whyText, type MetricKey } from "../lib/why";
 
 interface Props {
   metrics: WindowRow;
@@ -13,11 +13,11 @@ export const MetricsBox = memo(function MetricsBox({ metrics, best }: Props) {
   return (
     <div className="metrics-box" data-testid="metrics-box">
       <dl className="metrics-list">
-        {METRICS.map(({ key, digits }) => (
+        {METRICS.map(({ key }) => (
           <div key={key} className={`metric${best.has(key) ? " best" : ""}`} data-metric={key} data-best={best.has(key)}>
             <dt>{STRINGS.metricNames[key]}</dt>
             <dd>
-              <span className="metric-value">{metrics[key].toFixed(digits)}</span>
+              <span className="metric-value">{fmtMetric(key, metrics[key])}</span>
               {best.has(key) && (
                 <span className="badge best" title={STRINGS.panel.bestTitle}>
                   ★ {STRINGS.panel.best}

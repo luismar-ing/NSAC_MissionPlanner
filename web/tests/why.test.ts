@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import type { WindowRow } from "../src/lib/contract";
-import { bestBadges, METRICS, num, whyText } from "../src/lib/why";
+import { bestBadges, fmtMetric, METRICS, num, whyText } from "../src/lib/why";
 
 const row = (o: Partial<WindowRow>): WindowRow => ({
   start: "2027-01-01T00:00:00Z",
@@ -57,14 +57,28 @@ describe("why text", () => {
         trio.forEach((r, j) => {
           const t = whyText(r, best[j]);
           // every number in the sentence is one of this plan's metrics
-          const allowed = new Set(METRICS.map(({ key }) => num(r[key])).concat([r.score.toFixed(2)]));
+          const allowed = new Set(METRICS.map(({ key }) => num(r[key])).concat([fmtMetric("score", r.score)]));
           for (const m of t.match(/\d+(\.\d+)?/g) ?? []) expect(allowed.has(m), `${m} in "${t}"`).toBe(true);
-          if (best[j].has("sun_pct")) expect(t).toContain(`${num(r.sun_pct)}% sunlight`);
+          if (best[j].has("sun_pct")) expect(t).toMatch(new RegExp(`${num(r.sun_pct)}% sunlight|the most sunlight \\(${num(r.sun_pct)}%\\)`));
+          // never "only" for a long blackout, never the same caveat twice
+          expect(t).not.toMatch(/only (2[5-9]|[3-9]\d|\d{3,})(\.\d)? h/);
+          expect((t.match(/without Sun/g) ?? []).length).toBeLessThanOrEqual(1);
           n++;
         });
       }
     }
     expect(n).toBeGreaterThan(150);
+  });
+  it("states a weak best value as a relative best, and does not repeat it as a caveat (T5.1.b)", () => {
+    expect(whyText(row({ sun_pct: 10.1, longest_dark_h: 151, earth_h_min: 20 }), new Set(["sun_pct", "longest_dark_h"]))).toBe(
+      "Best option for the most sunlight (10.1%) and the shortest dark stretch (151 h).",
+    );
+    expect(whyText(row({ sun_pct: 40, longest_dark_h: 30, earth_h_min: 20, longest_comm_gap_h: 0.5 }), new Set(["longest_comm_gap_h"]))).toBe(
+      "Best option for comm gaps of at most 0.5 h.",
+    );
+    expect(whyText(row({ sun_pct: 100, longest_dark_h: 0, earth_h_min: 0 }), new Set())).toBe(
+      "100% sunlight, no dark stretch. Earth is out of view for at least one whole day.",
+    );
   });
   it("warns about long darkness even when the plan is best at something else", () => {
     const t = whyText(row({ sun_pct: 70, longest_dark_h: 89.5 }), new Set(["sun_pct"]));

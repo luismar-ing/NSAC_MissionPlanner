@@ -1,7 +1,7 @@
 import type { Daily, SiteFeatures } from "../lib/contract";
 import type { PlanData } from "../lib/planData";
 import { STRINGS } from "../lib/strings";
-import { bestBadges, METRICS, num, whyText, type MetricKey } from "../lib/why";
+import { bestBadges, fmtMetric, METRICS, num, whyText, type MetricKey } from "../lib/why";
 
 interface Props {
   plan: PlanData;
@@ -65,11 +65,11 @@ export function SitePanel({ plan, features, daily, pinned }: Props) {
       <section>
         <h3>{STRINGS.sitePanel.metrics}</h3>
         <dl className="kv">
-          {METRICS.map(({ key, digits }) => (
+          {METRICS.map(({ key }) => (
             <div key={key} data-key={key}>
               <dt>{STRINGS.metricNames[key]}</dt>
               <dd>
-                <Sourced text={plan.metrics[key].toFixed(digits)} source={`${METRIC_SOURCE[key]} ${METRIC_ORIGIN}`} />
+                <Sourced text={fmtMetric(key, plan.metrics[key])} source={`${METRIC_SOURCE[key]} ${METRIC_ORIGIN}`} />
               </dd>
             </div>
           ))}
@@ -152,10 +152,10 @@ export function SitePanel({ plan, features, daily, pinned }: Props) {
                     {p === plan ? "▸ " : ""}
                     {p.site.name} · {p.plan.arrival_utc.slice(0, 10)}
                   </th>
-                  <td>{p.metrics.sun_pct.toFixed(1)}</td>
-                  <td>{p.metrics.longest_dark_h.toFixed(1)}</td>
-                  <td>{p.metrics.earth_h_min.toFixed(1)}</td>
-                  <td>{p.metrics.score.toFixed(2)}</td>
+                  <td>{fmtMetric("sun_pct", p.metrics.sun_pct)}</td>
+                  <td>{fmtMetric("longest_dark_h", p.metrics.longest_dark_h)}</td>
+                  <td>{fmtMetric("earth_h_min", p.metrics.earth_h_min)}</td>
+                  <td>{fmtMetric("score", p.metrics.score)}</td>
                 </tr>
               ))}
             </tbody>
