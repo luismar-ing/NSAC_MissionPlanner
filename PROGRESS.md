@@ -2088,3 +2088,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/scene3d/bridge.ts`, `web/src/lib/modeTransition.ts` (ampliado), `web/src/panels2d/ThumbnailStrip.tsx` (botones) y `web/tests/planSwitch.test.tsx`. En `tests/liveView.test.tsx`, la primera espera sube a 5 s porque falló una vez por tiempo con toda la suite en marcha.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T4.4.c.
+
+## 2026-10-22 · T4.4.c · Verificación del viaje con datos reales
+
+- **Tarea:** T4.4.c — Verificación del viaje con datos reales ([x]).
+- **Qué se hizo:** verificación con los datos reales del pipeline, en el navegador y sobre la imagen que dibuja la app. No hay cambios de código. Se añaden `docs/validation.md` §5 y tres capturas en `docs/img/`.
+- **Cómo se verificó:**
+  1. **Fase lunar en 3 fechas de T2.1.c** (cámara en el centro de la Tierra mirando a la Luna; fracción del disco que aclara la luz del Sol, comparando el render con y sin ella; control con trazado de rayos de la esfera dibujada):
+     ```
+     instante               Horizons  escena(lejano)  rayos ×6  render ×6   captura
+     2027-01-15T06:00:00Z   43.734    43.599          43.38     43.25      docs/img/t44c_phase_2027-01-15.png
+     2027-04-20T03:00:00Z   99.082    99.077          99.37     99.55      docs/img/t44c_phase_2027-04-20.png
+     2027-12-24T23:00:00Z    8.408     8.373           7.60      7.39      docs/img/t44c_phase_2027-12-24.png
+     Luna a tamaño real (control): 01-15 rayos 43.56 / render 43.43 · 12-24 rayos 8.25 / render 8.03
+     ```
+     El render queda a ≤ 0,21 puntos de la geometría que dibuja, y la luz de la escena da exactamente la fracción de los datos (≤ 0,135 de Horizons, §4). La diferencia visible frente a Horizons (hasta −1,0 puntos en creciente) viene de mirar una Luna ×6 a distancia finita (D8). A tamaño real baja a ≤ 0,38 puntos. Detalle en `docs/validation.md` §5.
+  2. **Llegada en `arrival_utc`** (Haworth 2027-03-09, Malapert Massif 2027-10-15, Connecting Ridge 2027-01-02): el cohete está a **0 m** del sitio en la llegada y 1 h después; 10 min antes está a 1,4–1,7 km, en el descenso. El salto «At the site» pone `missionTime` = `arrival_utc` y la fase «site».
+  3. **Etiqueta ILLUSTRATIVE** visible en el despegue, el tránsito y el aterrizaje de los 3 planes; oculta en el sitio, que son datos reales.
+  4. **Recorrido completo sin cortes** fotograma a fotograma (829 fotogramas por plan): cambio de vista máximo de 3,53° (Haworth, T4.3.c), 3,43° (Malapert) y 3,96° (Connecting Ridge) por fotograma, en la aproximación final. Pasa por las 4 fases, se piden los 4 niveles de terreno, λ = 1 al llegar y el panorama aparece en el primer fotograma de la fase de sitio.
+- **Decisiones tomadas:** la medición de la fase se hace sobre el render (lo que ve el usuario), no solo sobre los vectores, y se separan las tres fuentes de error: datos, geometría dibujada y rasterizado.
+- **Desviaciones de la spec / cambios en la guía:** ninguna. La fracción iluminada que se ve en 3D se aparta hasta ~1 punto de la real por la exageración ×6 (D8). El ángulo de fase es exacto; queda documentado en `docs/validation.md` §5.
+- **Problemas abiertos:** el indicador de escala dice «Moon phase exact». El ángulo de fase lo es, pero la fracción visible de la Luna ×6 difiere hasta ~1 punto. Si se quiere precisar el texto, es tarea de T5 (pulido).
+- **Siguiente tarea:** Fase 4 cerrada → hito de demo de la Fase 4. Después, T5.1.a.

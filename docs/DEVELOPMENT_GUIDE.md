@@ -683,7 +683,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 - **Depende de:** T4.4.a, T4.3.c · **Spec:** 8.0, 9, 10 (T4.4) · **Decisiones:** — · **Est.:** 2 h · **Adelantable**
 - **Aceptación:** prueba: el plan cambia sin salir del modo y con un solo contexto WebGL; revisión visual sin saltos bruscos.
 
-##### [ ] T4.4.c — Verificación del viaje con datos reales
+##### [x] T4.4.c — Verificación del viaje con datos reales
 - **Qué:** recorrer el viaje con datos reales: fase lunar en las 3 fechas de T2.1.c, llegada al sitio en `arrival_utc`, etiqueta ILLUSTRATIVE.
 - **Archivos:** `PROGRESS.md` (evidencia)
 - **Depende de:** T4.4.b, T3.5.a · **Spec:** 5.8, 10 (T4.1–T4.4) · **Decisiones:** — · **Est.:** 1.5 h

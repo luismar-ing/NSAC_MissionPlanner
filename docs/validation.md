@@ -152,3 +152,21 @@ La fase de la escena usa la luz en la dirección `sun_dir` (Tierra → Sol) y la
 | 2027-09-30T18:00:00Z | 0.732 | 0.727 | 0.005 | 170.190 | 170.219 | 0.000000 | 0.05 |
 | 2027-12-24T23:00:00Z | 8.408 | 8.373 | 0.036 | 146.283 | 146.361 | 0.000000 | 0.04 |
 <!-- vs_scene:end -->
+
+## 5. Escena 3D renderizada: fase lunar (T4.4.c, 2026-10-22)
+
+Medida sobre la imagen que dibuja la app (WebGL, navegador, 1297 × 807 px). La cámara se coloca en el centro de la Tierra mirando al centro de la Luna, con un campo de 4° para que el disco ocupe unos 310 px de radio (~300 000 px). Cada instante se dibuja dos veces, con la luz del Sol y sin ella; un píxel del disco cuenta como iluminado si el Sol lo aclara (Δ luminancia > 0). Así se descarta la luz ambiente del lado nocturno.
+
+Como control, se calcula también la fracción exacta de la **esfera dibujada** con un trazado de rayos en la CPU, píxel a píxel, con la misma cámara y la misma dirección de luz. En cada fecha se elige un plan que aterriza después, para que la escena esté en escala espacial (λ = 0, Luna ×6 por D8).
+
+| Instante (UTC) | Horizons (%) | Escena, observador lejano (%) | Esfera ×6 vista desde la Tierra, rayos (%) | **Render ×6 (%)** | Render − rayos (puntos) | Luna a tamaño real: rayos / render (%) | Captura |
+|---|---|---|---|---|---|---|---|
+| 2027-01-15T06:00:00Z | 43.734 | 43.599 | 43.38 | **43.25** | −0.13 | 43.56 / 43.43 | `docs/img/t44c_phase_2027-01-15.png` |
+| 2027-04-20T03:00:00Z | 99.082 | 99.077 | 99.37 | **99.55** | +0.18 | — | `docs/img/t44c_phase_2027-04-20.png` |
+| 2027-12-24T23:00:00Z | 8.408 | 8.373 | 7.60 | **7.39** | −0.21 | 8.25 / 8.03 | `docs/img/t44c_phase_2027-12-24.png` |
+
+**Lectura:**
+- **La luz de la escena es la de los datos.** La fracción de observador lejano que da la geometría de la escena (dirección de la luz frente a la dirección Luna → cámara) reproduce exactamente la columna «escena» de §4, que está a ≤ 0.135 puntos de Horizons.
+- **El render es fiel a lo que dibuja:** queda a ≤ 0.21 puntos del trazado de rayos de la misma esfera. La diferencia viene de los píxeles del terminador, donde el Sol aporta menos de un nivel de 8 bits.
+- **La exageración ×6 de D8 explica el resto.** Una Luna 6 veces mayor, vista a distancia finita, deja ver algo menos de un hemisferio (radio angular de 1,6° en lugar de 0,26°). Eso desplaza la fracción visible hasta −0.77 puntos en creciente. A tamaño real el efecto se reduce unas 6 veces (8.25 % frente a 8.37 %) y el render queda a ≤ 0.38 puntos de Horizons.
+- Las direcciones y los ángulos de la escena son exactos (§4, T4.1.b). La fase que ve el usuario en la vista 3D difiere de la real como máximo en ~1 punto, y solo por el tamaño exagerado de la Luna. Así lo dice el indicador de escala («Not to scale», «Earth and Moon drawn 6× larger … Moon phase exact»).
