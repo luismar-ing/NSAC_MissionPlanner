@@ -54,7 +54,7 @@ def convert() -> dict:
             entry["files"][tag] = {"file": out.name, "width": size[0], "height": size[1], "bytes": len(data),
                                    "sha256": hashlib.sha256(data).hexdigest()}
         manifest["textures"][body] = entry
-    (OUT / "textures.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    (OUT / "textures.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
     return manifest
 
 
