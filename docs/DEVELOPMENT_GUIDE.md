@@ -631,7 +631,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ### T4.2 Cohete, despegue y trayectoria (spec 5.8, 8.2)
 
-##### [ ] T4.2.a — Modelo del cohete
+##### [x] T4.2.a — Modelo del cohete
 - **Qué:** modelo propio simplificado (geometría procedural) o glTF con licencia verificada y registrada.
 - **Archivos:** `web/src/scene3d/rocket.ts`, `data/README.md` (si es externo)
 - **Depende de:** T4.1.c · **Spec:** 6, 11 regla 12 · **Decisiones:** D8 · **Est.:** 1.5 h · **Adelantable**

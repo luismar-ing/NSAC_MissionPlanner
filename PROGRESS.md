@@ -1881,3 +1881,22 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivo extra `web/src/lib/mission.ts`. La prueba es `mission.test.tsx` (necesita jsdom), no `.ts`.
 - **Problemas abiertos:** ninguno. T4.1 completo.
 - **Siguiente tarea:** T4.2.a.
+
+## 2026-10-22 · T4.2.a · Modelo del cohete
+
+- **Tarea:** T4.2.a — Modelo del cohete ([x]).
+- **Qué se hizo:**
+  - `web/src/scene3d/rocket.ts`: modelo **propio y procedural** (no hay archivo externo ni licencia que registrar; `data/README.md` no cambia): lanzador genérico de dos etapas, con perfil de revolución (tobera, primera etapa, interetapa, segunda etapa, carenado ojival), banda en la interetapa y cuatro aletas. No representa ningún vehículo real. Ejes locales: +Y = morro, longitud 1, base en y = 0. Materiales con los colores de los tokens y una autoiluminación tenue en gris medio, para que la cara en sombra se lea sobre el negro (ayuda visual, no física).
+  - Escala (D8): el cohete se dibuja con un **tamaño aparente constante**, el 8 % de la altura de la vista, mediante `apparentLength(distancia, fov, fracción)`. Junto a la Luna mide unas 22 unidades (≈ 22 000 km), unas 225 000 veces su tamaño real (≈ 100 m). El indicador de escala lo dice: «Earth and Moon drawn 6× larger, rocket enlarged to stay visible».
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/rocket.test.ts
+   ✓ is 1 unit long along +Y with its base at the origin, slender, with 4 fins
+   ✓ apparent length keeps a constant fraction of the view height at any distance
+  $ npm --prefix web test → Tests 135 passed · typecheck → exit 0
+  ```
+  Revisión visual en el navegador: el cohete, colocado a mitad del camino Tierra–Luna con el gancho de depuración, se ve con sus etapas, aletas y tobera (inspeccionado también a 5×). Sin autoiluminación, la cara en sombra se perdía sobre el fondo; con ella se ve gris, y la cara iluminada por el Sol sigue más clara. Al 6 % parecía una aguja; se dejó en el 8 %.
+- **Decisiones tomadas:** geometría procedural en lugar de un glTF externo (sin licencia que verificar, ~0 kB de recursos). Tamaño aparente constante en lugar de un factor fijo, porque la distancia a la cámara varía en varios órdenes de magnitud durante el viaje.
+- **Desviaciones de la spec / cambios en la guía:** archivo extra `web/tests/rocket.test.ts`. El cohete se añade a la escena y sigue la trayectoria en T4.2.b y T4.2.c.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T4.2.b.

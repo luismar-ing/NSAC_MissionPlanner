@@ -146,7 +146,7 @@ export const STRINGS = {
   scale: {
     notToScale: "Not to scale",
     realScale: "Real scale",
-    exaggerated: (f: number) => `Earth and Moon drawn ${f}× larger · distances, Sun direction and Moon phase exact`,
+    exaggerated: (f: number) => `Earth and Moon drawn ${f}× larger, rocket enlarged to stay visible · distances, Sun direction and Moon phase exact`,
     local: "Terrain and distances at their real size",
     detail: (km: number) => `1 scene unit = ${km} km. Sizes are enlarged so the bodies stay visible; positions are scaled uniformly, so every angle is exact (spec 5.9).`,
   },
