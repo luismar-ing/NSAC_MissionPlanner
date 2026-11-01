@@ -2465,3 +2465,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** archivos extra `web/src/lib/credits.ts` y `web/tests/credits.test.tsx`.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** la Fase 5 solo espera T5.2.e (revisión visual con el humano). Después, el hito de la Fase 5.
+
+## 2026-11-01 · PLAN · Fase R (rediseño de la interfaz)
+
+- **Tarea:** planificación (no es una subtarea). Sin código del producto.
+- **Qué se hizo:**
+  - Lienzo con 3 direcciones visuales (A Glass Orbit, B Instrument, C Cinematic), con 3 pantallas cada una: https://claude.ai/artifact/3ZdsgNg6jhr7nBp1NW5yUB (privado).
+  - El humano eligió: portada A1; Mission Planner A2 → B2 → B3 con estilo A3, más el terreno y el cielo 3D en el sitio; Educator por capítulos como C2 y C3.
+  - Respuestas del humano: música generada con Web Audio; comparación 2D en un panel deslizable; los extras de la Fase 6 se mantienen, después de la Fase R; paleta de las maquetas (Sol naranja, Tierra azul).
+  - `docs/DEVELOPMENT_GUIDE.md`: nueva **Fase R** (15 subtareas: TR.0.a a TR.5.a, más T6.1.a–c trasladadas desde la Fase 6). T5.2.e depende ahora de TR.5.a. T6.3.b queda cubierta por el modo Educator.
+  - `docs/DECISIONS.md`: **A7** confirmada; sustituye a A6.
+- **Cómo se verificó:** `grep -cE '^##### \[ \] TR' docs/DEVELOPMENT_GUIDE.md` → 15.
+- **Decisiones tomadas:** A7.
+- **Desviaciones de la spec / cambios en la guía:** la disposición de 8.0 (dos modos de pantalla) pasa a portada + dos modos de uso. La comparación 2D, el calendario, el panorama Nivel A y el panel del sitio se conservan sin cambios de formato (regla 6) y sin WebGL (regla 7). Los colores vuelven a los de la spec 9.
+- **Problemas abiertos:** la revisión visual T5.2.e se hará sobre el diseño nuevo. Plan de recorte de la Fase R: si no está cerrada el 2026-11-09, se recorta TR.3 (Nivel B) y la portada usa una Luna estática.
+- **Siguiente tarea:** TR.0.a.

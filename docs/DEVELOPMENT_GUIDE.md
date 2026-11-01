@@ -747,7 +747,7 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 ##### [!] T5.2.e — Revisión visual con el humano
 - **Qué:** sesión de revisión en la pantalla o el proyector real; el agente prepara la lista de puntos a revisar.
 - **Archivos:** `PROGRESS.md`
-- **Depende de:** T5.2.c · **Spec:** 10 (T5.2) · **Decisiones:** — · **Est.:** 1 h · **Humano**
+- **Depende de:** T5.2.c, TR.5.a (la revisión se hace sobre el diseño de la Fase R) · **Spec:** 10 (T5.2) · **Decisiones:** — · **Est.:** 1 h · **Humano**
 - **Aceptación:** el humano confirma en el chat; su feedback queda en `PROGRESS.md`.
 - **Bloqueo:** espera la revisión del humano en la pantalla o el proyector real (lista de puntos en `PROGRESS.md`, entrada «T5.2.e · preparada»).
 
@@ -772,14 +772,90 @@ Un solo contexto WebGL; three.js se carga bajo demanda. Si falta tiempo, esta fa
 
 ---
 
-## Fase 6: Extras (solo si el MVP está sólido, en este orden)
+## Fase R: Rediseño de la interfaz (decisión del humano, 2026-11-01)
 
-Aceptación general: cada extra se desactiva con un interruptor sin romper el MVP (todas las pruebas siguen pasando con el extra desactivado). El extra 6 de 4.2 (AR en el celular) no está planificado.
+Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elección del humano (decisión A7):
+- **Portada:** A1, con la Luna real girando de fondo y dos tarjetas con efecto spotlight (Educator / Mission Planner) y música ambiental.
+- **Mission Planner:** A2 (globo terrestre interactivo + barra lateral de lanzamiento) → B2 (tránsito 3D con telemetría) → al aterrizar, la disposición de B3 con el estilo de A3, más la vista 3D del terreno y el cielo en el sitio (Nivel B, antes T6.1).
+- **Educator:** recorrido por capítulos como C2 y C3, fácil de digerir.
+- **Comparación 2D** (calendario completo y bandeja de 2 a 5 planes): panel deslizable que se abre desde la barra lateral en cualquier fase. Nunca se recorta (regla 6) y sigue sin WebGL (regla 7).
+- **Música:** generada en el navegador con Web Audio. Sin archivos ni licencias; empieza con el clic que elige el modo y se puede silenciar.
+- **Extras de la Fase 6:** se mantienen, pero solo se hacen si sobra tiempo después de esta fase y antes de la fecha de corte de la Fase 7.
+
+**Elegibilidad:** la Fase R es elegible aunque la Fase 5 siga abierta por T5.2.e, porque la revisión visual se hará sobre el diseño nuevo (T5.2.e depende ahora de TR.5.a). Se aplica el plan de recorte: si el 2026-11-09 la Fase R no está cerrada, se recorta primero TR.3 (Nivel B) y la portada usa una Luna estática.
+
+### TR.0 Base
+
+##### [ ] TR.0.a — Decisión A7, tokens y tipografías del nuevo estilo
+- **Qué:** registrar A7 (sustituye a A6). Tokens: Sol `#ffb347` y Tierra `#4aa3ff` (los colores de la spec 9 y de las maquetas), superficies de vidrio translúcido con contraste ≥ 4.5:1, radios y desenfoque. Tipografías autoalojadas: Space Grotesk (titulares de Mission Planner), Instrument Serif (Educator) y Geist / Geist Mono, que se conservan para el texto y la telemetría.
+- **Archivos:** `web/src/styles/tokens.ts`, `web/src/styles/tokens.css`, `web/package.json`, `docs/DECISIONS.md`
+- **Depende de:** — · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
+- **Aceptación:** `npm --prefix web test` y `typecheck` pasan; prueba de contraste de los pares texto/fondo de los tokens (≥ 4.5:1); el Sol y la Tierra se distinguen también por luminosidad.
+
+##### [ ] TR.0.b — Pantallas y modo en el estado global
+- **Qué:** `screen: "landing" | "planner" | "educator"` en el store; `App` decide qué pantalla mostrar; volver a la portada sin perder planes anclados; créditos y movimiento reducido accesibles desde todas las pantallas.
+- **Archivos:** `web/src/store/appStore.ts`, `web/src/App.tsx`, `web/tests/appStore.test.ts`
+- **Depende de:** TR.0.a · **Spec:** 8.0 · **Decisiones:** A7 · **Est.:** 2 h
+- **Aceptación:** pruebas del store (cambio de pantalla, la bandeja se conserva); `npm --prefix web test` pasa.
+
+### TR.1 Portada (A1)
+
+##### [ ] TR.1.a — Portada con tarjetas spotlight
+- **Qué:** título, las dos tarjetas (`<button>` reales, con resplandor que sigue al cursor y también al foco del teclado), enlace a créditos y botón de sonido.
+- **Archivos:** `web/src/views/Landing.tsx`, `web/src/components/SpotlightCard.tsx`, `web/src/lib/strings.ts`, `web/tests/landing.test.tsx`
+- **Depende de:** TR.0.b · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
+- **Aceptación:** prueba: Tab + Enter en cada tarjeta abre su modo; revisión visual contra A1 a 1920×1080.
+
+##### [ ] TR.1.b — Luna girando con el único contexto WebGL
+- **Qué:** escena de fondo con la Luna (`moon_2k.jpg`), girando despacio e iluminada por la dirección real del Sol de `scene/ephemeris`. Usa el `rendererManager` existente, así que es el mismo contexto que luego usa el viaje. Con movimiento reducido no gira; sin WebGL se muestra una imagen fija.
+- **Archivos:** `web/src/scene3d/backdrop.ts`, `web/src/views/Landing.tsx`
+- **Depende de:** TR.1.a · **Spec:** 8.7, 9 · **Decisiones:** D13 · **Est.:** 2.5 h
+- **Aceptación:** `npm --prefix web run fps` informa de 1 contexto WebGL en portada → planner → sitio y ≥ 60 fps en la portada; carga del shell < 3 s (`perf`).
+
+##### [ ] TR.1.c — Música ambiental generada (Web Audio)
+- **Qué:** pad cálido sintetizado (osciladores y filtros, sin archivos). Empieza al elegir un modo, con fundido de entrada, y tiene botón de silencio en todas las pantallas. La preferencia se guarda en `localStorage`, con `try/catch`. Se acredita en Credits como «procedural, no external audio».
+- **Archivos:** `web/src/lib/ambient.ts`, `web/src/components/SoundToggle.tsx`, `web/src/lib/credits.ts`, `web/tests/ambient.test.ts`
+- **Depende de:** TR.1.a · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
+- **Aceptación:** prueba con un `AudioContext` simulado: no suena antes de un gesto, se silencia y recuerda la preferencia; revisión auditiva del humano.
+
+### TR.2 Mission Planner (A2 → B2 → B3 con estilo A3)
+
+##### [ ] TR.2.a — Globo terrestre interactivo antes del lanzamiento
+- **Qué:** la escena abre en «planificación», antes de `launch_utc`: cámara sobre la Tierra que el usuario gira arrastrando (como nullschool), con marcador del sitio de lanzamiento y fondo de estrellas. El plan elegido en la barra lateral se aplica con el `setPlan` existente.
+- **Archivos:** `web/src/scene3d/renderer.ts`, `web/src/scene3d/cameraDirector.ts`, `web/tests/cameraDirector.test.ts`
+- **Depende de:** TR.1.b · **Spec:** 8.2, 8.3 · **Decisiones:** D8 · **Est.:** 3 h
+- **Aceptación:** prueba del director (encuadre de planificación continuo con el de despegue, sin saltos); revisión visual: arrastrar gira el globo.
+
+##### [ ] TR.2.b — Barra lateral de inicio de misión (A2)
+- **Qué:** barra lateral de vidrio con la fecha de llegada (tira de días coloreada por el score del sitio), la ventana 3/7/14, la lista de sitios con su `sun_pct` y el botón «Launch». Debajo, la barra de fases (Launch · Transit · Landing · Site) y la etiqueta ILLUSTRATIVE.
+- **Archivos:** `web/src/views/PlannerView.tsx`, `web/src/components/MissionSidebar.tsx`, `web/tests/plannerSidebar.test.tsx`
+- **Depende de:** TR.0.b, TR.2.a · **Spec:** 8.5, 5.6 · **Decisiones:** A7 · **Est.:** 3 h
+- **Aceptación:** prueba: cambiar fecha, ventana o sitio fija el plan correcto (`selectedPlanId`) y «Launch» inicia la misión; actualización < 100 ms.
+
+##### [ ] TR.2.c — Panel deslizable de búsqueda y comparación
+- **Qué:** `ConstraintControls`, `Calendar` y `Tray` actuales dentro de un panel que se desliza sobre el globo y se abre desde la barra lateral («Full calendar», «Compare plans · n») en cualquier fase. Los paneles 2D conservan su formato, escala y tipografía idénticos.
+- **Archivos:** `web/src/components/Drawer.tsx`, `web/src/views/PlannerView.tsx`, `web/src/styles/tokens.css`
+- **Depende de:** TR.2.b · **Spec:** 8.0, 8.1, 8.5 · **Decisiones:** A7 · **Est.:** 2.5 h
+- **Aceptación:** las pruebas existentes de calendario y bandeja pasan; con el panel abierto hay 1 solo contexto WebGL (`fps`); el foco queda atrapado en el panel y Esc lo cierra.
+
+##### [ ] TR.2.d — Tránsito con telemetría (B2)
+- **Qué:** columna de telemetría en monoespaciada (plan, lanzamiento, llegada, ventana, tránsito, fase, escala), `MissionControls` con segmentos por fase y velocidades, indicador de escala y ILLUSTRATIVE junto a la estela.
+- **Archivos:** `web/src/views/PlannerView.tsx`, `web/src/scene3d/MissionControls.tsx`, `web/src/components/Telemetry.tsx`
+- **Depende de:** TR.2.b · **Spec:** 8.2, 5.9 · **Decisiones:** — · **Est.:** 2.5 h
+- **Aceptación:** pruebas existentes de `MissionControls` pasan; revisión visual contra B2; la etiqueta ILLUSTRATIVE se ve en las fases 1 a 3.
+
+##### [ ] TR.2.e — Llegada al sitio: disposición B3 con estilo A3
+- **Qué:** barra superior (sitio, llegada, ventana, «Compare plans», sonido); tarjeta de métricas de vidrio a la derecha (`MetricsBox` + texto «why»); consola inferior con el panorama 360° (Nivel A), la cinta de tiempo y la tabla de métricas frente a los planes anclados (★ = mejor, con forma además de color); dock de tiempo. El panel de características (8.6) se abre desde la tarjeta.
+- **Archivos:** `web/src/views/SiteLayout.tsx`, `web/src/views/LiveView.tsx`, `web/src/views/SitePanel.tsx`
+- **Depende de:** TR.2.d · **Spec:** 8.4, 8.6, 5.5 · **Decisiones:** A7 · **Est.:** 3 h
+- **Aceptación:** pruebas existentes del panel del sitio y del panorama pasan; el panorama y la escena siguen el mismo `missionTime`; revisión visual contra B3/A3.
+
+### TR.3 Superficie 3D: terreno y cielo (antes T6.1)
 
 ##### [ ] T6.1.a — Terreno 3D Nivel B: malla del parche (~20 km)
 - **Qué:** malla de un parche de ~20 km de radio con la cámara a h_obs.
 - **Archivos:** `web/src/scene3d/terrainLevelB.ts`, `pipeline/terrain_lod.py`
-- **Depende de:** T5.1.c · **Spec:** 8.4 (Nivel B), 4.2 · **Decisiones:** D9 · **Est.:** 3 h
+- **Depende de:** TR.2.e · **Spec:** 8.4 (Nivel B), 4.2 · **Decisiones:** D9 · **Est.:** 3 h
 - **Aceptación:** revisión visual: el contorno del terreno coincide con el panorama 2D en 4 rumbos.
 
 ##### [ ] T6.1.b — Nivel B: luz del Sol, sombras y estrellas a 60 fps
@@ -793,6 +869,53 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Archivos:** `web/src/store/*.ts`
 - **Depende de:** T6.1.b · **Spec:** 10 (Fase 6) · **Decisiones:** — · **Est.:** 1 h
 - **Aceptación:** con el Nivel B desactivado, `npm --prefix web test` pasa y el flujo de demo funciona.
+
+##### [ ] TR.3.a — Vista del cielo en superficie (tipo Stellarium)
+- **Qué:** al aterrizar, la cámara pasa sin cortes a primera persona a h_obs. Arrastrar mira alrededor y la rueda cambia el campo de visión. Encima, la rejilla de azimut/elevación y las etiquetas del Sol y la Tierra con su el/az y el estado del enlace, sacados de los mismos datos que el panorama.
+- **Archivos:** `web/src/scene3d/cameraDirector.ts`, `web/src/scene3d/skyOverlay.ts`, `web/src/views/SiteLayout.tsx`
+- **Depende de:** T6.1.b · **Spec:** 8.3, 8.4 · **Decisiones:** D9 · **Est.:** 3 h
+- **Aceptación:** prueba: el az/el de las etiquetas coincide con la serie del panorama en 3 instantes (< 0.1°); con el Nivel B apagado, el sitio muestra el panorama Nivel A.
+
+### TR.4 Educator (C2, C3)
+
+##### [ ] TR.4.a — Motor de capítulos
+- **Qué:** 4 capítulos (Leaving Earth, The journey, Landing, On the surface), cada uno con su fase o instante de misión, un subtítulo corto en inglés y sus acciones. Anterior/siguiente, indicador de progreso y salida en cualquier momento. Con movimiento reducido, los saltos son cortes.
+- **Archivos:** `web/src/lib/chapters.ts`, `web/src/lib/strings.ts`, `web/tests/chapters.test.ts`
+- **Depende de:** TR.0.b · **Spec:** 3, 9 · **Decisiones:** — · **Est.:** 2 h
+- **Aceptación:** pruebas: cada capítulo lleva la misión a su fase; Esc vuelve a la portada; los textos no contienen cifras que no salgan de los datos.
+
+##### [ ] TR.4.b — Capítulo 1: elegir sitio y fecha (C2)
+- **Qué:** globo (TR.2.a), pestañas de sitio, barras de días por score, «Begin the journey» y un plan bueno preseleccionado. Titulares en Instrument Serif y etiqueta ILLUSTRATIVE.
+- **Archivos:** `web/src/views/EducatorView.tsx`
+- **Depende de:** TR.4.a, TR.2.a · **Spec:** 8.5 · **Decisiones:** A7 · **Est.:** 2.5 h
+- **Aceptación:** prueba: elegir pestaña y día fija el plan; revisión visual contra C2.
+
+##### [ ] TR.4.c — Capítulos 2 a 4 y superficie (C3)
+- **Qué:** subtítulos del tránsito y del aterrizaje. En la superficie: subtítulo central, «Watch a full day» (reproduce 24 h) y «Look around 360°» (vista TR.3.a, o panorama Nivel A si el Nivel B está apagado). Al cerrar, T6.3.b pasa a `[x]`.
+- **Archivos:** `web/src/views/EducatorView.tsx`, `web/src/lib/strings.ts`
+- **Depende de:** TR.4.b, TR.3.a · **Spec:** 8.2, 8.4 · **Decisiones:** — · **Est.:** 2.5 h
+- **Aceptación:** revisión visual del recorrido completo contra C3; se puede salir en cualquier momento.
+
+### TR.5 Cierre
+
+##### [ ] TR.5.a — Móvil, accesibilidad, rendimiento y capturas
+- **Qué:** 375 px sin scroll horizontal (barra lateral y paneles como hojas inferiores); recorrido completo con teclado; contraste; movimiento reducido en todas las pantallas; repetir `perf` y `fps`; regenerar `screens` con las pantallas nuevas.
+- **Archivos:** `web/src/styles/tokens.css`, `web/scripts/screens.mjs`, `docs/performance.md`
+- **Depende de:** TR.2.e, TR.4.c · **Spec:** 8.7, 9 · **Decisiones:** — · **Est.:** 3 h
+- **Aceptación:** `perf` y `fps` dentro de presupuesto (resultados en `docs/performance.md`); capturas 1920×1080 y 375×812 de cada pantalla en `docs/figures/screens/`.
+
+### Hito de demo · Fase R
+
+**Qué se puede mostrar:** portada → Mission Planner (globo, barra lateral, comparación, viaje, sitio con cielo 3D) y portada → Educator (4 capítulos).
+**Cómo probarlo:** `npm --prefix web run build`, luego `npm --prefix web run preview`; recorrer ambos modos con sonido y con movimiento reducido. Después, T5.2.e (revisión visual con el humano) sobre el diseño nuevo.
+
+---
+
+## Fase 6: Extras (solo si el MVP está sólido, en este orden)
+
+Aceptación general: cada extra se desactiva con un interruptor sin romper el MVP (todas las pruebas siguen pasando con el extra desactivado). El extra 6 de 4.2 (AR en el celular) no está planificado.
+
+**T6.1 (terreno 3D, Nivel B) se trasladó a la Fase R** (TR.3) por decisión del humano (2026-11-01): la vista 3D del terreno y del cielo en el sitio forma parte del rediseño. **T6.3.b (modo educativo narrado)** queda cubierta por el modo Educator (TR.4); se marca `[x]` al cerrar TR.4.c.
 
 ##### [ ] T6.2.a — Mapa polar iluminado: fuente o cálculo (verificación)
 - **Qué:** verificar si existe un mapa de iluminación LOLA publicado con licencia utilizable; si no, calcular la fracción de iluminación en una rejilla gruesa con el pipeline y marcar el método.
