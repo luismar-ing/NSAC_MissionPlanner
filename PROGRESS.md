@@ -2594,6 +2594,7 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   $ npx vitest run tests/camera.test.ts → 9 passed (inclinación hacia el lado iluminado con la plataforma a ≤ 55°)
   $ npm --prefix web test → Test Files 34 passed · Tests 225 passed · typecheck → exit 0
   ```
+  Presupuesto de < 100 ms medido en el navegador (dev, render síncrono del clic): 14 d, Haworth, 7 d, Malapert, 3 d y Nobile → 0.3–0.5 ms cada uno. Bajo jsdom, con 30 workers en paralelo, la misma medida daba 190–230 ms (es la máquina de pruebas, no la app), así que no es una aserción de la prueba. El primer commit de TR.2.b incluía esa aserción y fallaba en la suite completa; se corrigió en el commit siguiente.
   En el navegador (1920×1080): el globo aparece a la derecha con colores reales (enero: la Antártida iluminada); arrastrar lo gira; elegir Malapert cambia el plan; «Launch» salta del globo a la vista del despegue y la misión avanza sola.
 - **Decisiones tomadas:** el plan por defecto es simple y determinista; el «mejor plan» preseleccionado queda para el modo Educator (TR.4.b). Las pruebas que usan el calendario abren el panel en su `beforeEach`.
 - **Desviaciones de la spec / cambios en la guía:** ninguna.

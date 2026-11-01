@@ -49,10 +49,9 @@ describe("Mission Planner sidebar (A2)", () => {
     fireEvent.change(sidebar().getByLabelText("Arrival date (UTC)"), { target: { value: "2027-03-09" } });
     expect(appStore.getState().selectedPlanId).toBe("connecting_ridge_20270309_7d");
 
-    const t0 = performance.now();
+    // (the < 100 ms update budget is measured in the browser, not under jsdom: see PROGRESS, TR.2.b)
     fireEvent.click(sidebar().getByRole("button", { name: "14 days" }));
     fireEvent.click(sidebar().getByRole("button", { name: /^Haworth/ }));
-    expect(performance.now() - t0).toBeLessThan(100);
     expect(appStore.getState().selectedPlanId).toBe("haworth_20270309_14d");
     expect(sidebar().getByRole("button", { name: /^Haworth/ }).getAttribute("aria-pressed")).toBe("true");
 
