@@ -47,6 +47,7 @@ beforeEach(() => {
   failing.clear();
   const st = appStore.getState();
   st.setScreen("planner"); // the compare and live views live in the Mission Planner screen (A7)
+  st.setDrawerOpen(true); // calendar, tray and site section: the search panel (TR.2.b)
   st.setViewMode("compare");
   for (const id of [...st.comparePlans]) st.unpinPlan(id);
   st.selectPlan(null);

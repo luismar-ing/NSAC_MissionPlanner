@@ -14,12 +14,12 @@ const STEP_MIN = 10; // scrubber resolution
  * timeline arrives a moment later, and playback skips those frames instead of clamping the new plan's clock
  * into the old mission; then it carries on with the new plan.
  */
-export function MissionControls({ timeline, planId }: { timeline: MissionTimeline; planId?: string }) {
+export function MissionControls({ timeline, planId, autoPlay = false }: { timeline: MissionTimeline; planId?: string; autoPlay?: boolean }) {
   const missionTime = useApp((s) => s.missionTime);
   const missionPhase = useApp((s) => s.missionPhase);
   const setMissionTime = useApp((s) => s.setMissionTime);
   const setMissionPhase = useApp((s) => s.setMissionPhase);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(autoPlay); // "Launch" in the Mission Planner starts playing at once
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(6);
 
   const go = (t: number) => {

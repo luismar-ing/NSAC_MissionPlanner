@@ -91,9 +91,11 @@ export function createBodies(scene: THREE.Scene, mode: ScaleMode = SPACE_SCALE):
   const moon = new THREE.Mesh(moonGeo, new THREE.MeshStandardMaterial({ color: COLORS.textMuted, roughness: 1, metalness: 0 }));
   moon.name = "moon";
 
-  const sunLight = new THREE.DirectionalLight(COLORS.sun, 3);
+  // sunlight itself is white (lit ground keeps its own colours); the Sun's orange is for the Sun as a symbol
+  // (its glow here, its disc in the 2D views), so the colour means "the Sun" everywhere (A7)
+  const sunLight = new THREE.DirectionalLight(COLORS.text, 3);
   sunLight.name = "sun-light";
-  const ambient = new THREE.AmbientLight(COLORS.sun, 0.04); // a hint of the night side, like a very faint earthshine
+  const ambient = new THREE.AmbientLight(COLORS.text, 0.04); // a hint of the night side, like a very faint earthshine
   const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color: COLORS.sun, depthWrite: false, sizeAttenuation: false }));
   sunGlow.name = "sun-glow";
   sunGlow.scale.set(0.12, 0.12, 1);

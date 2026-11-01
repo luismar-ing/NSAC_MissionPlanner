@@ -826,7 +826,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.1.b · **Spec:** 8.2, 8.3 · **Decisiones:** D8 · **Est.:** 3 h
 - **Aceptación:** prueba del director (encuadre de planificación continuo con el de despegue, sin saltos); revisión visual: arrastrar gira el globo.
 
-##### [ ] TR.2.b — Barra lateral de inicio de misión (A2)
+##### [x] TR.2.b — Barra lateral de inicio de misión (A2)
 - **Qué:** barra lateral de vidrio con la fecha de llegada (tira de días coloreada por el score del sitio), la ventana 3/7/14, la lista de sitios con su `sun_pct` y el botón «Launch». Debajo, la barra de fases (Launch · Transit · Landing · Site) y la etiqueta ILLUSTRATIVE.
 - **Archivos:** `web/src/views/PlannerView.tsx`, `web/src/components/MissionSidebar.tsx`, `web/tests/plannerSidebar.test.tsx`
 - **Depende de:** TR.0.b, TR.2.a · **Spec:** 8.5, 5.6 · **Decisiones:** A7 · **Est.:** 3 h

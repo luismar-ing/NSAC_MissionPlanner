@@ -21,7 +21,7 @@ import { useSiteData } from "./useSiteData";
  * the horizon panorama (8.4) and the site features panel (8.6) appear under the scene, driven by the same
  * missionTime as the scene, so scrubbing or playing moves the 3D sky and the panorama together.
  */
-export function LiveView() {
+export function LiveView({ sceneOutside = false, autoPlay = false }: { sceneOutside?: boolean; autoPlay?: boolean } = {}) {
   const data = useApp((s) => s.data);
   const plan = useApp((s) => (s.selectedPlanId ? s.plansById.get(s.selectedPlanId) : undefined));
   const site = useApp((s) => s.sites.find((x) => x.id === plan?.site_id));
@@ -69,7 +69,8 @@ export function LiveView() {
       <div className="live-body">
         <div className="live-main">
           <div className="scene-wrap" ref={sceneRef}>
-            <SceneHost />
+            {/* in the Mission Planner the scene lives behind every stage (PlannerView), so the globe can hop to launch */}
+            {!sceneOutside && <SceneHost />}
             {/* spec 8.2: the scale indicator is shown in phases 1 to 3 (launch, transit, landing); it says "real
                 scale" once the final approach has switched to it (T4.3.b) */}
             {!atSite && <ScaleIndicator mode={sceneScale === "local" ? LOCAL_SCALE : SPACE_SCALE} />}
@@ -80,7 +81,7 @@ export function LiveView() {
               </p>
             )}
           </div>
-          {timeline && <MissionControls timeline={timeline.tl} planId={timeline.planId} />}
+          {timeline && <MissionControls timeline={timeline.tl} planId={timeline.planId} autoPlay={autoPlay} />}
           <p className="visually-hidden" aria-live="polite">
             {atSite && site ? STRINGS.live.arrived(site.name) : ""}
           </p>

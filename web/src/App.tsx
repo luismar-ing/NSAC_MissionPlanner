@@ -8,6 +8,7 @@ import { CompareView } from "./views/CompareView";
 import { LiveView } from "./views/LiveView";
 import { Landing } from "./views/Landing";
 import { SoundToggle } from "./components/SoundToggle";
+import { PlannerView } from "./views/PlannerView";
 
 export const APP_TITLE = STRINGS.appTitle;
 
@@ -62,6 +63,51 @@ export function App() {
       </div>
     );
 
+  const status = (
+    <>
+      {(load.status === "idle" || load.status === "loading") && (
+        <p className="state-message" aria-busy="true">
+          {STRINGS.loading}
+        </p>
+      )}
+      {load.status === "error" && (
+        <div className="state-message">
+          <ErrorMessage what={STRINGS.loadError} info={describeError(load.error)} onRetry={() => void appStore.getState().loadCore()} />
+        </div>
+      )}
+    </>
+  );
+
+  if (screen === "planner") {
+    const tools = (
+      <>
+        <button type="button" className="btn ghost" title={STRINGS.homeTitle} onClick={() => setScreen("landing")}>
+          {STRINGS.home}
+        </button>
+        <SoundToggle />
+        {motionToggle}
+        <button type="button" className="btn ghost" onClick={() => setCreditsOpen(true)}>
+          {STRINGS.credits.open}
+        </button>
+      </>
+    );
+    return (
+      <div className="app-planner" data-screen="planner">
+        {load.status === "ready" ? (
+          <PlannerView tools={tools} />
+        ) : (
+          <>
+            <header className="planner-top">
+              <div className="landing-tools">{tools}</div>
+            </header>
+            {status}
+          </>
+        )}
+        {credits}
+      </div>
+    );
+  }
+
   return (
     <div className="app" data-screen={screen}>
       <header className="app-header">
@@ -78,16 +124,7 @@ export function App() {
           {manifest && <span className="data-badge">{STRINGS.dataBadge(manifest.data_status, manifest.data_version)}</span>}
         </div>
       </header>
-      {(load.status === "idle" || load.status === "loading") && (
-        <p className="state-message" aria-busy="true">
-          {STRINGS.loading}
-        </p>
-      )}
-      {load.status === "error" && (
-        <div className="state-message">
-          <ErrorMessage what={STRINGS.loadError} info={describeError(load.error)} onRetry={() => void appStore.getState().loadCore()} />
-        </div>
-      )}
+      {status}
       {load.status === "ready" && (viewMode === "live" ? <LiveView /> : <CompareView />)}
       {footer}
       {credits}

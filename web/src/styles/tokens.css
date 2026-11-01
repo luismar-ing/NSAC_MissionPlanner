@@ -1738,3 +1738,348 @@ input[type="range"] {
     min-height: 0;
   }
 }
+
+/* ------------------------------------------------------------------ Mission Planner (decision A7, A2) */
+
+.glass {
+  background: var(--glass-panel);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.app-planner {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.planner {
+  position: relative;
+  height: 100vh;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+/* the one scene fills the screen behind every stage */
+.planner-scene {
+  position: absolute;
+  inset: 0;
+}
+
+.planner-scene .scene-host {
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.planner-top {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 3;
+}
+
+.planner-top .landing-tools {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.planner-top .btn {
+  border-radius: 999px;
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.mission-sidebar {
+  position: absolute;
+  left: 24px;
+  top: 24px;
+  bottom: 24px;
+  z-index: 2;
+  width: 360px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow-y: auto;
+}
+
+.sidebar-mode {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--font-lg);
+}
+
+.sidebar-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-label {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0;
+}
+
+.sidebar-hint {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.arrival-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.arrival-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-xl);
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  color-scheme: dark;
+}
+
+.arrival-input:hover {
+  border-color: var(--glass-stroke-hover);
+}
+
+.day-strip {
+  display: grid;
+  grid-template-columns: repeat(21, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.day-cell {
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--color-dark);
+  cursor: pointer;
+}
+
+.day-cell[aria-pressed="true"] {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.mission-sidebar .segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.04);
+}
+
+.mission-sidebar .segmented button {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px;
+  background: none;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.mission-sidebar .segmented button + button {
+  border: 0;
+}
+
+.mission-sidebar .segmented button[aria-pressed="true"] {
+  background: rgb(255 255 255 / 0.12);
+  color: var(--color-text);
+}
+
+.site-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.site-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.site-row:hover {
+  background: rgb(255 255 255 / 0.05);
+  color: var(--color-text);
+}
+
+.site-row[aria-pressed="true"] {
+  background: rgb(255 255 255 / 0.1);
+  color: var(--color-text);
+}
+
+.site-sun {
+  color: var(--color-sun);
+  white-space: nowrap;
+}
+
+.sidebar-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.btn.primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+  font-weight: 600;
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--color-focus);
+  border-color: var(--color-focus);
+}
+
+.launch-btn {
+  padding: 14px;
+  border-radius: 14px;
+  font-size: var(--font-md);
+}
+
+.planner-badge {
+  position: absolute;
+  top: 84px;
+  right: 24px;
+  z-index: 2;
+  margin: 0;
+  max-width: 28rem;
+  text-align: right;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.phase-rail {
+  position: absolute;
+  left: 400px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.phase-rail li::before {
+  content: "○ ";
+}
+
+.phase-rail li[aria-current="step"] {
+  color: var(--color-text);
+}
+
+.phase-rail li[aria-current="step"]::before {
+  content: "● ";
+}
+
+/* the journey (until TR.2.d): the live view's panels float over the scene, which stays draggable */
+.planner-mission {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 72px 24px 56px;
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+.planner-mission .live-area {
+  background: transparent;
+  border: 0;
+}
+
+.planner-mission .scene-wrap {
+  height: calc(100vh - 340px);
+  min-height: 240px;
+}
+
+.planner-mission .live-head,
+.planner-mission .scene-wrap > *,
+.planner-mission .mission-controls,
+.planner-mission .live-site,
+.planner-mission .thumb-strip {
+  pointer-events: auto;
+}
+
+.planner[data-stage="mission"] .phase-rail {
+  left: 24px;
+}
+
+.search-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  width: min(1180px, 100%);
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--glass-panel-strong);
+  border-left: 1px solid var(--glass-stroke);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.search-drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+@media (max-width: 720px) {
+  .mission-sidebar {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    max-height: 62vh;
+  }
+  .planner-top {
+    top: 8px;
+    right: 8px;
+    left: 8px;
+  }
+  .planner-badge,
+  .planner[data-stage="planning"] .phase-rail {
+    display: none;
+  }
+}

@@ -62,6 +62,8 @@ function pose(position: Vec3, target: Vec3, preferredUp: Vec3): Pose {
 export const PLANNING_DISTANCE_R = 4.2;
 /** Sideways shift of the globe in Earth radii (A2: the sidebar covers the left of the screen). */
 export const PLANNING_SHIFT_R = 0.9;
+/** Largest lean of the planning view from the pad towards the Sun (radians). */
+export const PLANNING_SUN_LEAN = (55 * Math.PI) / 180;
 
 /**
  * Planning (Mission Planner, design A2): before launch, the whole Earth seen from straight above the launch
@@ -69,7 +71,12 @@ export const PLANNING_SHIFT_R = 0.9;
  * shows it while the plan is being chosen, and "Launch" hops to the launch framing in real time (hopPose).
  */
 export function planningPose(i: DirectorInput): Pose {
-  const up = i.padUpAtLaunch;
+  // many launches happen at night at the pad: lean the view from the pad towards the Sun (at most
+  // PLANNING_SUN_LEAN), so the lit half of the globe shows while the pad stays well inside the visible face
+  const pad = i.padUpAtLaunch;
+  const sep = Math.acos(Math.max(-1, Math.min(1, dot(pad, i.sunDir))));
+  const toSun = sub(i.sunDir, mul(pad, dot(pad, i.sunDir)));
+  const up = len(toSun) < 1e-9 ? pad : rotateAbout(pad, unit(cross(pad, toSun)), Math.min(PLANNING_SUN_LEAN, sep * 0.6));
   const fwd = mul(up, -1);
   const right = unit(cross(fwd, Math.abs(up[2]) < 0.95 ? [0, 0, 1] : [0, 1, 0]));
   const target = mul(right, -i.earthRadius * PLANNING_SHIFT_R); // looking left of the centre puts the globe right

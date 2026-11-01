@@ -12,6 +12,7 @@ import { clampMission, phaseAt, timelineOf } from "./mission";
 export const TRANSITION_MS = MOTION.midMs;
 
 let expandFrom: DOMRect | null = null; // panel → scene
+let searchWasOpen = false; // the Mission Planner's search panel, reopened on the way back (A7)
 let collapseFrom: DOMRect | null = null; // scene → panel
 
 const reducedMotion = () => appStore.getState().reducedMotion; // app setting, initialised from the system one
@@ -28,13 +29,20 @@ export function openLive(planId: string): void {
   if (st.selectedPlanId !== planId) st.selectPlan(planId);
   expandFrom = document.querySelector(panelSelector(planId))?.getBoundingClientRect() ?? null;
   st.setViewMode("live");
-  if (appStore.getState().viewMode === "live") window.scrollTo?.({ top: 0 });
+  if (appStore.getState().viewMode === "live") {
+    // the search panel slides away for the journey and comes back with "Back" (closeLive)
+    searchWasOpen = st.drawerOpen;
+    st.setDrawerOpen(false);
+    window.scrollTo?.({ top: 0 });
+  }
 }
 
 /** Back to compare mode (button or Esc); the selected plan's panel grows back out of the scene. */
 export function closeLive(): void {
   collapseFrom = document.querySelector(".scene-wrap")?.getBoundingClientRect() ?? null;
   appStore.getState().setViewMode("compare");
+  if (searchWasOpen) appStore.getState().setDrawerOpen(true);
+  searchWasOpen = false;
 }
 
 export const takeExpandOrigin = () => {

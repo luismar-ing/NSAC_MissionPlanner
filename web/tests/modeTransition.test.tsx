@@ -35,6 +35,7 @@ beforeAll(async () => {
   window.scrollTo = () => {};
   await appStore.getState().loadCore();
   appStore.getState().setScreen("planner"); // compare and live live in the Mission Planner screen (A7)
+  appStore.getState().setDrawerOpen(true); // calendar and tray: the search panel (TR.2.b)
 });
 afterEach(cleanup);
 

@@ -66,6 +66,7 @@ beforeAll(async () => {
 beforeEach(() => {
   const st = appStore.getState();
   st.setScreen("planner"); // the compare and live views live in the Mission Planner screen (A7)
+  st.setDrawerOpen(true); // calendar, tray and site section: the search panel (TR.2.b)
   st.setViewMode("compare");
   for (const id of [...st.comparePlans]) st.unpinPlan(id);
   st.selectPlan(null);
@@ -262,7 +263,8 @@ describe("window length and constraints", () => {
   it("calendar window L → same site and arrival with the new L in the site section and the calendar", async () => {
     await renderApp([], A);
     await siteHeading(/Haworth/);
-    fireEvent.click(screen.getByRole("button", { name: "14 days" }));
+    // the calendar's own L control (the mission sidebar has one too, behind the search panel)
+    fireEvent.click(within(screen.getByTestId("search-drawer")).getByRole("button", { name: "14 days" }));
     expect(appStore.getState().selectedPlanId).toBe("haworth_20270309_14d");
     await waitFor(() => expect(within(siteArea()).getByText(/14 days/)).toBeTruthy());
     await waitFor(() => expect(canvas().dataset.selectedCell).toMatch(/^haworth:/));

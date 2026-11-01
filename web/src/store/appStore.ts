@@ -41,8 +41,12 @@ export interface AppState {
   selectedWindow: 3 | 7 | 14 | number; // window length L shown in the calendar
   constraints: Constraints;
   screen: Screen;
-  /** Going back to the landing page keeps plans, pins and selection; the mode reopens at its start. */
+  /** Going back to the landing page keeps plans, pins and selection; the mode reopens at its start. Entering
+   *  a mode with no plan selected picks the default one (defaultPlanId), so the globe always has a mission. */
   setScreen(screen: Screen): void;
+  /** Search and comparison panel of the Mission Planner (calendar, constraints, tray), over the globe (A7). */
+  drawerOpen: boolean;
+  setDrawerOpen(open: boolean): void;
   viewMode: ViewMode;
   setViewMode(mode: ViewMode): void;
   /** Reduced motion (spec 9, T5.2.b): no camera flights or animated transitions. Starts from the system setting. */
@@ -82,6 +86,15 @@ export interface AppState {
 
 export const DEFAULT_CONSTRAINTS: Constraints = { minSunPct: null, maxDarkH: null, minEarthH: null };
 
+/** The plan a mode opens on when none is selected: the first site, the first arrival day, 7 days. */
+export function defaultPlanId(st: Pick<AppState, "sites" | "manifest" | "plansById">): string | null {
+  const site = st.sites[0];
+  const start = st.manifest?.date_range.arrival_start;
+  if (!site || !start) return null;
+  const id = `${site.id}_${start.slice(0, 10).replace(/-/g, "")}_7d`;
+  return st.plansById.has(id) ? id : null;
+}
+
 export function createAppStore(data: DataStore = DataStore.forPage()) {
   return createStore<AppState>()((set, get) => ({
     data,
@@ -97,7 +110,14 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     constraints: { ...DEFAULT_CONSTRAINTS },
     screen: "landing",
     setScreen(screen) {
-      set(screen === "landing" ? { screen, viewMode: "compare", missionPhase: "overview" } : { screen });
+      if (screen === "landing") return set({ screen, viewMode: "compare", missionPhase: "overview", drawerOpen: false });
+      set({ screen });
+      const def = get().selectedPlanId ? null : defaultPlanId(get());
+      if (def) get().selectPlan(def);
+    },
+    drawerOpen: false,
+    setDrawerOpen(open) {
+      set({ drawerOpen: open });
     },
     viewMode: "compare",
     reducedMotion: typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -154,6 +174,9 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
           plans: core.plans,
           plansById: new Map(core.plans.map((p) => [p.id, p])),
         });
+        // a mode opened before the data arrived gets its default plan now
+        const def = get().screen !== "landing" && !get().selectedPlanId ? defaultPlanId(get()) : null;
+        if (def) get().selectPlan(def);
       } catch (e) {
         set({ load: { status: "error", message: (e as Error).message, error: e } });
       }

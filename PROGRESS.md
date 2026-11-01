@@ -2573,3 +2573,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.2.b.
+
+## 2026-11-01 · TR.2.b · Barra lateral de inicio de misión (A2)
+
+- **Tarea:** TR.2.b ([x]).
+- **Qué se hizo:**
+  - `views/PlannerView.tsx`: pantalla completa de Mission Planner con **una sola escena** detrás de todas las etapas, para que el globo salte al despegue sin remontar la escena. En planificación: globo y barra lateral. En misión: la `LiveView` actual sin su propia escena (prop `sceneOutside`; se rediseña en TR.2.d/e). Además, barra de fases (Plan · Launch · Transit · Landing · Site, con `aria-current`), etiqueta ILLUSTRATIVE y panel «Search and compare» con la `CompareView` actual (TR.2.c lo pule). Mientras se planifica, la escena sigue el plan elegido mediante `sceneBridge.setPlan`.
+  - `components/MissionSidebar.tsx`: fecha de llegada (anterior/siguiente, `<input type="date">` y una tira de 21 días coloreada con la rampa «combined» del calendario, cada día con su score en `aria-label`), estancia 3/7/14, lista de sitios con su `sun_pct` y «Launch · fecha de lanzamiento».
+  - Store: `drawerOpen` / `setDrawerOpen`. Al entrar en un modo sin plan elegido se selecciona `defaultPlanId` (primer sitio, primer día, 7 d), también si los datos llegan después del clic.
+  - `MissionControls` acepta `autoPlay`: «Launch» arranca desde la cuenta atrás y reproduciendo.
+  - `renderer.ts`: durante la planificación, la escena se dibuja en el instante de la cuenta atrás (plataforma bajo la cámara), y el salto también funciona al volver a planificar. `planningPose` se inclina hacia el Sol hasta 55°: muchos lanzamientos son de noche en la plataforma.
+  - `bodies.ts`: la luz del Sol pasa a blanca (`COLORS.text`). Con A7, el token del Sol es naranja y teñía toda la escena; el naranja queda para el Sol como símbolo (su resplandor y su disco en 2D).
+  - `modeTransition.ts`: abrir la vista 3D desde el panel lo cierra, y «Back» (Esc) lo vuelve a abrir.
+  - `App.tsx`: Mission Planner a pantalla completa con su barra (Home, sonido, movimiento, créditos), también mientras carga.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/plannerSidebar.test.tsx → 2 passed
+    plan por defecto connecting_ridge_20270101_7d; día siguiente, fecha, 14 d y Haworth → haworth_20270309_14d en < 100 ms; clic en un día de la tira → haworth_20270311_14d
+    «Launch · Dec 29, 2026» → vista live, controles reproduciendo, fase «Launch» marcada; el panel se abre y se cierra
+  $ npx vitest run tests/camera.test.ts → 9 passed (inclinación hacia el lado iluminado con la plataforma a ≤ 55°)
+  $ npm --prefix web test → Test Files 34 passed · Tests 225 passed · typecheck → exit 0
+  ```
+  En el navegador (1920×1080): el globo aparece a la derecha con colores reales (enero: la Antártida iluminada); arrastrar lo gira; elegir Malapert cambia el plan; «Launch» salta del globo a la vista del despegue y la misión avanza sola.
+- **Decisiones tomadas:** el plan por defecto es simple y determinista; el «mejor plan» preseleccionado queda para el modo Educator (TR.4.b). Las pruebas que usan el calendario abren el panel en su `beforeEach`.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** los controles de la misión siguen con el estilo anterior hasta TR.2.d.
+- **Siguiente tarea:** TR.2.c.

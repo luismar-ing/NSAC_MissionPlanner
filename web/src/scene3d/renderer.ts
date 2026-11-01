@@ -377,7 +377,9 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
 
   renderer.setAnimationLoop(() => {
     const { traj, tl, siteBody, siteRadiusUnits, terrain, landingMs, flown, ahead } = rig;
-    const t = opts.getTimeMs();
+    const planning = opts.planning?.() ?? false;
+    // while planning, the globe is shown as it will be at the start of the countdown (pad under the camera)
+    const t = planning && tl ? tl.startMs : opts.getTimeMs();
     const state = sceneStateAt(ix, t);
     updateBodies(bodies, state, handle);
     earthW = [0, 0, 0];
@@ -422,9 +424,8 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
     const earthK = 1 - (1 - 1 / SPACE_SCALE.bodyExaggeration) * lambda;
     bodies.earth.scale.set(earthK, earthK * (EARTH_RADII_KM.polar / EARTH_RADII_KM.equatorial), earthK);
 
-    const planning = opts.planning?.() ?? false;
-    if (wasPlanning && !planning) {
-      // "Launch": leave the globe (or the user's own view of it) and hop to the mission's framing
+    if (wasPlanning !== planning) {
+      // "Launch" (or back to planning): leave the current view, the user's own included, and hop to the new one
       if (lastPose && lastFrames && !reduced?.matches) switching = { from: { earth: toFrame(lastPose, lastFrames.earth), moon: toFrame(lastPose, lastFrames.moon) }, startMs: performance.now() };
       if (controller.mode === "manual") {
         controller.resume();

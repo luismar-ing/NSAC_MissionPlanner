@@ -165,7 +165,7 @@ describe("planning globe (TR.2.a, design A2)", () => {
   const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const unitV = (a: Vec3): Vec3 => a.map((c) => c / len(a)) as Vec3;
 
-  it("shows the whole Earth, the launch pad facing the camera, right of centre and north up", () => {
+  it("shows the whole Earth, leaning to the lit side with the pad in view, right of centre and north up", () => {
     for (const id of ["haworth_20270309_7d", "malapert_massif_20271015_14d"]) {
       const { tl, input } = setup(id);
       const i = input(tl.startMs);
@@ -179,8 +179,11 @@ describe("planning globe (TR.2.a, design A2)", () => {
       expect(Math.abs(dot(unitV(toEarth), unitV(p.up)))).toBeLessThan(1e-9);
       expect(radiusDeg).toBeLessThan(21);
       expect(angle(fwd, toEarth) + radiusDeg).toBeLessThan(34);
-      // the camera sits above the pad, so the pad is the point of the globe nearest to it
-      expect(dot(unitV(p.position), i.padUpAtLaunch)).toBeGreaterThan(0.95);
+      // the camera leans from the pad towards the Sun (night launches): the pad stays well inside the visible
+      // face (≤ 55° from its centre) and the view never turns away from the lit side
+      const camDir = unitV(sub(p.position, p.target));
+      expect(dot(camDir, i.padUpAtLaunch)).toBeGreaterThan(Math.cos((56 * Math.PI) / 180));
+      expect(dot(camDir, i.sunDir)).toBeGreaterThanOrEqual(dot(i.padUpAtLaunch, i.sunDir) - 1e-9);
       // the Earth is drawn right of the screen centre (the sidebar covers the left)
       const right = cross(fwd, p.up);
       expect(dot(unitV(toEarth), right)).toBeGreaterThan(0.1);
