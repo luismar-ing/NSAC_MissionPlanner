@@ -40,11 +40,16 @@ export function App() {
   const credits = creditsOpen && <Credits onClose={() => setCreditsOpen(false)} />;
 
   // the landing page needs no data: it shows at once while the core data loads behind it
+  const motionToggle = (
+    <button type="button" className="btn ghost motion-toggle" aria-pressed={reducedMotion} title={STRINGS.motion.title} onClick={() => setReducedMotion(!reducedMotion)}>
+      <span aria-hidden="true">{reducedMotion ? "■" : "□"}</span> {STRINGS.motion.reduce}
+    </button>
+  );
+
   if (screen === "landing")
     return (
-      <div className="app app-landing" data-screen="landing">
-        <Landing />
-        {footer}
+      <div className="app-landing" data-screen="landing">
+        <Landing tools={motionToggle} onCredits={() => setCreditsOpen(true)} />
         {credits}
       </div>
     );
@@ -60,9 +65,7 @@ export function App() {
           <button type="button" className="btn ghost" title={STRINGS.homeTitle} onClick={() => setScreen("landing")}>
             {STRINGS.home}
           </button>
-          <button type="button" className="btn ghost motion-toggle" aria-pressed={reducedMotion} title={STRINGS.motion.title} onClick={() => setReducedMotion(!reducedMotion)}>
-            <span aria-hidden="true">{reducedMotion ? "■" : "□"}</span> {STRINGS.motion.reduce}
-          </button>
+          {motionToggle}
           {manifest && <span className="data-badge">{STRINGS.dataBadge(manifest.data_status, manifest.data_version)}</span>}
         </div>
       </header>

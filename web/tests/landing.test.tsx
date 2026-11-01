@@ -19,4 +19,17 @@ describe("landing page (A7)", () => {
     fireEvent.click(screen.getByRole("button", { name: /Educator/ }));
     expect(appStore.getState().screen).toBe("educator");
   });
+
+  it("mode cards are real buttons reachable by keyboard, and credits open from the landing page", () => {
+    appStore.setState({ screen: "landing" });
+    render(<App />);
+    const cards = screen.getAllByRole("button").filter((b) => b.classList.contains("mode-card"));
+    expect(cards.map((c) => c.getAttribute("data-mode"))).toEqual(["educator", "planner"]);
+    for (const c of cards) {
+      c.focus();
+      expect(document.activeElement).toBe(c);
+    }
+    fireEvent.click(screen.getByRole("button", { name: /About/ }));
+    expect(screen.getByRole("dialog")).toBeTruthy();
+  });
 });

@@ -1527,3 +1527,203 @@ input[type="range"] {
   text-align: left;
   font-weight: 400;
 }
+
+/* ------------------------------------------------------------------ landing page (decision A7, design A1) */
+
+.app-landing {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.landing {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: clamp(24px, 4vh, 48px);
+  padding: clamp(16px, 3vw, 48px) clamp(16px, 5vw, 80px);
+  isolation: isolate;
+}
+
+.landing-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+/* the Moon sits right of centre and partly off-screen; on narrow screens it moves up behind the headline */
+.landing-moon-static,
+.landing-backdrop canvas {
+  position: absolute;
+  width: min(62vw, 110vh);
+  aspect-ratio: 1;
+  right: -12vw;
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.landing-moon-static {
+  border-radius: 50%;
+  background-size: 200% 100%;
+  background-position: 50% 50%;
+  box-shadow: inset -8vw -2vw 10vw 2vw var(--color-bg);
+  opacity: 0.85;
+}
+
+.landing-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--color-bg) 0%, transparent 72%);
+}
+
+.landing-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.landing-wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--font-lg);
+  letter-spacing: 0.02em;
+}
+
+.landing-tools {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.landing-tools .btn {
+  border-radius: 999px;
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.landing-copy {
+  align-self: center;
+  max-width: 34rem;
+}
+
+.landing-kicker {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-md);
+}
+
+.landing-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(40px, 5.2vw, 84px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.landing-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.spotlight-card {
+  --spot-x: 50%;
+  --spot-y: 50%;
+  position: relative;
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-lg);
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--glass-blur));
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color var(--motion-mid),
+    translate var(--motion-mid);
+}
+
+/* the light: a soft disc at the pointer, shown on hover and keyboard focus */
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(18rem circle at var(--spot-x) var(--spot-y), rgb(255 255 255 / 0.11), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--motion-mid);
+  pointer-events: none;
+}
+
+.spotlight-card:hover,
+.spotlight-card:focus-visible {
+  border-color: var(--glass-stroke-hover);
+  translate: 0 -2px;
+}
+
+.spotlight-card:hover::before,
+.spotlight-card:focus-visible::before {
+  opacity: 1;
+}
+
+.spotlight-card:focus-visible {
+  --spot-x: 50%;
+  --spot-y: 40%;
+}
+
+.mode-card {
+  flex: 1 1 18rem;
+  max-width: 24rem;
+  min-height: 15rem;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mode-card-name {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+.mode-card-title {
+  font-family: var(--font-display);
+  font-size: var(--font-xl);
+  font-weight: 500;
+}
+
+.mode-card-body {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.mode-card-enter {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.landing-foot {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+@media (max-width: 720px) {
+  .landing-moon-static,
+  .landing-backdrop canvas {
+    width: 120vw;
+    right: -40vw;
+    top: 8vh;
+    translate: 0 0;
+  }
+  .landing-shade {
+    background: linear-gradient(180deg, transparent 0%, var(--color-bg) 55%);
+  }
+  .mode-card {
+    max-width: none;
+    min-height: 0;
+  }
+}

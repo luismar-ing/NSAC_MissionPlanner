@@ -2509,3 +2509,17 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.1.a.
+
+## 2026-11-01 · TR.1.a · Portada con tarjetas spotlight
+
+- **Tarea:** TR.1.a ([x]).
+- **Qué se hizo:** `views/Landing.tsx` según A1: marca, controles arriba (movimiento reducido; el sonido llega en TR.1.c), titular en Space Grotesk ligera, dos tarjetas de vidrio y pie con créditos de la Luna y acceso a «About & credits». `components/SpotlightCard.tsx`: `<button>` con una luz suave que sigue al puntero (variables CSS escritas en el elemento, sin re-render). Con el teclado, `:focus-visible` centra la luz. Luna estática con la textura `moon_2k.jpg` como reserva hasta TR.1.b. Estilos en `tokens.css` (sección «landing page»), con disposición apilada por debajo de 720 px.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test → Test Files 32 passed · Tests 218 passed · typecheck → exit 0
+  ```
+  En el navegador: 1920×1080 parecido a A1; a 375×812, `scrollWidth` = 375 (sin scroll horizontal) y tarjetas apiladas.
+- **Decisiones tomadas:** la luz de las tarjetas es blanca neutra en los dos modos, no naranja y azul como en la maqueta: esos colores significan Sol y Tierra (spec 9). Las etiquetas van en mayúscula inicial, no en versalitas espaciadas.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** la Luna estática se ve plana; la sustituye la esfera iluminada de TR.1.b.
+- **Siguiente tarea:** TR.1.b.

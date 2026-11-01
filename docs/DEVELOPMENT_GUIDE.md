@@ -800,7 +800,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 
 ### TR.1 Portada (A1)
 
-##### [ ] TR.1.a — Portada con tarjetas spotlight
+##### [x] TR.1.a — Portada con tarjetas spotlight
 - **Qué:** título, las dos tarjetas (`<button>` reales, con resplandor que sigue al cursor y también al foco del teclado), enlace a créditos y botón de sonido.
 - **Archivos:** `web/src/views/Landing.tsx`, `web/src/components/SpotlightCard.tsx`, `web/src/lib/strings.ts`, `web/tests/landing.test.tsx`
 - **Depende de:** TR.0.b · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
