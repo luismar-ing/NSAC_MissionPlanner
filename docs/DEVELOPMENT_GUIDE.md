@@ -852,7 +852,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 
 ### TR.3 Superficie 3D: terreno y cielo (antes T6.1)
 
-##### [ ] T6.1.a — Terreno 3D Nivel B: malla del parche (~20 km)
+##### [x] T6.1.a — Terreno 3D Nivel B: malla del parche (~20 km)
 - **Qué:** malla de un parche de ~20 km de radio con la cámara a h_obs.
 - **Archivos:** `web/src/scene3d/terrainLevelB.ts`, `pipeline/terrain_lod.py`
 - **Depende de:** TR.2.e · **Spec:** 8.4 (Nivel B), 4.2 · **Decisiones:** D9 · **Est.:** 3 h

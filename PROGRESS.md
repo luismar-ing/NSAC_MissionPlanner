@@ -2644,3 +2644,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna (8.6 se muestra a un clic de la llegada).
 - **Problemas abiertos:** la consola ocupa cerca del 40 % del alto; la vista del cielo en primera persona (TR.3.a) aprovechará mejor la parte superior.
 - **Siguiente tarea:** T6.1.a (TR.3, terreno Nivel B).
+
+## 2026-11-01 · T6.1.a · Terreno 3D Nivel B: malla del parche (Fase R, TR.3)
+
+- **Tarea:** T6.1.a ([x]), adelantada a la Fase R por A7.
+- **Qué se hizo:** las mallas ya existían. El terreno de T4.3.b cubre ±20 km (lod0 a 400 m, lod1 ±10 km a 80 m y lod2 ±3 km a 40 m) y, más allá, el contexto polar hasta ±302 km a 2 km. No hacía falta cambiar `pipeline/terrain_lod.py`. `scene3d/terrainLevelB.ts` (sin three.js) añade `meshHorizonDeg`, el perfil del horizonte que dibujan esas mallas vistas desde h_obs: muestreo bilineal de la malla más fina que cubra cada punto y, fuera de ella, el contexto polar con la caída por curvatura de la spec 5.2. También añade `surfaceLook`, la vista en primera persona a h_obs en ENU del sitio.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/levelB.test.ts --reporter=verbose
+  Level B skyline − 2D mask:
+    connecting_ridge: N -0.01° E -0.36° S 0.02° W -0.01°
+    haworth: N 0.01° E -0.21° S 0.01° W -0.01°
+    nobile_rim_1: N -0.00° E 0.02° S 0.00° W -0.01°
+    malapert_massif: N -0.00° E -0.15° S -0.01° W -0.00°
+    de_gerlache_rim_2: N -0.02° E 0.01° S 0.00° W -0.20°
+    every 10°: mean |Δ| 0.09°, p95 0.33°, max 0.66°
+  ✓ 2 passed (criterio: cardinales < 0.5°, media < 0.25°)
+  $ npm --prefix web test → todos pasan · typecheck → exit 0
+  ```
+- **Decisiones tomadas:** la comparación es numérica (el mismo rayo que la spec 5.2 sobre las mallas que se dibujan), no solo visual: es más estricta y reproducible. El máximo de 0.66° aparece donde la cresta lejana cae en el contexto polar de 2 km.
+- **Desviaciones de la spec / cambios en la guía:** `pipeline/terrain_lod.py` no cambia (la guía lo listaba como posible).
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.1.b.

@@ -1,0 +1,60 @@
+/**
+ * T6.1.a: Level B terrain. Standing on the site at h_obs, the skyline of the meshes the 3D scene draws (site
+ * levels lod2/lod1/lod0 + polar context) must match the 2D horizon mask (spec 5.2, full-resolution DEM) at the
+ * four cardinal bearings, so the 3D ground and the panorama tell the same story.
+ */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import { DataStore } from "../src/lib/data";
+import { meshHorizonDeg, surfaceLook, type SurfaceTerrain } from "../src/scene3d/terrainLevelB";
+
+const REAL = join(__dirname, "..", "public", "data");
+const fetcher = async (url: string) => {
+  try {
+    return new Response(readFileSync(join(REAL, url.replace(/^\/base\//, ""))), { status: 200 });
+  } catch {
+    return new Response("not found", { status: 404 });
+  }
+};
+const data = new DataStore("/base/", fetcher);
+const SITES = ["connecting_ridge", "haworth", "nobile_rim_1", "malapert_massif", "de_gerlache_rim_2"];
+const H_OBS = 3; // D12
+
+async function terrainOf(site: string): Promise<SurfaceTerrain> {
+  const levels = await Promise.all([2, 1, 0].map((l) => data.terrain(site, l)));
+  const polar = await data.terrain("_polar", 0);
+  const o = levels[0].header.origin;
+  return { levels, polar, site: { lat: o.lat, lon: o.lon, elevation_m: o.elevation_m } };
+}
+
+describe("Level B: the 3D skyline matches the 2D horizon mask", () => {
+  it("at N, E, S, W for every site (and in every 10° for the statistics)", async () => {
+    const rows: string[] = [];
+    let worstCardinal = 0;
+    const all: number[] = [];
+    for (const site of SITES) {
+      const t = await terrainOf(site);
+      const mask = JSON.parse(readFileSync(join(REAL, "horizon", `${site}.json`), "utf-8")) as { elev_deg: number[]; az_step_deg: number; h_obs_m: number };
+      expect(mask.h_obs_m).toBe(H_OBS);
+      const errAt = (az: number) => meshHorizonDeg(t, az, H_OBS) - mask.elev_deg[Math.round(az / mask.az_step_deg) % mask.elev_deg.length];
+      const card = [0, 90, 180, 270].map(errAt);
+      worstCardinal = Math.max(worstCardinal, ...card.map(Math.abs));
+      for (let az = 0; az < 360; az += 10) all.push(Math.abs(errAt(az)));
+      rows.push(`${site}: N ${card[0].toFixed(2)}° E ${card[1].toFixed(2)}° S ${card[2].toFixed(2)}° W ${card[3].toFixed(2)}°`);
+    }
+    all.sort((a, b) => a - b);
+    const mean = all.reduce((a, b) => a + b, 0) / all.length;
+    console.log(`Level B skyline − 2D mask:\n  ${rows.join("\n  ")}\n  every 10°: mean |Δ| ${mean.toFixed(2)}°, p95 ${all[Math.floor(all.length * 0.95)].toFixed(2)}°, max ${all.at(-1)!.toFixed(2)}°`);
+    expect(worstCardinal).toBeLessThan(0.5);
+    expect(mean).toBeLessThan(0.25);
+  });
+
+  it("first-person look: forward points at the azimuth / elevation, up stays perpendicular", () => {
+    const l = surfaceLook(90, 10, H_OBS);
+    expect(l.position).toEqual([0, 0, H_OBS]);
+    expect(l.forward[0]).toBeCloseTo(Math.cos((10 * Math.PI) / 180), 12); // east
+    expect(l.forward[2]).toBeCloseTo(Math.sin((10 * Math.PI) / 180), 12);
+    expect(l.forward.reduce((s, v, i) => s + v * l.up[i], 0)).toBeCloseTo(0, 12);
+  });
+});
