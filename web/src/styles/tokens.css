@@ -2008,36 +2008,146 @@ input[type="range"] {
   content: "● ";
 }
 
-/* the journey (until TR.2.d): the live view's panels float over the scene, which stays draggable */
-.planner-mission {
+/* the journey (design B2): panels float over the full-screen scene, which stays draggable between them */
+.mission-stage {
   position: absolute;
   inset: 0;
   z-index: 1;
-  padding: 72px 24px 56px;
-  overflow-y: auto;
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(0, 232px);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-md);
+  padding: 24px;
   pointer-events: none;
 }
 
-.planner-mission .live-area {
-  background: transparent;
-  border: 0;
-}
-
-.planner-mission .scene-wrap {
-  height: calc(100vh - 340px);
-  min-height: 240px;
-}
-
-.planner-mission .live-head,
-.planner-mission .scene-wrap > *,
-.planner-mission .mission-controls,
-.planner-mission .live-site,
-.planner-mission .thumb-strip {
+.mission-stage > * {
   pointer-events: auto;
 }
 
+.mission-head {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.telemetry-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--font-lg);
+}
+
+.mission-head kbd {
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.telemetry {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+}
+
+.telemetry-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: var(--space-sm);
+}
+
+.telemetry dt {
+  color: var(--color-text-muted);
+}
+
+.telemetry dd {
+  margin: 0;
+}
+
+.mission-notes {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  align-self: end;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: 44rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.mission-notes > * {
+  pointer-events: auto;
+}
+
+.mission-notes .scene-badge,
+.mission-notes .scale-indicator {
+  position: static;
+  margin: 0;
+}
+
+.mission-thumbs {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.mission-dock {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  max-height: 34vh;
+  overflow-y: auto;
+  padding: 14px 18px;
+  background: var(--glass-panel);
+  border: 1px solid var(--glass-stroke);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+.mission-stage.at-site .mission-dock {
+  max-height: 58vh;
+}
+
+.mission-dock .mission-controls {
+  margin-top: 0;
+}
+
+.phase-track {
+  display: flex;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.phase-seg {
+  flex-basis: 0;
+  min-width: 3.5rem;
+  padding-top: 4px;
+  border-top: 2px solid var(--color-border-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phase-seg[data-on] {
+  color: var(--color-text);
+  border-top-color: var(--color-text);
+}
+
 .planner[data-stage="mission"] .phase-rail {
-  left: 24px;
+  display: none;
 }
 
 .drawer-scrim {

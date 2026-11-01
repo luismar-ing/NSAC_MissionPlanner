@@ -91,7 +91,7 @@ describe("compare ↔ live (spec 8.0)", () => {
     await screen.findByTestId("mission-controls");
     expect(appStore.getState().missionTime).toBe(before.missionTime);
     expect(appStore.getState().missionPhase).toBe("transit");
-    fireEvent.click(screen.getByRole("button", { name: /Back to compare/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Back to planning/ }));
     expect(appStore.getState().viewMode).toBe("compare");
     expect(snapshot()).toEqual(before);
   });

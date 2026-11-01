@@ -94,7 +94,7 @@ export function LiveView({ sceneOutside = false, autoPlay = false }: { sceneOuts
 }
 
 /** Panorama and site features panel shown on arrival (spec 8.2 phase 4, 8.6), on the mission clock. */
-function ArrivalDock() {
+export function ArrivalDock() {
   const missionTime = useApp((s) => s.missionTime);
   const { plan, site, pinned, error, retry } = useSiteData();
   return (

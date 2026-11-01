@@ -85,6 +85,18 @@ export function MissionControls({ timeline, planId, autoPlay = false }: { timeli
           </span>
         )}
       </div>
+      {/* the mission's phases along the scrubber, to scale (design B2) */}
+      <div className="phase-track" aria-hidden="true">
+        {PLAY_PHASES.map((p) => {
+          const from = phaseStart(timeline, p);
+          const to = p === "site" ? timeline.endMs : phaseStart(timeline, PLAY_PHASES[PLAY_PHASES.indexOf(p) + 1]);
+          return (
+            <span key={p} className="phase-seg" data-on={missionPhase === p || undefined} style={{ flexGrow: Math.max(1, to - from) }}>
+              {STRINGS.mission.phases[p]}
+            </span>
+          );
+        })}
+      </div>
       <div className="scrubber">
         <button
           type="button"

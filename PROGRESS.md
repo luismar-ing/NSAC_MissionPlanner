@@ -2615,3 +2615,17 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.2.d.
+
+## 2026-11-01 · TR.2.d · Tránsito con telemetría (B2)
+
+- **Tarea:** TR.2.d ([x]).
+- **Qué se hizo:** `views/MissionStage.tsx` sustituye a la `LiveView` dentro de Mission Planner. Paneles flotantes sobre la escena a pantalla completa, que sigue siendo arrastrable entre ellos. Arriba a la izquierda, el sitio, «Back to planning» (Esc) y `components/Telemetry.tsx` en monoespaciada (lanzamiento, llegada, estancia, tránsito, fase y escala). Encima del dock, la etiqueta ILLUSTRATIVE y el indicador de escala (fases 1 a 3). A la derecha, las miniaturas de los otros planes anclados. Abajo, el dock de vidrio con `MissionControls`, que ahora dibuja una pista con las cuatro fases a escala sobre el scrubber. Al llegar al sitio, el panorama y el panel del sitio actuales hasta TR.2.e. `LiveView` sigue sirviendo al modo Educator hasta TR.4. Se mantienen los mismos `data-testid` y nombres accesibles; el botón «Back to compare» pasa a «Back to planning», que es lo que hace ahora.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test → Tests 226 passed · typecheck → exit 0
+  ```
+  En el navegador (1920×1080), tras «Launch» y «Transit»: telemetría legible a la izquierda, dock con la fase «Transit» marcada en la pista y en «Jump to», etiqueta ILLUSTRATIVE e indicador de escala sobre el dock, sin solaparse con la barra superior.
+- **Decisiones tomadas:** la etiqueta ILLUSTRATIVE va encima del dock y no arriba en el centro, porque arriba chocaba con los botones de la barra superior.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.2.e.

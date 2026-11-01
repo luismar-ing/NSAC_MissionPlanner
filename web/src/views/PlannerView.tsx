@@ -7,7 +7,7 @@ import { sceneBridge } from "../scene3d/bridge";
 import { SceneHost } from "../scene3d/SceneHost";
 import { appStore, useApp } from "../store/appStore";
 import { CompareView } from "./CompareView";
-import { LiveView } from "./LiveView";
+import { MissionStage } from "./MissionStage";
 
 /** The globe shows while the plan is being chosen; "Launch" (live view mode) starts the journey. */
 const isPlanning = () => appStore.getState().viewMode !== "live";
@@ -79,9 +79,7 @@ export function PlannerView({ tools }: { tools: ReactNode }) {
       </header>
       {!mission && <MissionSidebar onLaunch={launch} onOpenSearch={() => setDrawerOpen(true)} />}
       {mission && (
-        <div className="planner-mission">
-          <LiveView sceneOutside autoPlay={launched} />
-        </div>
+        <MissionStage autoPlay={launched} />
       )}
       {trajectoryMode === "ILLUSTRATIVE" && !mission && (
         <p className="planner-badge" title={STRINGS.panel.illustrativeTitle}>

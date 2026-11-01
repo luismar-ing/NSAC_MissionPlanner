@@ -49,6 +49,14 @@ export const STRINGS = {
     closeSearch: "Close",
     searchTitle: "Search and compare plans",
   },
+  telemetry: {
+    launch: "Launch",
+    arrival: "Arrival",
+    stay: "Stay",
+    transit: "Transit",
+    phase: "Phase",
+    scale: "Scale",
+  },
   home: "Home",
   homeTitle: "Back to the start page (your pinned plans are kept)",
   landing: {
@@ -199,7 +207,7 @@ export const STRINGS = {
   },
   live: {
     open: "Open 3D view",
-    back: "Back to compare",
+    back: "Back to planning",
     sceneAria: "3D scene of the selected plan: Earth, Moon and Sun",
     loading: "Loading the 3D scene…",
     error: "The 3D scene could not be started (WebGL unavailable). The 2D comparison still works.",

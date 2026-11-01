@@ -838,7 +838,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.2.b · **Spec:** 8.0, 8.1, 8.5 · **Decisiones:** A7 · **Est.:** 2.5 h
 - **Aceptación:** las pruebas existentes de calendario y bandeja pasan; con el panel abierto hay 1 solo contexto WebGL (`fps`); el foco queda atrapado en el panel y Esc lo cierra.
 
-##### [ ] TR.2.d — Tránsito con telemetría (B2)
+##### [x] TR.2.d — Tránsito con telemetría (B2)
 - **Qué:** columna de telemetría en monoespaciada (plan, lanzamiento, llegada, ventana, tránsito, fase, escala), `MissionControls` con segmentos por fase y velocidades, indicador de escala y ILLUSTRATIVE junto a la estela.
 - **Archivos:** `web/src/views/PlannerView.tsx`, `web/src/scene3d/MissionControls.tsx`, `web/src/components/Telemetry.tsx`
 - **Depende de:** TR.2.b · **Spec:** 8.2, 5.9 · **Decisiones:** — · **Est.:** 2.5 h
