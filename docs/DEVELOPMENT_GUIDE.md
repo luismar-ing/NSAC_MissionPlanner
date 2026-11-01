@@ -858,7 +858,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.2.e · **Spec:** 8.4 (Nivel B), 4.2 · **Decisiones:** D9 · **Est.:** 3 h
 - **Aceptación:** revisión visual: el contorno del terreno coincide con el panorama 2D en 4 rumbos.
 
-##### [ ] T6.1.b — Nivel B: luz del Sol, sombras y estrellas a 60 fps
+##### [x] T6.1.b — Nivel B: luz del Sol, sombras y estrellas a 60 fps
 - **Qué:** luz direccional desde el Sol, sombras y cielo negro con estrellas.
 - **Archivos:** `web/src/scene3d/terrainLevelB.ts`
 - **Depende de:** T6.1.a · **Spec:** 8.4 · **Decisiones:** D9 · **Est.:** 3 h

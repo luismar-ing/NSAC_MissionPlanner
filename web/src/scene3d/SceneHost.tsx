@@ -41,6 +41,7 @@ export function SceneHost({ planning }: { planning?: () => boolean } = {}) {
           loadTerrain: (siteId, lod) => st.data.terrain(siteId, lod),
           reducedMotion: () => appStore.getState().reducedMotion,
           planning,
+          levelB: () => appStore.getState().levelB,
         });
         sceneBridge.setPlan = (p) => control.current?.setPlan(p); // plan switch from the thumbnails (T4.4.b)
         setStatus("ready");

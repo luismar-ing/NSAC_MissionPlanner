@@ -2666,3 +2666,25 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** `pipeline/terrain_lod.py` no cambia (la guía lo listaba como posible).
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.1.b.
+
+## 2026-11-01 · T6.1.b · Nivel B: luz del Sol, sombras y estrellas (Fase R, TR.3)
+
+- **Tarea:** T6.1.b ([x]).
+- **Qué se hizo:** sombras del Sol en el sitio (`renderer.ts`). Las mallas del terreno proyectan y reciben sombra. La cámara de sombras es ortográfica, alineada con el Sol, de ±10 km de ancho y 130 km de fondo hacia el Sol: las crestas hasta los 100 km de la máscara 2D sombrean el sitio, que es justo lo que significa `sun_vis = 0`. Mapa de 2048², PCF, `normalBias` de 30 m contra el acné con Sol rasante. El mapa solo se redibuja cuando el Sol se mueve más de 60 s de misión respecto al suelo o llega una malla nueva (`TerrainManager.version`): girar la cámara no cuesta nada. Solo se activa al llegar (λ ≥ 0.95) y si `levelB` está activo (store, por defecto sí). Las estrellas ya existían (campo decorativo, no un catálogo).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/levelB.test.ts --reporter=verbose
+  Level B shadows vs sun_vis (borde superior sobre el horizonte de las mallas que proyectan la sombra, spec 5.3):
+    malapert_massif_20270106_7d: 91.7 % of 336 samples
+    haworth_20270615_7d: 98.5 % of 336 samples
+    de_gerlache_rim_2_20270901_7d: 99.4 % of 336 samples      (total 96.5 % > 95 %)
+  $ node web/scripts/fps.mjs http://localhost:5173/   (Intel Iris Xe, 1920×1080)
+  landing 60 · transit 60 · approach 59.9 · at the site, real scale + terrain (con sombras) 59.7 fps, p95 17 ms
+  webglContextsAfterHome 1 · after 10 round trips 1
+  $ npm --prefix web test → todos pasan · typecheck → exit 0
+  ```
+  Capturas headless a las 10 h (Sunlit) y 24 h (In shadow) de Malapert: crestas iluminadas con sombras nítidas. El suelo llano se ve oscuro en ambas porque el Sol roza el horizonte (coseno casi cero), lo que es físicamente correcto. La comparación válida es la numérica de arriba.
+- **Decisiones tomadas:** la coherencia con `sun_vis` se mide sobre la geometría que proyecta las sombras, no sobre píxeles: el aspecto del suelo bajo un Sol a 1° no distingue «iluminado» de «en sombra». El 8 % de desacuerdo en Malapert se concentra donde el Sol pasa a menos de 0.2° del perfil (resolución del contexto polar, 2 km). `fps.mjs` abre ahora el panel «Search and compare» para llegar al calendario.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.1.c.

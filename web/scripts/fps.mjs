@@ -60,6 +60,9 @@ const out = await page.evaluate(async () => {
   await until(() => document.querySelector(".landing-backdrop")?.dataset.moon === "live");
   const landing = await frames(3000);
   document.querySelector('.mode-card[data-mode="planner"]').click();
+  // the calendar and the tray live in the Mission Planner's search panel (TR.2.c)
+  await until(() => btn("Search and compare"));
+  btn("Search and compare").click();
   await until(() => document.querySelector('[data-testid="calendar-canvas"]')?.style.height);
   const idle = await frames(2000); // reference: the compare view, no WebGL
   const canvas = document.querySelector('[data-testid="calendar-canvas"]');

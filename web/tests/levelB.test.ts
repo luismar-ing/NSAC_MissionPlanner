@@ -7,6 +7,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DataStore } from "../src/lib/data";
+import { loadPlanData } from "../src/lib/planData";
+import type { Plan } from "../src/lib/contract";
 import { meshHorizonDeg, surfaceLook, type SurfaceTerrain } from "../src/scene3d/terrainLevelB";
 
 const REAL = join(__dirname, "..", "public", "data");
@@ -56,5 +58,37 @@ describe("Level B: the 3D skyline matches the 2D horizon mask", () => {
     expect(l.forward[0]).toBeCloseTo(Math.cos((10 * Math.PI) / 180), 12); // east
     expect(l.forward[2]).toBeCloseTo(Math.sin((10 * Math.PI) / 180), 12);
     expect(l.forward.reduce((s, v, i) => s + v * l.up[i], 0)).toBeCloseTo(0, 12);
+  });
+
+  it("T6.1.b: the shadow casters agree with sun_vis (upper limb above the meshes' skyline, spec 5.3) over whole windows", async () => {
+    const plans = JSON.parse(readFileSync(join(REAL, "plans.json"), "utf-8")) as Plan[] | { plans: Plan[] };
+    const list = Array.isArray(plans) ? plans : plans.plans;
+    const sites = JSON.parse(readFileSync(join(REAL, "sites.json"), "utf-8"));
+    const siteList = Array.isArray(sites) ? sites : sites.sites;
+    const lines: string[] = [];
+    let agree = 0;
+    let total = 0;
+    for (const id of ["malapert_massif_20270106_7d", "haworth_20270615_7d", "de_gerlache_rim_2_20270901_7d"]) {
+      const plan = list.find((p) => p.id === id)!;
+      const pd = await loadPlanData(data, plan, siteList);
+      const t = await terrainOf(plan.site_id);
+      const cache = new Map<number, number>(); // skyline per 0.5° of azimuth (the Sun moves slowly)
+      const sky = (az: number) => {
+        const k = Math.round(az * 2) / 2;
+        if (!cache.has(k)) cache.set(k, meshHorizonDeg(t, k, H_OBS));
+        return cache.get(k)!;
+      };
+      let a = 0;
+      const n = pd.series.sunVis.length;
+      for (let i = 0; i < n; i++) {
+        const lit = pd.series.sunEl[i] + 0.265 > sky(pd.series.sunAz[i]) ? 1 : 0;
+        if (lit === pd.series.sunVis[i]) a++;
+      }
+      agree += a;
+      total += n;
+      lines.push(`${id}: ${((100 * a) / n).toFixed(1)} % of ${n} samples`);
+    }
+    console.log(`Level B shadows vs sun_vis:\n  ${lines.join("\n  ")}`);
+    expect(agree / total).toBeGreaterThan(0.95);
   });
 });

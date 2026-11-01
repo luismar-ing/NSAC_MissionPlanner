@@ -155,6 +155,8 @@ type Level = "polar" | "lod0" | "lod1" | "lod2";
 export class TerrainManager {
   readonly group = new THREE.Group();
   readonly requested: Level[] = [];
+  /** Bumped whenever the meshes change (the sunlight's shadow map is redrawn then, T6.1.b). */
+  version = 0;
   private data: Partial<Record<Level, TerrainData>> = {};
   private meshes: Partial<Record<Level, THREE.Mesh>> = {};
   private material = new THREE.MeshStandardMaterial({ color: COLORS.textMuted, roughness: 1, metalness: 0, transparent: true, opacity: 0 });
@@ -182,6 +184,7 @@ export class TerrainManager {
 
   /** (Re)builds every loaded level with the holes the finer loaded levels need. */
   private rebuild(): void {
+    this.version++;
     const finest = (l: Level): number => {
       if (l === "polar") return this.data.lod0 ? HALF.lod0 : 0;
       if (l === "lod0") return this.data.lod1 ? HALF.lod1 : 0;
@@ -200,6 +203,9 @@ export class TerrainManager {
         const m = new THREE.Mesh(geo, this.material);
         m.name = `terrain-${l}`;
         m.frustumCulled = false;
+        // Level B (T6.1.b): ridges up to the mask's 100 km cast their shadows on the site
+        m.castShadow = true;
+        m.receiveShadow = true;
         this.meshes[l] = m;
         this.group.add(m);
       }

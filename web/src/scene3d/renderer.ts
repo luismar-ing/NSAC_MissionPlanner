@@ -135,7 +135,16 @@ export interface MountOptions {
    * mission's framing in real time, like a change of plan.
    */
   planning?(): boolean;
+  /** Read every frame: Level B at the site (sunlight shadows from the terrain, T6.1). Off = the MVP scene. */
+  levelB?(): boolean;
 }
+
+/** Sunlight shadows at the site (T6.1.b): an orthographic box ±SHADOW_HALF across, SHADOW_DEPTH long towards
+ *  the Sun, so ridges as far as the 2D horizon mask looks (100 km) shade the ground around the site. */
+const SHADOW_HALF = 10 / 1000; // 10 km in scene units
+const SHADOW_DEPTH = 130 / 1000;
+/** Mission time the Sun may move (relative to the ground) before the shadow map is redrawn. */
+const SHADOW_REDRAW_MS = 60_000;
 
 /** Real size of the rocket at the site, drawn at real local scale (λ = 1): ~100 m, a generic launcher. */
 export const ROCKET_REAL_LENGTH_UNITS = 100 / 1e6;
@@ -175,6 +184,21 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   pad.name = "launch-pad";
   pad.scale.set(0.012, 0.012, 1);
   scene.add(rocket, pad);
+
+  // sunlight shadows (Level B): set up once; drawn only at the site and only when the Sun or the ground changed
+  const webgl = renderer instanceof THREE.WebGLRenderer ? renderer : null;
+  if (webgl) {
+    webgl.shadowMap.enabled = true;
+    webgl.shadowMap.type = THREE.PCFShadowMap;
+    webgl.shadowMap.autoUpdate = false;
+  }
+  const sh = bodies.sunLight.shadow;
+  sh.mapSize.set(2048, 2048);
+  Object.assign(sh.camera, { left: -SHADOW_HALF, right: SHADOW_HALF, top: SHADOW_HALF, bottom: -SHADOW_HALF, near: 0, far: SHADOW_DEPTH + SHADOW_HALF });
+  sh.camera.updateProjectionMatrix();
+  sh.bias = -0.00005;
+  sh.normalBias = 0.00003; // 30 m: about one cell of the finest terrain, against shadow acne under a grazing Sun
+  let shadowAt = { t: Number.NaN, version: -1 };
 
   const earthR = bodyRadius(EARTH_RADII_KM.equatorial);
   const moonR = bodyRadius(MOON_RADIUS_KM);
@@ -492,6 +516,23 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       if (pad.visible) handle.world.set(pad, pointToScene(padPositionKm(state.earthQuat), state.moonKm));
     }
     applyCameraRelative(handle);
+    // Level B: the light sits SHADOW_DEPTH towards the Sun from the site, so its shadow box covers the ground
+    // around the site and the ridges between it and the Sun (camera-relative positions, set just above)
+    const shadows = !!(webgl && terrain && opts.levelB?.() !== false && lambda >= 0.95 && terrain.group.visible);
+    if (bodies.sunLight.castShadow !== shadows) {
+      bodies.sunLight.castShadow = shadows;
+      shadowAt = { t: Number.NaN, version: -1 };
+    }
+    if (shadows && terrain && webgl) {
+      const g = terrain.group.position;
+      bodies.sunLight.target.position.copy(g);
+      bodies.sunLight.target.updateMatrixWorld();
+      bodies.sunLight.position.set(g.x + state.sunDir[0] * SHADOW_DEPTH, g.y + state.sunDir[1] * SHADOW_DEPTH, g.z + state.sunDir[2] * SHADOW_DEPTH);
+      if (!(Math.abs(t - shadowAt.t) < SHADOW_REDRAW_MS) || terrain.version !== shadowAt.version) {
+        webgl.shadowMap.needsUpdate = true;
+        shadowAt = { t, version: terrain.version };
+      }
+    }
     camera.up.set(...pose.up);
     camera.lookAt(pose.target[0] - pose.position[0], pose.target[1] - pose.position[1], pose.target[2] - pose.position[2]);
     renderer.render(scene, camera);

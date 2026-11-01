@@ -52,6 +52,9 @@ export interface AppState {
   /** Reduced motion (spec 9, T5.2.b): no camera flights or animated transitions. Starts from the system setting. */
   reducedMotion: boolean;
   setReducedMotion(on: boolean): void;
+  /** Level B at the site (T6.1): terrain shadows and the first-person sky view. Off = the MVP scene. */
+  levelB: boolean;
+  setLevelB(on: boolean): void;
   /** Scale the 3D scene is drawn at (spec 5.9): "space" (bodies ×6) or "local" (real size near the site). */
   sceneScale: "space" | "local";
   setSceneScale(s: "space" | "local"): void;
@@ -123,6 +126,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     reducedMotion: typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     setReducedMotion(on) {
       set({ reducedMotion: on });
+    },
+    levelB: true,
+    setLevelB(on) {
+      set({ levelB: on });
     },
     sceneScale: "space",
     setSceneScale(s) {
