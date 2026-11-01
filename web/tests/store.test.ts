@@ -98,4 +98,23 @@ describe("app store", () => {
     expect(store.getState().selectedWindow).toBe(3);
     expect(store.getState().notice).toMatch(/3, 7, 14/);
   });
+
+  it("screens (A7): starts on the landing page; going home keeps pins and selection and resets the mode", () => {
+    const st = store.getState();
+    expect(st.screen).toBe("landing");
+    st.setScreen("planner");
+    st.pinPlan("haworth_20270615_14d");
+    st.selectPlan("haworth_20270615_14d");
+    st.setViewMode("live");
+    st.setMissionPhase("transit");
+    st.setScreen("landing");
+    const s = store.getState();
+    expect(s.screen).toBe("landing");
+    expect(s.comparePlans).toEqual(["haworth_20270615_14d"]);
+    expect(s.selectedPlanId).toBe("haworth_20270615_14d");
+    expect(s.viewMode).toBe("compare");
+    expect(s.missionPhase).toBe("overview");
+    s.setScreen("educator");
+    expect(store.getState().screen).toBe("educator");
+  });
 });

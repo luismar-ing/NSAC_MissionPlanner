@@ -792,7 +792,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** — · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
 - **Aceptación:** `npm --prefix web test` y `typecheck` pasan; prueba de contraste de los pares texto/fondo de los tokens (≥ 4.5:1); el Sol y la Tierra se distinguen también por luminosidad.
 
-##### [ ] TR.0.b — Pantallas y modo en el estado global
+##### [x] TR.0.b — Pantallas y modo en el estado global
 - **Qué:** `screen: "landing" | "planner" | "educator"` en el store; `App` decide qué pantalla mostrar; volver a la portada sin perder planes anclados; créditos y movimiento reducido accesibles desde todas las pantallas.
 - **Archivos:** `web/src/store/appStore.ts`, `web/src/App.tsx`, `web/tests/appStore.test.ts`
 - **Depende de:** TR.0.a · **Spec:** 8.0 · **Decisiones:** A7 · **Est.:** 2 h

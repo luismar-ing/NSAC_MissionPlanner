@@ -15,6 +15,8 @@ export type MissionPhase = "overview" | "launch" | "transit" | "landing" | "site
 export const MISSION_PHASES: readonly MissionPhase[] = ["overview", "launch", "transit", "landing", "site"];
 /** Screen mode (spec 8.0): compare (2D) or live (the selected plan in 3D). */
 export type ViewMode = "compare" | "live";
+/** Top-level screen (decision A7): the landing page and the two ways of using the app. */
+export type Screen = "landing" | "planner" | "educator";
 
 /** Spec 5.6 constraints; null = control disabled (not evaluated). */
 export interface Constraints {
@@ -38,6 +40,9 @@ export interface AppState {
   selectedSite: string | null;
   selectedWindow: 3 | 7 | 14 | number; // window length L shown in the calendar
   constraints: Constraints;
+  screen: Screen;
+  /** Going back to the landing page keeps plans, pins and selection; the mode reopens at its start. */
+  setScreen(screen: Screen): void;
   viewMode: ViewMode;
   setViewMode(mode: ViewMode): void;
   /** Reduced motion (spec 9, T5.2.b): no camera flights or animated transitions. Starts from the system setting. */
@@ -90,6 +95,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     selectedSite: null,
     selectedWindow: 7,
     constraints: { ...DEFAULT_CONSTRAINTS },
+    screen: "landing",
+    setScreen(screen) {
+      set(screen === "landing" ? { screen, viewMode: "compare", missionPhase: "overview" } : { screen });
+    },
     viewMode: "compare",
     reducedMotion: typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     setReducedMotion(on) {

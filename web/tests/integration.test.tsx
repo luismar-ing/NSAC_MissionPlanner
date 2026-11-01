@@ -65,6 +65,7 @@ beforeAll(async () => {
 // a clean global state for every cell
 beforeEach(() => {
   const st = appStore.getState();
+  st.setScreen("planner"); // the compare and live views live in the Mission Planner screen (A7)
   st.setViewMode("compare");
   for (const id of [...st.comparePlans]) st.unpinPlan(id);
   st.selectPlan(null);

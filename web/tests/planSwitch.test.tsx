@@ -54,6 +54,7 @@ beforeAll(async () => {
   globalThis.fetch = fileFetch;
   window.scrollTo = () => {};
   await appStore.getState().loadCore();
+  appStore.getState().setScreen("planner"); // compare and live live in the Mission Planner screen (A7)
 });
 afterEach(cleanup);
 

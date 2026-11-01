@@ -2495,3 +2495,17 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna; vuelven los colores de la spec 9.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.0.b.
+
+## 2026-11-01 · TR.0.b · Pantallas y modo en el estado global
+
+- **Tarea:** TR.0.b ([x]).
+- **Qué se hizo:** `screen: "landing" | "planner" | "educator"` y `setScreen` en `store/appStore.ts`. Volver a la portada conserva planes, anclados y selección, y deja el modo en su inicio (`viewMode` compare, fase overview). `App.tsx` muestra la portada sin esperar a los datos y, en los modos, el shell actual con un botón «Home». La portada provisional `views/Landing.tsx` (sin estilo; TR.1.a) tiene las dos tarjetas como `<button>`. Textos en `lib/strings.ts`.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test → Test Files 32 passed · Tests 217 passed · typecheck → exit 0
+  ```
+  Pruebas nuevas: `store.test.ts` (pantallas) y `landing.test.tsx` (cada tarjeta abre su modo; «Home» vuelve). Las pruebas que montan `<App/>` entran ahora en «planner» antes de comprobar las vistas.
+- **Decisiones tomadas:** hasta TR.4, el modo Educator muestra el shell actual.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.1.a.
