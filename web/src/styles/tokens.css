@@ -1,4 +1,4 @@
-/* Base styles, "Quantum" look (decision A6): minimal, outlined rather than filled, one green accent.
+/* Base styles. Decision A7 (Phase R): deep space background, glass panels, spec 9 colours for the Sun and Earth.
    Colours come ONLY from CSS custom properties set by styles/tokens.ts (no hex values here). */
 
 *,

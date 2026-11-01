@@ -83,4 +83,4 @@ The same list is in the app (footer → **About & credits**). Exact files, sizes
 
 **Not real data:** trajectories and the launch are ILLUSTRATIVE (see above). The rocket is PolePlanner's own procedural model, with no external asset.
 
-**Software:** web app: React and React DOM 19.3.1, three.js 0.186.1, Zustand 5.0.15 and Zod 4.6.7 (all MIT); Geist and Geist Mono fonts 5.3.0 (SIL Open Font License 1.1). Pipeline: SpiceyPy 8.3.0 (MIT), NumPy 2.5.4 (BSD-3-Clause), rasterio 1.5.2 (BSD-3-Clause), pyproj 3.8.0 (MIT), pandas 3.0.6 (BSD-3-Clause), pydantic 2.14.1 (MIT), Matplotlib 3.11.2 (PSF-based) and Pillow 13.0.0 (MIT-CMU).
+**Software:** web app: React and React DOM 19.3.1, three.js 0.186.1, Zustand 5.0.15 and Zod 4.6.7 (all MIT); Geist, Geist Mono, Space Grotesk and Instrument Serif fonts 5.3.0 (SIL Open Font License 1.1). Pipeline: SpiceyPy 8.3.0 (MIT), NumPy 2.5.4 (BSD-3-Clause), rasterio 1.5.2 (BSD-3-Clause), pyproj 3.8.0 (MIT), pandas 3.0.6 (BSD-3-Clause), pydantic 2.14.1 (MIT), Matplotlib 3.11.2 (PSF-based) and Pillow 13.0.0 (MIT-CMU).

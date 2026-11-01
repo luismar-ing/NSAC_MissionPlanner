@@ -786,7 +786,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 
 ### TR.0 Base
 
-##### [ ] TR.0.a — Decisión A7, tokens y tipografías del nuevo estilo
+##### [x] TR.0.a — Decisión A7, tokens y tipografías del nuevo estilo
 - **Qué:** registrar A7 (sustituye a A6). Tokens: Sol `#ffb347` y Tierra `#4aa3ff` (los colores de la spec 9 y de las maquetas), superficies de vidrio translúcido con contraste ≥ 4.5:1, radios y desenfoque. Tipografías autoalojadas: Space Grotesk (titulares de Mission Planner), Instrument Serif (Educator) y Geist / Geist Mono, que se conservan para el texto y la telemetría.
 - **Archivos:** `web/src/styles/tokens.ts`, `web/src/styles/tokens.css`, `web/package.json`, `docs/DECISIONS.md`
 - **Depende de:** — · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h

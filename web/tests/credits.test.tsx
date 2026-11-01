@@ -89,6 +89,8 @@ describe("credits (rule 12)", () => {
     expect(shown["Zustand"].version).toBe(pkg("zustand").version);
     expect(shown["Zod"].version).toBe(pkg("zod").version);
     expect(shown["Geist and Geist Mono fonts (Fontsource)"].version).toBe(pkg("@fontsource-variable/geist").version);
+    expect(shown["Space Grotesk font (Fontsource)"].version).toBe(pkg("@fontsource-variable/space-grotesk").version);
+    expect(shown["Instrument Serif font (Fontsource)"].version).toBe(pkg("@fontsource/instrument-serif").version);
     const req = readFileSync(join(ROOT, "pipeline", "requirements.txt"), "utf-8");
     const pinned = (n: string) => new RegExp(`^${n}==(.+)$`, "mi").exec(req)?.[1].trim();
     const py = Object.fromEntries(SOFTWARE_CREDITS.pipeline.map((s) => [s.name.split(" ")[0].toLowerCase(), s.version]));

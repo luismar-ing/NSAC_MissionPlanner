@@ -2480,3 +2480,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** la disposición de 8.0 (dos modos de pantalla) pasa a portada + dos modos de uso. La comparación 2D, el calendario, el panorama Nivel A y el panel del sitio se conservan sin cambios de formato (regla 6) y sin WebGL (regla 7). Los colores vuelven a los de la spec 9.
 - **Problemas abiertos:** la revisión visual T5.2.e se hará sobre el diseño nuevo. Plan de recorte de la Fase R: si no está cerrada el 2026-11-09, se recorta TR.3 (Nivel B) y la portada usa una Luna estática.
 - **Siguiente tarea:** TR.0.a.
+
+## 2026-11-01 · TR.0.a · Decisión A7, tokens y tipografías
+
+- **Tarea:** TR.0.a ([x]).
+- **Qué se hizo:** `styles/tokens.ts` con los colores de la spec 9 (Sol `#FFB347`, Tierra `#4AA3FF`, noche `#1A2238`, ambos `#9BE3A6`, texto `#E6EDF7`), fondo `#05070D` y nuevo objeto `GLASS` (paneles translúcidos con opacidad 0.72, trazos, desenfoque y radios) expuesto como variables CSS. Tipografías Space Grotesk (titulares de Mission Planner) e Instrument Serif (Educator), autoalojadas con Fontsource 5.3.0 (OFL-1.1), cargadas en `main.tsx` y acreditadas en Credits y en el README.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/tokens.test.ts → 6 passed (incluye contraste ≥ 4.5:1 del texto sobre fondo, paneles y vidrio sobre el fondo más claro posible; Sol y Tierra separados en luminosidad OKLab > 0.1)
+  $ npm --prefix web test → Test Files 31 passed · Tests 215 passed · typecheck → exit 0
+  ```
+  En el navegador, la vista actual usa los colores nuevos sin roturas.
+- **Decisiones tomadas:** la opacidad del vidrio sube de 0.62 (maqueta) a 0.72: con 0.62, el texto secundario quedaba en 3.5:1 sobre regolito iluminado. El azul de la Tierra sobre vidrio solo se usa para cifras grandes (≥ 3:1, texto grande de WCAG). La selección usa texto claro, nunca el color de un cuerpo.
+- **Desviaciones de la spec / cambios en la guía:** ninguna; vuelven los colores de la spec 9.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.0.b.

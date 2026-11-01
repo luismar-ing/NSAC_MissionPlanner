@@ -92,6 +92,8 @@ export const SOFTWARE_CREDITS: { app: SoftwareCredit[]; pipeline: SoftwareCredit
     { name: "Zustand", version: "5.0.15", license: "MIT" },
     { name: "Zod", version: "4.6.7", license: "MIT" },
     { name: "Geist and Geist Mono fonts (Fontsource)", version: "5.3.0", license: "SIL Open Font License 1.1" },
+    { name: "Space Grotesk font (Fontsource)", version: "5.3.0", license: "SIL Open Font License 1.1" },
+    { name: "Instrument Serif font (Fontsource)", version: "5.3.0", license: "SIL Open Font License 1.1" },
   ],
   pipeline: [
     { name: "SpiceyPy (NAIF SPICE toolkit)", version: "8.3.0", license: "MIT" },
