@@ -61,6 +61,39 @@ export const STRINGS = {
     aerial: "Aerial view",
     standTitle: "See the sky from 3 m above the ground: drag to look around, scroll to zoom",
   },
+  educator: {
+    chapterOf: (i: number, n: number) => `Chapter ${i} of ${n}`,
+    progress: "Story progress",
+    back: "Back",
+    next: "Next chapter",
+    begin: "Begin the journey",
+    fullDay: "Watch a full day",
+    lookAround: "Look around 360°",
+    lookHint: "Drag the sky to look around. Scroll to zoom.",
+    exit: "Exit to start",
+    siteTabs: "Landing site",
+    dayBars: "Arrival days, taller = better for this site",
+    arrive: (date: string, days: number) => `Arrive ${date} · stay ${days} days`,
+    chapters: {
+      leaving: {
+        title: "Leaving Earth",
+        caption: () => "Pick the day you want to arrive. The Moon will be somewhere else in its orbit, and the Sun will reach the pole from a different side.",
+      },
+      journey: {
+        title: "The journey",
+        caption: (d: { transitDays: number }) => `About ${d.transitDays} days of coasting. The rocket aims for where the Moon will be when it arrives, not where it is now.`,
+      },
+      landing: {
+        title: "Landing",
+        caption: () => "Near the south pole the Sun never climbs high. Crater floors stay in shadow, while ridges and rims catch the light: that is why missions aim for them.",
+      },
+      surface: {
+        title: "On the surface",
+        caption: (d: { site: string; windowDays: number; sunPct: string; earthHoursMean: string }) =>
+          `Here the Sun circles the horizon instead of rising and setting, and a single hill can hide it for hours. During these ${d.windowDays} days, ${d.site} gets sunlight ${d.sunPct}% of the time, and the Earth is in view ${d.earthHoursMean} hours a day on average.`,
+      },
+    },
+  },
   sky: {
     sun: "Sun",
     earth: "Earth",

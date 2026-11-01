@@ -2714,7 +2714,7 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Cómo se verificó:**
   ```
   $ npx vitest run tests/levelB.test.ts → sky labels vs series: worst 0.010° en 3 instantes × 5 sitios (antes de corregir el paralaje: 0.146°, error)
-  $ npm --prefix web test → 233 passed · typecheck → exit 0
+  $ npm --prefix web test → 232 passed · typecheck → exit 0
   $ node web/scripts/fps.mjs → at the site (primera persona, sombras): 59.3 fps, p95 17 ms · 1 contexto WebGL
   ```
   Headless (Malapert, 2027-01-06 10:00 UTC): la etiqueta de la Tierra dice az 359.6° · el −1.5° y la lectura del panorama 2D, az 359.6° · el −1.48°. Arrastrar gira la vista. El horizonte, la rejilla y los cardinales quedan por encima de la consola.
@@ -2722,3 +2722,19 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.4.a.
+
+## 2026-11-01 · TR.4.a · Motor de capítulos (Educator)
+
+- **Tarea:** TR.4.a ([x]).
+- **Qué se hizo:** `lib/chapters.ts`: cuatro capítulos en orden (Leaving Earth, The journey, Landing, On the surface). Cada uno indica si muestra el globo de planificación, en qué instante de la misión abre, hasta dónde se reproduce solo y a qué velocidad (el viaje a 6 h/s, el aterrizaje a 1 h/s). `stepChapter` mantiene anterior/siguiente dentro de la historia. Los subtítulos en inglés están en `lib/strings.ts` (`educator`); las únicas cifras salen de los datos del plan (días de tránsito y de estancia, % de Sol y horas de Tierra de la ventana).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/chapters.test.ts → 3 passed
+    fases al abrir: launch, launch, landing, site; cada capítulo termina donde empieza el siguiente
+    los subtítulos no contienen ningún número que no venga de los datos
+  $ npm --prefix web test → todos pasan · typecheck → exit 0
+  ```
+- **Decisiones tomadas:** la prueba de «Esc vuelve a la portada» pasa a TR.4.b, porque necesita la vista.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.4.b.

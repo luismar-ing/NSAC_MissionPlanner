@@ -878,7 +878,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 
 ### TR.4 Educator (C2, C3)
 
-##### [ ] TR.4.a — Motor de capítulos
+##### [x] TR.4.a — Motor de capítulos
 - **Qué:** 4 capítulos (Leaving Earth, The journey, Landing, On the surface), cada uno con su fase o instante de misión, un subtítulo corto en inglés y sus acciones. Anterior/siguiente, indicador de progreso y salida en cualquier momento. Con movimiento reducido, los saltos son cortes.
 - **Archivos:** `web/src/lib/chapters.ts`, `web/src/lib/strings.ts`, `web/tests/chapters.test.ts`
 - **Depende de:** TR.0.b · **Spec:** 3, 9 · **Decisiones:** — · **Est.:** 2 h
