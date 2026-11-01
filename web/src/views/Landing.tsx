@@ -57,7 +57,7 @@ export function Landing({ tools, onCredits }: { tools?: ReactNode; onCredits(): 
         ))}
       </nav>
       <footer className="landing-foot">
-        <span>{STRINGS.landing.credit}</span>{" "}
+        <span>{STRINGS.footerCredits}</span>{" "}
         <button type="button" className="link-btn" onClick={onCredits}>
           {STRINGS.credits.open}
         </button>

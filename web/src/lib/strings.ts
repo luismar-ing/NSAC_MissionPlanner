@@ -124,7 +124,6 @@ export const STRINGS = {
       body: "Pick a site and an arrival date, then compare plans by sunlight, Earth contact and darkness.",
     },
     enter: "Enter",
-    credit: "Moon: NASA SVS CGI Moon Kit (LRO LROC color). Data: NASA LRO LOLA, NAIF SPICE.",
   },
   constraintsTitle: "Mission constraints",
   constraintsPlaceholder: "Set minimum sunlight, maximum darkness and minimum Earth contact.",

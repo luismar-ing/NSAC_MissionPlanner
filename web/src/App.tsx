@@ -4,18 +4,15 @@ import { ErrorMessage } from "./components/ErrorMessage";
 import { describeError } from "./lib/errors";
 import { STRINGS } from "./lib/strings";
 import { appStore, useApp } from "./store/appStore";
-import { CompareView } from "./views/CompareView";
-import { LiveView } from "./views/LiveView";
 import { Landing } from "./views/Landing";
 import { SoundToggle } from "./components/SoundToggle";
 import { PlannerView } from "./views/PlannerView";
+import { EducatorView } from "./views/EducatorView";
 
 export const APP_TITLE = STRINGS.appTitle;
 
 export function App() {
   const load = useApp((s) => s.load);
-  const manifest = useApp((s) => s.manifest);
-  const viewMode = useApp((s) => s.viewMode);
   const screen = useApp((s) => s.screen);
   const setScreen = useApp((s) => s.setScreen);
   const reducedMotion = useApp((s) => s.reducedMotion);
@@ -31,14 +28,6 @@ export function App() {
     void appStore.getState().loadCore(); // idempotent: StrictMode's double effect does not load twice
   }, []);
 
-  const footer = (
-    <footer className="app-footer">
-      <span>{STRINGS.footerCredits}</span>{" "}
-      <button type="button" className="link-btn" onClick={() => setCreditsOpen(true)}>
-        {STRINGS.credits.open}
-      </button>
-    </footer>
-  );
   const credits = creditsOpen && <Credits onClose={() => setCreditsOpen(false)} />;
 
   // the landing page needs no data: it shows at once while the core data loads behind it
@@ -78,55 +67,35 @@ export function App() {
     </>
   );
 
-  if (screen === "planner") {
-    const tools = (
-      <>
-        <button type="button" className="btn ghost" title={STRINGS.homeTitle} onClick={() => setScreen("landing")}>
-          {STRINGS.home}
-        </button>
-        <SoundToggle />
-        {motionToggle}
-        <button type="button" className="btn ghost" onClick={() => setCreditsOpen(true)}>
-          {STRINGS.credits.open}
-        </button>
-      </>
-    );
-    return (
-      <div className="app-planner" data-screen="planner">
-        {load.status === "ready" ? (
+  // the two modes share one full-screen layout: the 3D scene behind, the mode's own panels over it (A7)
+  const tools = (
+    <>
+      <button type="button" className="btn ghost" title={STRINGS.homeTitle} onClick={() => setScreen("landing")}>
+        {STRINGS.home}
+      </button>
+      <SoundToggle />
+      {motionToggle}
+      <button type="button" className="btn ghost" onClick={() => setCreditsOpen(true)}>
+        {STRINGS.credits.open}
+      </button>
+    </>
+  );
+  return (
+    <div className="app-planner" data-screen={screen}>
+      {load.status === "ready" ? (
+        screen === "planner" ? (
           <PlannerView tools={tools} />
         ) : (
-          <>
-            <header className="planner-top">
-              <div className="landing-tools">{tools}</div>
-            </header>
-            {status}
-          </>
-        )}
-        {credits}
-      </div>
-    );
-  }
-
-  return (
-    <div className="app" data-screen={screen}>
-      <header className="app-header">
-        <h1 className="app-title">
-          {STRINGS.appTitle}
-          <span className="app-subtitle">{STRINGS.appSubtitle}</span>
-        </h1>
-        <div className="header-tools">
-          <button type="button" className="btn ghost" title={STRINGS.homeTitle} onClick={() => setScreen("landing")}>
-            {STRINGS.home}
-          </button>
-          <SoundToggle />
-          {motionToggle}
-          {manifest && <span className="data-badge">{STRINGS.dataBadge(manifest.data_status, manifest.data_version)}</span>}
-        </div>
-      </header>
-      {status}
-      {load.status === "ready" && (viewMode === "live" ? <LiveView /> : <CompareView />)}
-      {footer}
+          <EducatorView tools={tools} />
+        )
+      ) : (
+        <>
+          <header className="planner-top">
+            <div className="landing-tools">{tools}</div>
+          </header>
+          {status}
+        </>
+      )}
       {credits}
     </div>
   );

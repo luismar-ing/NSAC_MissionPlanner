@@ -2738,3 +2738,11 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.4.b.
+
+## 2026-11-01 · TR.4.b · Capítulo 1 del modo Educator (en curso)
+
+- **Tarea:** TR.4.b ([~], sin cerrar).
+- **Qué se hizo:** `views/EducatorView.tsx`: escena única detrás; capítulo 1 (C2) con pestañas de sitio, barras de días por score, «Begin the journey», plan preseleccionado (el mejor score de 7 días del año) y Esc vuelve a la portada. Capítulos 2 a 4 con subtítulo y Back/Next. `App.tsx`: Educator a pantalla completa, como Planner; se retira el shell antiguo. La línea completa de créditos de datos pasa al pie de la portada. Estilos básicos en `tokens.css`.
+- **Cómo se verificó:** `npm --prefix web test` → 235 passed · typecheck → exit 0. **No verificado:** pruebas propias de EducatorView (pestañas, barras, Begin, Esc) ni revisión en el navegador.
+- **Problemas abiertos:** faltan la prueba de la vista y la revisión visual contra C2; TR.4.c (reproducción de los capítulos, «Watch a full day», «Look around 360°») y TR.5.a siguen pendientes.
+- **Siguiente tarea:** terminar TR.4.b.
