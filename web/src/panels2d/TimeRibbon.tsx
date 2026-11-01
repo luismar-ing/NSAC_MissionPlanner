@@ -10,7 +10,7 @@ interface Props {
   compareTime: number; // hours since arrival
 }
 
-// two lanes: Sun on top (white light), Earth below (green). Each lane has its own colour, so "both" is simply
+// two lanes: Sun on top (orange), Earth below (blue). Each lane has its own colour, so "both" is simply
 // both lanes lit and the state reads by position as well as by colour (spec 9, decision A7).
 const LANE_SUN = { y: 2, h: 15 };
 const LANE_EARTH = { y: 19, h: 15 };

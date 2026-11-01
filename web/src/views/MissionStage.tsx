@@ -10,7 +10,7 @@ import { MissionControls } from "../scene3d/MissionControls";
 import { ScaleIndicator } from "../scene3d/ScaleIndicator";
 import { LOCAL_SCALE, SPACE_SCALE } from "../scene3d/scale";
 import { useApp } from "../store/appStore";
-import { ArrivalDock } from "./LiveView";
+import { SiteLayout } from "./SiteLayout";
 
 /**
  * The journey of the Mission Planner (design B2): the scene stays full screen behind (PlannerView); over it, the
@@ -86,10 +86,11 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
         {atSite && site ? STRINGS.live.arrived(site.name) : ""}
       </p>
 
+      {atSite && <SiteLayout />}
+
       <div className="mission-dock">
         {failure !== null && <ErrorMessage what={STRINGS.errors.scene} info={describeError(failure)} onRetry={() => setAttempt((n) => n + 1)} />}
         {timeline && <MissionControls timeline={timeline.tl} planId={timeline.planId} autoPlay={autoPlay} />}
-        {atSite && <ArrivalDock />}
       </div>
     </section>
   );

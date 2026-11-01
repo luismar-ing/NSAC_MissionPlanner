@@ -95,7 +95,8 @@ describe("change of plan from a thumbnail (spec 8.0)", () => {
     await waitFor(() => expect(within(strip).getAllByTestId("thumb").map((t) => t.getAttribute("data-plan-id"))).toEqual([A, C]));
     await waitFor(() => expect(screen.getByTestId("mission-phase").textContent).toBe("At the site"));
     expect(within(strip).getByTestId("thumb-clock").textContent).toBe("Day 2, 06:00");
-    // the site panel and panorama of the new plan follow
+    // the site panel (behind "Site details", TR.2.e) and the panorama of the new plan follow
+    fireEvent.click(await screen.findByRole("button", { name: "Site details and sources" }));
     await waitFor(() => expect(screen.getByLabelText(/Site features: Malapert Massif/)).toBeTruthy());
   });
 

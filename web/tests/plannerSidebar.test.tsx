@@ -103,4 +103,30 @@ describe("Mission Planner sidebar (A2)", () => {
     expect(screen.queryByRole("dialog", { name: "Search and compare plans" })).toBeNull();
     expect(appStore.getState().viewMode).toBe("live"); // the journey's own Esc did not fire
   });
+
+  it("arrival (TR.2.e): ILLUSTRATIVE before landing only; metrics card, panorama on the mission clock, ★ against pinned plans", async () => {
+    const st = appStore.getState();
+    st.setScreen("planner");
+    st.selectPlan("haworth_20270309_7d");
+    st.pinPlan("haworth_20270309_7d");
+    st.pinPlan("malapert_massif_20270309_7d");
+    render(<App />);
+    fireEvent.click(sidebar().getByRole("button", { name: /^Launch/ }));
+    await screen.findByTestId("mission-controls", {}, { timeout: 5000 });
+    expect(screen.getByTestId("illustrative-label")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Pause the mission" }));
+    fireEvent.click(screen.getByRole("button", { name: "At the site" }));
+    const site = await screen.findByTestId("live-site");
+    expect(screen.queryByTestId("illustrative-label")).toBeNull(); // the site itself is real data
+    const card = await within(site).findByRole("complementary", { name: "Window metrics" }, { timeout: 5000 });
+    expect(within(card).getByTestId("metrics-box")).toBeTruthy();
+    // the panorama follows the mission clock: arrival = sample 0
+    await waitFor(() => expect(within(site).getByTestId("panorama").dataset.sample).toBe("0"));
+    const table = await within(site).findByTestId("site-compare-mini");
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Metric", "This plan", "Malapert Massif"]);
+    expect(within(table).getAllByText("★").length + table.querySelectorAll('[data-best="true"]').length).toBeGreaterThan(0);
+    fireEvent.click(within(card).getByRole("button", { name: "Site details and sources" }));
+    expect(screen.getByRole("dialog", { name: "Haworth: details and sources" })).toBeTruthy();
+    for (const id of ["haworth_20270309_7d", "malapert_massif_20270309_7d"]) appStore.getState().unpinPlan(id);
+  });
 });

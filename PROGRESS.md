@@ -2629,3 +2629,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.2.e.
+
+## 2026-11-01 · TR.2.e · Llegada al sitio: disposición B3 con estilo A3
+
+- **Tarea:** TR.2.e ([x]).
+- **Qué se hizo:** `views/SiteLayout.tsx` sustituye al antiguo `ArrivalDock` dentro de Mission Planner. El cielo 3D queda arriba. A la derecha, una tarjeta de vidrio «Window metrics» con `MetricsBox` (métricas, ★ y texto «why»), cuyo botón «Site details and sources» abre el `SitePanel` completo (8.6: ubicación, valores diarios y rasgos cercanos, cada uno con su fuente) en un `Drawer`. Abajo, una consola con el panorama 360° (8.4, Nivel A) y la cinta de tiempo sobre el reloj de misión, y la tabla «Against your pinned plans» con las seis métricas y ★ en la mejor de cada fila (forma además de color). Debajo, el dock de misión. La rejilla de `MissionStage` usa áreas con nombre y cambia de disposición al llegar al sitio; la sección usa `display: contents` para que sus partes ocupen su sitio en esa rejilla.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/plannerSidebar.test.tsx → 4 passed (ILLUSTRATIVE solo antes de aterrizar; tarjeta con métricas; panorama en la muestra 0 al llegar; tabla con columnas Metric · This plan · Malapert Massif; «Site details» abre «Haworth: details and sources»)
+  $ npm --prefix web test → Tests 227 passed · typecheck → exit 0
+  ```
+  En el navegador (1920×1080), en el sitio: telemetría a la izquierda, tarjeta de métricas a la derecha bajo la barra superior (sin solaparse), terreno real detrás, consola con el panorama y la cinta, y el dock abajo.
+- **Decisiones tomadas:** el panel de características completo pasa a un diálogo para no tapar el cielo; la prueba de cambio de plan lo abre igual que lo haría un usuario.
+- **Desviaciones de la spec / cambios en la guía:** ninguna (8.6 se muestra a un clic de la llegada).
+- **Problemas abiertos:** la consola ocupa cerca del 40 % del alto; la vista del cielo en primera persona (TR.3.a) aprovechará mejor la parte superior.
+- **Siguiente tarea:** T6.1.a (TR.3, terreno Nivel B).

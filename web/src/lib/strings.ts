@@ -49,6 +49,13 @@ export const STRINGS = {
     closeSearch: "Close",
     searchTitle: "Search and compare plans",
   },
+  siteLayout: {
+    card: "Window metrics",
+    details: "Site details and sources",
+    detailsTitle: (site: string) => `${site}: details and sources`,
+    compare: "Against your pinned plans",
+    thisPlan: "This plan",
+  },
   telemetry: {
     launch: "Launch",
     arrival: "Arrival",
@@ -201,7 +208,7 @@ export const STRINGS = {
     noNearby: "No verified named feature nearby.",
     compare: "Compared with the other pinned plans",
     plan: "Plan",
-    short: { sun: "Sun %", dark: "Dark h", earth: "Earth min h", score: "Score" },
+    short: { sun: "Sun %", dark: "Dark h", earth: "Earth min h", score: "Score", metric: "Metric" },
     notAvailable: "Not available",
     noSource: "No verifiable source: value not shown (spec 5.10).",
   },

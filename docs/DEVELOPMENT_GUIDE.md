@@ -844,7 +844,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.2.b · **Spec:** 8.2, 5.9 · **Decisiones:** — · **Est.:** 2.5 h
 - **Aceptación:** pruebas existentes de `MissionControls` pasan; revisión visual contra B2; la etiqueta ILLUSTRATIVE se ve en las fases 1 a 3.
 
-##### [ ] TR.2.e — Llegada al sitio: disposición B3 con estilo A3
+##### [x] TR.2.e — Llegada al sitio: disposición B3 con estilo A3
 - **Qué:** barra superior (sitio, llegada, ventana, «Compare plans», sonido); tarjeta de métricas de vidrio a la derecha (`MetricsBox` + texto «why»); consola inferior con el panorama 360° (Nivel A), la cinta de tiempo y la tabla de métricas frente a los planes anclados (★ = mejor, con forma además de color); dock de tiempo. El panel de características (8.6) se abre desde la tarjeta.
 - **Archivos:** `web/src/views/SiteLayout.tsx`, `web/src/views/LiveView.tsx`, `web/src/views/SitePanel.tsx`
 - **Depende de:** TR.2.d · **Spec:** 8.4, 8.6, 5.5 · **Decisiones:** A7 · **Est.:** 3 h
