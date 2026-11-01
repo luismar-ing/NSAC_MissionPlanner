@@ -2600,3 +2600,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** los controles de la misión siguen con el estilo anterior hasta TR.2.d.
 - **Siguiente tarea:** TR.2.c.
+
+## 2026-11-01 · TR.2.c · Panel deslizable de búsqueda y comparación
+
+- **Tarea:** TR.2.c ([x]).
+- **Qué se hizo:** `components/Drawer.tsx`: diálogo modal (`role="dialog"`, `aria-modal`) que entra desde la derecha (300 ms; sin animación con movimiento reducido), con fondo que lo cierra al hacer clic. El foco entra en «Close», Tab y Shift+Tab no salen del panel y, al cerrar, el foco vuelve a quien lo abrió. Esc cierra solo el panel: marca el evento, y la vista del viaje ignora ese Esc. El panel contiene `ConstraintControls`, `Calendar`, `Tray` y la sección del sitio, sin cambios de formato ni de escala (spec 8.1). Se abre desde la barra lateral y, durante el viaje, desde la barra superior («Search and compare · n pinned»).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/plannerSidebar.test.tsx → 3 passed (foco dentro y atrapado, Esc cierra y devuelve el foco; en el viaje, Esc cierra el panel y la vista sigue en live)
+  $ npm --prefix web test → Tests 226 passed · typecheck → exit 0
+  ```
+  En el navegador, con el panel abierto: 1 canvas WebGL (el de la escena) más el canvas 2D del calendario; el foco en «Close».
+- **Decisiones tomadas:** el panel es opaco (`--color-bg`), no de vidrio. Con vidrio, el globo se veía a través del calendario y la comparación perdía legibilidad (spec 8.1: mismo formato sobre cualquier fondo).
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.2.d.

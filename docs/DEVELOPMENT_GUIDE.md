@@ -832,7 +832,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.0.b, TR.2.a · **Spec:** 8.5, 5.6 · **Decisiones:** A7 · **Est.:** 3 h
 - **Aceptación:** prueba: cambiar fecha, ventana o sitio fija el plan correcto (`selectedPlanId`) y «Launch» inicia la misión; actualización < 100 ms.
 
-##### [ ] TR.2.c — Panel deslizable de búsqueda y comparación
+##### [x] TR.2.c — Panel deslizable de búsqueda y comparación
 - **Qué:** `ConstraintControls`, `Calendar` y `Tray` actuales dentro de un panel que se desliza sobre el globo y se abre desde la barra lateral («Full calendar», «Compare plans · n») en cualquier fase. Los paneles 2D conservan su formato, escala y tipografía idénticos.
 - **Archivos:** `web/src/components/Drawer.tsx`, `web/src/views/PlannerView.tsx`, `web/src/styles/tokens.css`
 - **Depende de:** TR.2.b · **Spec:** 8.0, 8.1, 8.5 · **Decisiones:** A7 · **Est.:** 2.5 h

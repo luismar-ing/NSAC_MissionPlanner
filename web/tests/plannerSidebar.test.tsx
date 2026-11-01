@@ -77,4 +77,30 @@ describe("Mission Planner sidebar (A2)", () => {
     expect(screen.getByRole("button", { name: /Pause the mission/ })).toBeTruthy(); // playing
     expect(screen.getByRole("list", { name: "Mission phases" }).querySelector('[aria-current="step"]')?.textContent).toBe("Launch");
   });
+
+  it("search panel (TR.2.c): focus goes in and stays in, Esc closes it and returns focus; during the journey Esc closes only the panel", async () => {
+    render(<App />);
+    act(() => appStore.getState().setScreen("planner"));
+    const opener = sidebar().getByRole("button", { name: "Search and compare" });
+    opener.focus();
+    fireEvent.click(opener);
+    const dialog = screen.getByRole("dialog", { name: "Search and compare plans" });
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    const close = within(dialog).getByRole("button", { name: "Close" });
+    expect(document.activeElement).toBe(close);
+    fireEvent.keyDown(close, { key: "Tab", shiftKey: true }); // first element: Shift+Tab wraps to the last
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    expect(document.activeElement).not.toBe(close);
+    fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Search and compare plans" })).toBeNull();
+    expect(document.activeElement).toBe(opener);
+
+    fireEvent.click(sidebar().getByRole("button", { name: /^Launch/ }));
+    await screen.findByTestId("mission-controls", {}, { timeout: 5000 });
+    fireEvent.click(screen.getByRole("button", { name: "Search and compare" })); // from the journey too
+    const d2 = screen.getByRole("dialog", { name: "Search and compare plans" });
+    fireEvent.keyDown(within(d2).getByRole("button", { name: "Close" }), { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Search and compare plans" })).toBeNull();
+    expect(appStore.getState().viewMode).toBe("live"); // the journey's own Esc did not fire
+  });
 });

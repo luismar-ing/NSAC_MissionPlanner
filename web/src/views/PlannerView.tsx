@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Drawer } from "../components/Drawer";
 import { MissionSidebar } from "../components/MissionSidebar";
 import { timelineOf, PLAY_PHASES } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
@@ -21,6 +22,7 @@ export function PlannerView({ tools }: { tools: ReactNode }) {
   const viewMode = useApp((s) => s.viewMode);
   const missionPhase = useApp((s) => s.missionPhase);
   const drawerOpen = useApp((s) => s.drawerOpen);
+  const pinned = useApp((s) => s.comparePlans.length);
   const setDrawerOpen = useApp((s) => s.setDrawerOpen);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
   const [launched, setLaunched] = useState(false);
@@ -65,7 +67,15 @@ export function PlannerView({ tools }: { tools: ReactNode }) {
         </div>
       )}
       <header className="planner-top">
-        <div className="landing-tools">{tools}</div>
+        <div className="landing-tools">
+          {/* search and comparison stay one click away during the journey too (TR.2.c) */}
+          {mission && (
+            <button type="button" className="btn ghost" onClick={() => setDrawerOpen(true)}>
+              {STRINGS.planner.search(pinned)}
+            </button>
+          )}
+          {tools}
+        </div>
       </header>
       {!mission && <MissionSidebar onLaunch={launch} onOpenSearch={() => setDrawerOpen(true)} />}
       {mission && (
@@ -86,15 +96,9 @@ export function PlannerView({ tools }: { tools: ReactNode }) {
         ))}
       </ol>
       {drawerOpen && (
-        <div className="search-drawer" role="dialog" aria-modal="false" aria-label={STRINGS.planner.searchTitle} data-testid="search-drawer">
-          <div className="search-drawer-head">
-            <h2 className="panel-title">{STRINGS.planner.searchTitle}</h2>
-            <button type="button" className="btn ghost" onClick={() => setDrawerOpen(false)}>
-              {STRINGS.planner.closeSearch}
-            </button>
-          </div>
+        <Drawer title={STRINGS.planner.searchTitle} closeLabel={STRINGS.planner.closeSearch} onClose={() => setDrawerOpen(false)} testId="search-drawer">
           <CompareView />
-        </div>
+        </Drawer>
       )}
     </div>
   );
