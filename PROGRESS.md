@@ -2702,3 +2702,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.3.a.
+
+## 2026-11-01 · TR.3.a · Vista del cielo en superficie (tipo Stellarium)
+
+- **Tarea:** TR.3.a ([x]).
+- **Qué se hizo:**
+  - `renderer.ts`: modo superficie. Al llegar al sitio (λ = 1), con Nivel B activo y `surfaceView` en el store (por defecto activo), la cámara baja en tiempo real (1.6 s, `approachPose`: distancia logarítmica al sitio y giro suave, sin cortes) a primera persona a h_obs = 3 m. La primera mirada apunta a la Tierra, 8° bajo el horizonte para que la línea del horizonte quede sobre la consola. Arrastrar gira la mirada («agarrar el cielo»), la rueda cambia el campo de visión (15–100°) y las flechas y +/− hacen lo mismo con el teclado. El cohete se oculta: el observador es el módulo, y su modelo de ~100 m quedaría a 3 m.
+  - `scene3d/skyOverlay.ts`: superposición SVG con círculos de altura (10–60°), meridianos cada 30°, el horizonte matemático discontinuo, los puntos cardinales y el Sol y la Tierra rotulados con su az/el, en los colores de los tokens.
+  - `terrainLevelB.ts`: `skyAzEl` / `azElAtSite`. La dirección del Sol se corrige por paralaje Tierra–Luna (la escena solo guarda Tierra → Sol: hasta ~0.15° de error visto desde la Luna). La luz de las sombras de T6.1.b usa también esa dirección corregida.
+  - `SiteLayout`: botón «Stand on the site» / «Aerial view» (solo con Nivel B). Con Nivel B apagado se queda la vista aérea y el panorama 2D (Nivel A) de la consola.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/levelB.test.ts → sky labels vs series: worst 0.010° en 3 instantes × 5 sitios (antes de corregir el paralaje: 0.146°, error)
+  $ npm --prefix web test → 233 passed · typecheck → exit 0
+  $ node web/scripts/fps.mjs → at the site (primera persona, sombras): 59.3 fps, p95 17 ms · 1 contexto WebGL
+  ```
+  Headless (Malapert, 2027-01-06 10:00 UTC): la etiqueta de la Tierra dice az 359.6° · el −1.5° y la lectura del panorama 2D, az 359.6° · el −1.48°. Arrastrar gira la vista. El horizonte, la rejilla y los cardinales quedan por encima de la consola.
+- **Decisiones tomadas:** las etiquetas usan la geometría de la escena (comprobada contra las series a < 0.1°), así que el 3D y el 2D dicen lo mismo. La línea discontinua es el horizonte matemático (0°); el perfil del terreno lo dibuja el propio 3D.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.4.a.

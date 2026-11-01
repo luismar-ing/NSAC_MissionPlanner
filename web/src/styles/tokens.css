@@ -2289,3 +2289,12 @@ input[type="range"] {
     display: none;
   }
 }
+
+/* surface view sky overlay (TR.3.a): over the canvas, never catches the pointer */
+.sky-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

@@ -57,6 +57,14 @@ export const STRINGS = {
     thisPlan: "This plan",
     levelB: "3D terrain shadows",
     levelBTitle: "Level B: the terrain around the site casts the Sun's shadows in the 3D view. Turn off for the simpler scene.",
+    stand: "Stand on the site",
+    aerial: "Aerial view",
+    standTitle: "See the sky from 3 m above the ground: drag to look around, scroll to zoom",
+  },
+  sky: {
+    sun: "Sun",
+    earth: "Earth",
+    azel: (az: number, el: number) => `az ${az.toFixed(1)}° · el ${el.toFixed(1)}°`,
   },
   telemetry: {
     launch: "Launch",

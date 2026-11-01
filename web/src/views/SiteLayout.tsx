@@ -26,6 +26,8 @@ export function SiteLayout() {
   const [details, setDetails] = useState(false);
   const levelB = useApp((s) => s.levelB);
   const setLevelB = useApp((s) => s.setLevelB);
+  const surfaceView = useApp((s) => s.surfaceView);
+  const setSurfaceView = useApp((s) => s.setSurfaceView);
   const others = plan ? pinned.filter((p) => p.plan.id !== plan.plan.id) : [];
   const best = plan ? bestBadges([plan.metrics, ...others.map((p) => p.metrics)])[0] : new Set<never>();
 
@@ -52,6 +54,12 @@ export function SiteLayout() {
             <button type="button" className="btn ghost" aria-pressed={levelB} title={STRINGS.siteLayout.levelBTitle} onClick={() => setLevelB(!levelB)}>
               <span aria-hidden="true">{levelB ? "■" : "□"}</span> {STRINGS.siteLayout.levelB}
             </button>
+            {/* TR.3.a: the first-person sky (Level B) or the aerial framing of the site */}
+            {levelB && (
+              <button type="button" className="btn ghost" title={STRINGS.siteLayout.standTitle} onClick={() => setSurfaceView(!surfaceView)}>
+                {surfaceView ? STRINGS.siteLayout.aerial : STRINGS.siteLayout.stand}
+              </button>
+            )}
           </aside>
           <div className="site-console glass">
             <div className="site-console-main">

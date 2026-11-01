@@ -870,7 +870,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** T6.1.b · **Spec:** 10 (Fase 6) · **Decisiones:** — · **Est.:** 1 h
 - **Aceptación:** con el Nivel B desactivado, `npm --prefix web test` pasa y el flujo de demo funciona.
 
-##### [ ] TR.3.a — Vista del cielo en superficie (tipo Stellarium)
+##### [x] TR.3.a — Vista del cielo en superficie (tipo Stellarium)
 - **Qué:** al aterrizar, la cámara pasa sin cortes a primera persona a h_obs. Arrastrar mira alrededor y la rueda cambia el campo de visión. Encima, la rejilla de azimut/elevación y las etiquetas del Sol y la Tierra con su el/az y el estado del enlace, sacados de los mismos datos que el panorama.
 - **Archivos:** `web/src/scene3d/cameraDirector.ts`, `web/src/scene3d/skyOverlay.ts`, `web/src/views/SiteLayout.tsx`
 - **Depende de:** T6.1.b · **Spec:** 8.3, 8.4 · **Decisiones:** D9 · **Est.:** 3 h

@@ -13,7 +13,7 @@ import { phaseAt, type MissionTimeline } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { COLORS } from "../styles/tokens";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
-import { CameraController, directorPose, fromFrame, hopPose, localBlend, planningPose, reducedMotionPose, switchEase, toFrame, transitPose, type BodyFrame, type DirectorInput, type Pose } from "./cameraDirector";
+import { approachPose, CameraController, directorPose, fromFrame, hopPose, localBlend, planningPose, reducedMotionPose, switchEase, toFrame, transitPose, type BodyFrame, type DirectorInput, type Pose } from "./cameraDirector";
 import { indexEphemeris, rotate, sceneStateAt } from "./ephemeris";
 import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity } from "./launch";
 import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
@@ -21,6 +21,9 @@ import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, earthOffset, pointToScene, 
 import { siteBodyFixedKm, sitePositionKm, trailSamples, trailStyle } from "./trajectory";
 import { TerrainManager, type TerrainData } from "./terrain";
 import type { PlanSpec } from "./bridge";
+import { createSkyOverlay, dirOf, type Enu } from "./skyOverlay";
+import { H_OBS_M, skyAzEl } from "./terrainLevelB";
+import { enuBasis } from "./terrain";
 
 /** The part of THREE.WebGLRenderer the manager uses (lets tests run without WebGL). */
 export interface RendererLike {
@@ -105,6 +108,9 @@ export function applyCameraRelative(h: SceneHandle): void {
   }
 }
 
+const add3 = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const sub3 = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const scale3 = (a: Vec3, k: number): Vec3 => [a[0] * k, a[1] * k, a[2] * k];
 const unit = (a: Vec3): Vec3 => {
   const n = Math.hypot(...a) || 1;
   return [a[0] / n, a[1] / n, a[2] / n];
@@ -137,7 +143,14 @@ export interface MountOptions {
   planning?(): boolean;
   /** Read every frame: Level B at the site (sunlight shadows from the terrain, T6.1). Off = the MVP scene. */
   levelB?(): boolean;
+  /** Read every frame: stand on the site (first-person sky view at h_obs, TR.3.a). Needs Level B and the site. */
+  surface?(): boolean;
 }
+
+/** Surface view (TR.3.a): field of view limits (deg) and the initial gaze, a little below the horizon so the
+ *  skyline sits in the upper half of the screen, above the site console. */
+const SURFACE_FOV = { initial: 60, min: 15, max: 100 } as const;
+const SURFACE_LOOK_EL = -8;
 
 /** Sunlight shadows at the site (T6.1.b): an orthographic box ±SHADOW_HALF across, SHADOW_DEPTH long towards
  *  the Sun, so ridges as far as the 2D horizon mask looks (100 km) shade the ground around the site. */
@@ -313,6 +326,11 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   let lastFrames: { earth: BodyFrame; moon: BodyFrame } | null = null;
   let switching: { from: { earth: Pose; moon: Pose }; startMs: number } | null = null;
   let wasPlanning = opts.planning?.() ?? false;
+  // surface view (TR.3.a): the gaze, and the hop between the aerial site framing and standing on the site
+  const look = { az: Number.NaN, el: SURFACE_LOOK_EL, fov: SURFACE_FOV.initial as number };
+  let surfaceOn = false;
+  let surfaceHop: { rel: Pose; startMs: number } | null = null;
+  const overlay = createSkyOverlay(container);
   const canvas = renderer.domElement;
   canvas.tabIndex = 0;
   canvas.setAttribute("aria-label", STRINGS.live.cameraHelp);
@@ -326,13 +344,18 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   const minDist = () => (controller.orbit?.body === "moon" ? moonR : earthR) * 0.05;
   let drag: { x: number; y: number } | null = null;
   const onDown = (e: PointerEvent) => {
-    takeOver();
+    if (!surfaceOn) takeOver(); // standing on the site, dragging turns the gaze instead
     drag = { x: e.clientX, y: e.clientY };
     canvas.setPointerCapture?.(e.pointerId);
   };
   const onMove = (e: PointerEvent) => {
     if (!drag) return;
-    controller.rotate(-(e.clientX - drag.x) * 0.005, (e.clientY - drag.y) * 0.005);
+    if (surfaceOn) {
+      // grab the sky: a drag across the whole height turns the gaze by the field of view
+      const k = look.fov / Math.max(1, container.clientHeight);
+      look.az = (look.az - (e.clientX - drag.x) * k + 360) % 360;
+      look.el = Math.max(-30, Math.min(85, look.el + (e.clientY - drag.y) * k));
+    } else controller.rotate(-(e.clientX - drag.x) * 0.005, (e.clientY - drag.y) * 0.005);
     drag = { x: e.clientX, y: e.clientY };
   };
   const onUp = () => {
@@ -340,6 +363,10 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   };
   const onWheel = (e: WheelEvent) => {
     e.preventDefault();
+    if (surfaceOn) {
+      look.fov = Math.max(SURFACE_FOV.min, Math.min(SURFACE_FOV.max, look.fov * (e.deltaY > 0 ? 1.1 : 1 / 1.1)));
+      return;
+    }
     takeOver();
     controller.zoom(e.deltaY > 0 ? 1.1 : 1 / 1.1, minDist());
   };
@@ -352,10 +379,18 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       "+": () => controller.zoom(1 / 1.15, minDist()),
       "-": () => controller.zoom(1.15, minDist()),
     };
-    const action = keys[e.key];
+    const surfaceKeys: Record<string, () => void> = {
+      ArrowLeft: () => (look.az = (look.az - 3 + 360) % 360),
+      ArrowRight: () => (look.az = (look.az + 3) % 360),
+      ArrowUp: () => (look.el = Math.min(85, look.el + 3)),
+      ArrowDown: () => (look.el = Math.max(-30, look.el - 3)),
+      "+": () => (look.fov = Math.max(SURFACE_FOV.min, look.fov / 1.15)),
+      "-": () => (look.fov = Math.min(SURFACE_FOV.max, look.fov * 1.15)),
+    };
+    const action = (surfaceOn ? surfaceKeys : keys)[e.key];
     if (!action) return;
     e.preventDefault();
-    takeOver();
+    if (!surfaceOn) takeOver();
     action();
   };
   canvas.addEventListener("pointerdown", onDown);
@@ -475,6 +510,44 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
         pose = fromFrame(hopPose(switching.from[kind], toFrame(pose, f), w, f.radius), f);
       }
     }
+    // surface view (TR.3.a): stand on the site at h_obs once the scene is at real scale, if Level B is on
+    const surface = !!(siteBody && lambda >= 1 && opts.levelB?.() !== false && opts.surface?.());
+    let enu: Enu | null = null;
+    let sky: ReturnType<typeof skyAzEl> | null = null;
+    if (siteBody && lambda >= 1) {
+      const b = enuBasis(siteBody);
+      const q = state.moonQuat;
+      enu = { east: rotate(q, b.east), north: rotate(q, b.north), up: rotate(q, b.up) };
+      sky = skyAzEl(state, siteBody);
+    }
+    if (surface !== surfaceOn) {
+      // hop between the aerial framing and the observer's eye: log distance to the site, smooth turn (no cut)
+      if (lastPose && !reduced?.matches) surfaceHop = { rel: { position: sub3(lastPose.position, input.site), target: sub3(lastPose.target, input.site), up: lastPose.up }, startMs: performance.now() };
+      if (surface && Number.isNaN(look.az) && sky) look.az = sky.earth[0]; // first look: towards the Earth
+      if (surface && controller.mode === "manual") {
+        controller.resume();
+        opts.onCameraModeChange?.("director");
+      }
+      surfaceOn = surface;
+    }
+    if (surface && enu) {
+      const eye = add3(input.site, scale3(enu.up, H_OBS_M / 1e6));
+      const fwd = dirOf(enu, look.az, look.el);
+      pose = { position: eye, target: add3(eye, scale3(fwd, 1e-3)), up: dirOf(enu, look.az, look.el + 90) };
+    }
+    if (surfaceHop) {
+      const w = switchEase(performance.now() - surfaceHop.startMs);
+      if (w >= 1) surfaceHop = null;
+      else {
+        const r = surfaceHop.rel;
+        pose = approachPose({ position: add3(r.position, input.site), target: add3(r.target, input.site), up: r.up }, pose, input.site, w);
+      }
+    }
+    const fov = surfaceOn ? look.fov : 45;
+    if (camera.fov !== fov) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
     lastPose = pose;
     lastFrames = frames;
     handle.cameraWorld = pose.position;
@@ -485,6 +558,8 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       terrain.group.quaternion.copy(moonQ.set(...state.moonQuat)); // Moon-fixed geometry, relative to the site
     }
 
+    // standing on the site, the observer is the lander: its ~100 m model would stand 3 m away and fill the view
+    rocket.visible = !!traj && !surfaceOn;
     if (traj) {
       // rocket: on the pad during the countdown, then the trajectory; after landing it stays on the site,
       // which moves with the Moon
@@ -527,7 +602,9 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       const g = terrain.group.position;
       bodies.sunLight.target.position.copy(g);
       bodies.sunLight.target.updateMatrixWorld();
-      bodies.sunLight.position.set(g.x + state.sunDir[0] * SHADOW_DEPTH, g.y + state.sunDir[1] * SHADOW_DEPTH, g.z + state.sunDir[2] * SHADOW_DEPTH);
+      // sunlight as seen from the site (corrected for the Earth-Moon parallax, ~0.15 deg: it matters at a grazing Sun)
+      const sunAtSite = sky && enu ? dirOf(enu, sky.sun[0], sky.sun[1]) : state.sunDir;
+      bodies.sunLight.position.set(g.x + sunAtSite[0] * SHADOW_DEPTH, g.y + sunAtSite[1] * SHADOW_DEPTH, g.z + sunAtSite[2] * SHADOW_DEPTH);
       if (!(Math.abs(t - shadowAt.t) < SHADOW_REDRAW_MS) || terrain.version !== shadowAt.version) {
         webgl.shadowMap.needsUpdate = true;
         shadowAt = { t, version: terrain.version };
@@ -536,6 +613,8 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
     camera.up.set(...pose.up);
     camera.lookAt(pose.target[0] - pose.position[0], pose.target[1] - pose.position[1], pose.target[2] - pose.position[2]);
     renderer.render(scene, camera);
+    if (surfaceOn && enu && sky && !surfaceHop) overlay.update(camera, enu, sky.sun, sky.earth);
+    else overlay.hide();
   });
 
   return {
@@ -563,6 +642,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       canvas.removeEventListener("pointercancel", onUp);
       canvas.removeEventListener("wheel", onWheel);
       canvas.removeEventListener("keydown", onKey);
+      overlay.dispose();
       rendererManager.release();
       rig.terrain?.dispose();
       scene.traverse((o) => {

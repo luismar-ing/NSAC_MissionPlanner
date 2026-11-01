@@ -55,6 +55,9 @@ export interface AppState {
   /** Level B at the site (T6.1): terrain shadows and the first-person sky view. Off = the MVP scene. */
   levelB: boolean;
   setLevelB(on: boolean): void;
+  /** At the site with Level B: first-person sky view at h_obs (TR.3.a) instead of the aerial framing. */
+  surfaceView: boolean;
+  setSurfaceView(on: boolean): void;
   /** Scale the 3D scene is drawn at (spec 5.9): "space" (bodies ×6) or "local" (real size near the site). */
   sceneScale: "space" | "local";
   setSceneScale(s: "space" | "local"): void;
@@ -130,6 +133,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     levelB: true,
     setLevelB(on) {
       set({ levelB: on });
+    },
+    surfaceView: true,
+    setSurfaceView(on) {
+      set({ surfaceView: on });
     },
     sceneScale: "space",
     setSceneScale(s) {

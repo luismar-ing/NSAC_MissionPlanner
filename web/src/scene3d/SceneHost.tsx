@@ -42,6 +42,8 @@ export function SceneHost({ planning }: { planning?: () => boolean } = {}) {
           reducedMotion: () => appStore.getState().reducedMotion,
           planning,
           levelB: () => appStore.getState().levelB,
+          // standing on the site: only once arrived (the store's phase), and only if the visitor wants it
+          surface: () => appStore.getState().surfaceView && appStore.getState().missionPhase === "site",
         });
         sceneBridge.setPlan = (p) => control.current?.setPlan(p); // plan switch from the thumbnails (T4.4.b)
         setStatus("ready");

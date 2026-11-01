@@ -9,7 +9,11 @@ import { describe, expect, it } from "vitest";
 import { DataStore } from "../src/lib/data";
 import { loadPlanData } from "../src/lib/planData";
 import type { Plan } from "../src/lib/contract";
-import { meshHorizonDeg, surfaceLook, type SurfaceTerrain } from "../src/scene3d/terrainLevelB";
+import { meshHorizonDeg, skyAzEl, surfaceLook, type SurfaceTerrain } from "../src/scene3d/terrainLevelB";
+import { indexEphemeris, sceneStateAt } from "../src/scene3d/ephemeris";
+import { bodyFixedKm } from "../src/scene3d/terrain";
+import { MOON_RADIUS_KM } from "../src/scene3d/scale";
+import type { SceneEphemeris } from "../src/lib/contract";
 
 const REAL = join(__dirname, "..", "public", "data");
 const fetcher = async (url: string) => {
@@ -90,5 +94,31 @@ describe("Level B: the 3D skyline matches the 2D horizon mask", () => {
     }
     console.log(`Level B shadows vs sun_vis:\n  ${lines.join("\n  ")}`);
     expect(agree / total).toBeGreaterThan(0.95);
+  });
+
+  it("TR.3.a: the sky labels' az/el (scene geometry) match the panorama's series at 3 instants per site (< 0.1°)", () => {
+    const ix = indexEphemeris(JSON.parse(readFileSync(join(REAL, "scene", "ephemeris.json"), "utf-8")) as SceneEphemeris);
+    const sites = JSON.parse(readFileSync(join(REAL, "sites.json"), "utf-8")) as { id: string; lat: number; lon: number; elevation_m: number }[];
+    const list = Array.isArray(sites) ? sites : (sites as unknown as { sites: typeof sites }).sites;
+    let worst = 0;
+    const dAz = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
+    for (const s of list) {
+      const ts = JSON.parse(readFileSync(join(REAL, "timeseries", `${s.id}.json`), "utf-8"));
+      const body = bodyFixedKm(s.lat, s.lon, MOON_RADIUS_KM + s.elevation_m / 1000);
+      for (const k of [100, ts.n >> 1, ts.n - 200]) {
+        const t = Date.parse(ts.start_utc) + k * ts.step_min * 60_000;
+        const sky = skyAzEl(sceneStateAt(ix, t), body);
+        const sc = ts.angle_scale;
+        worst = Math.max(
+          worst,
+          dAz(sky.sun[0], ts.sun_az[k] * sc),
+          Math.abs(sky.sun[1] - ts.sun_el[k] * sc),
+          dAz(sky.earth[0], ts.earth_az[k] * sc),
+          Math.abs(sky.earth[1] - ts.earth_el[k] * sc),
+        );
+      }
+    }
+    console.log(`sky labels vs series: worst ${worst.toFixed(3)}°`);
+    expect(worst).toBeLessThan(0.1);
   });
 });
