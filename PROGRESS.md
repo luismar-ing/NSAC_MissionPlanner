@@ -2688,3 +2688,17 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.1.c.
+
+## 2026-11-01 · T6.1.c · Nivel B: interruptor (Fase R, TR.3)
+
+- **Tarea:** T6.1.c ([x]).
+- **Qué se hizo:** `levelB` / `setLevelB` en el store (por defecto activo) y un botón «3D terrain shadows» (`aria-pressed`) en la tarjeta de métricas del sitio (`SiteLayout`). El renderer lo lee en cada fotograma: apagado, no hay sombras y la escena es la del MVP. TR.3.a usará el mismo interruptor para la vista del cielo en primera persona.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test → 231 passed (prueba nueva: con el interruptor apagado, la llegada sigue mostrando panorama y métricas)
+  Con levelB = false por defecto (cambio temporal, revertido): 230 passed; solo falla la prueba del propio interruptor, que comprueba que empieza activo
+  ```
+- **Decisiones tomadas:** el interruptor vive en la tarjeta del sitio, donde tiene efecto, no en una pantalla de ajustes.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.3.a.

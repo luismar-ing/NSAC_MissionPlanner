@@ -864,7 +864,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** T6.1.a · **Spec:** 8.4 · **Decisiones:** D9 · **Est.:** 3 h
 - **Aceptación:** ≥ 60 fps en el portátil de la demo (salida del contador); sombras coherentes con las banderas `sun_vis`.
 
-##### [ ] T6.1.c — Nivel B: interruptor
+##### [x] T6.1.c — Nivel B: interruptor
 - **Qué:** interruptor que desactiva el Nivel B.
 - **Archivos:** `web/src/store/*.ts`
 - **Depende de:** T6.1.b · **Spec:** 10 (Fase 6) · **Decisiones:** — · **Est.:** 1 h

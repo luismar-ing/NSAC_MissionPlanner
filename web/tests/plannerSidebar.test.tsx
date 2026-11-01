@@ -129,4 +129,24 @@ describe("Mission Planner sidebar (A2)", () => {
     expect(screen.getByRole("dialog", { name: "Haworth: details and sources" })).toBeTruthy();
     for (const id of ["haworth_20270309_7d", "malapert_massif_20270309_7d"]) appStore.getState().unpinPlan(id);
   });
+
+  it("Level B switch (T6.1.c): off keeps the arrival working (panorama, metrics) and the choice in the store", async () => {
+    const st = appStore.getState();
+    st.setScreen("planner");
+    st.selectPlan("haworth_20270309_7d");
+    render(<App />);
+    fireEvent.click(sidebar().getByRole("button", { name: /^Launch/ }));
+    await screen.findByTestId("mission-controls", {}, { timeout: 5000 });
+    fireEvent.click(screen.getByRole("button", { name: "Pause the mission" }));
+    fireEvent.click(screen.getByRole("button", { name: "At the site" }));
+    const site = await screen.findByTestId("live-site");
+    const toggle = await within(site).findByRole("button", { name: /3D terrain shadows/ }, { timeout: 5000 });
+    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(toggle);
+    expect(appStore.getState().levelB).toBe(false);
+    expect(within(site).getByTestId("panorama")).toBeTruthy();
+    expect(within(site).getByTestId("metrics-box")).toBeTruthy();
+    fireEvent.click(toggle);
+    expect(appStore.getState().levelB).toBe(true);
+  });
 });

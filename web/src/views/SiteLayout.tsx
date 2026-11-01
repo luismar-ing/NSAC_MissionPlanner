@@ -24,6 +24,8 @@ export function SiteLayout() {
   const compareTime = useApp((s) => s.compareTime);
   const { plan, site, pinned, error, retry } = useSiteData();
   const [details, setDetails] = useState(false);
+  const levelB = useApp((s) => s.levelB);
+  const setLevelB = useApp((s) => s.setLevelB);
   const others = plan ? pinned.filter((p) => p.plan.id !== plan.plan.id) : [];
   const best = plan ? bestBadges([plan.metrics, ...others.map((p) => p.metrics)])[0] : new Set<never>();
 
@@ -45,6 +47,10 @@ export function SiteLayout() {
             <MetricsBox metrics={plan.metrics} best={best} />
             <button type="button" className="btn ghost" onClick={() => setDetails(true)}>
               {STRINGS.siteLayout.details}
+            </button>
+            {/* T6.1.c: Level B can be turned off; the MVP scene and every 2D view stay as they are */}
+            <button type="button" className="btn ghost" aria-pressed={levelB} title={STRINGS.siteLayout.levelBTitle} onClick={() => setLevelB(!levelB)}>
+              <span aria-hidden="true">{levelB ? "■" : "□"}</span> {STRINGS.siteLayout.levelB}
             </button>
           </aside>
           <div className="site-console glass">

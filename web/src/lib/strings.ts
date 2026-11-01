@@ -55,6 +55,8 @@ export const STRINGS = {
     detailsTitle: (site: string) => `${site}: details and sources`,
     compare: "Against your pinned plans",
     thisPlan: "This plan",
+    levelB: "3D terrain shadows",
+    levelBTitle: "Level B: the terrain around the site casts the Sun's shadows in the 3D view. Turn off for the simpler scene.",
   },
   telemetry: {
     launch: "Launch",
