@@ -81,6 +81,6 @@ The same list is in the app (footer → **About & credits**). Exact files, sizes
 | Moon texture (3D view, visual only) | NASA's Scientific Visualization Studio, CGI Moon Kit (LRO LROC color) | `lroc_color_poles_4k.tif`: https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_4k.tif | Public domain (NASA SVS) |
 | Earth texture (3D view) | NASA/GSFC Scientific Visualization Studio; Blue Marble Next Generation data courtesy of Reto Stockli (NASA/GSFC) and NASA's Earth Observatory | `flat_earth_Largest_still.0330.jpg`: https://svs.gsfc.nasa.gov/vis/a000000/a003600/a003615/flat_earth_Largest_still.0330.jpg | Public domain (NASA SVS) |
 
-**Not real data:** trajectories and the launch are ILLUSTRATIVE (see above). The rocket is PolePlanner's own procedural model, with no external asset.
+**Not real data:** trajectories and the launch are ILLUSTRATIVE (see above). The rocket is PolePlanner's own procedural model, with no external asset. The ambient music is generated live in the browser with the Web Audio API (no recordings).
 
 **Software:** web app: React and React DOM 19.3.1, three.js 0.186.1, Zustand 5.0.15 and Zod 4.6.7 (all MIT); Geist, Geist Mono, Space Grotesk and Instrument Serif fonts 5.3.0 (SIL Open Font License 1.1). Pipeline: SpiceyPy 8.3.0 (MIT), NumPy 2.5.4 (BSD-3-Clause), rasterio 1.5.2 (BSD-3-Clause), pyproj 3.8.0 (MIT), pandas 3.0.6 (BSD-3-Clause), pydantic 2.14.1 (MIT), Matplotlib 3.11.2 (PSF-based) and Pillow 13.0.0 (MIT-CMU).

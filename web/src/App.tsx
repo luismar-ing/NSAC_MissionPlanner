@@ -7,6 +7,7 @@ import { appStore, useApp } from "./store/appStore";
 import { CompareView } from "./views/CompareView";
 import { LiveView } from "./views/LiveView";
 import { Landing } from "./views/Landing";
+import { SoundToggle } from "./components/SoundToggle";
 
 export const APP_TITLE = STRINGS.appTitle;
 
@@ -49,7 +50,14 @@ export function App() {
   if (screen === "landing")
     return (
       <div className="app-landing" data-screen="landing">
-        <Landing tools={motionToggle} onCredits={() => setCreditsOpen(true)} />
+        <Landing
+          tools={
+            <>
+              <SoundToggle />
+              {motionToggle}
+            </>
+          }
+          onCredits={() => setCreditsOpen(true)} />
         {credits}
       </div>
     );
@@ -65,6 +73,7 @@ export function App() {
           <button type="button" className="btn ghost" title={STRINGS.homeTitle} onClick={() => setScreen("landing")}>
             {STRINGS.home}
           </button>
+          <SoundToggle />
           {motionToggle}
           {manifest && <span className="data-badge">{STRINGS.dataBadge(manifest.data_status, manifest.data_version)}</span>}
         </div>

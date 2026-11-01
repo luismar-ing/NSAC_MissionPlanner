@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { SpotlightCard } from "../components/SpotlightCard";
 import { MoonBackdrop } from "../scene3d/MoonBackdrop";
+import { ambient } from "../lib/ambient";
 import { STRINGS } from "../lib/strings";
 import { useApp, type Screen } from "../store/appStore";
 
@@ -39,7 +40,10 @@ export function Landing({ tools, onCredits }: { tools?: ReactNode; onCredits(): 
       </div>
       <nav className="landing-modes" aria-label={STRINGS.landing.choose}>
         {MODES.map(({ screen, text }) => (
-          <SpotlightCard key={screen} className="mode-card" data-mode={screen} onSelect={() => setScreen(screen)}>
+          <SpotlightCard key={screen} className="mode-card" data-mode={screen} onSelect={() => {
+              ambient.startFromGesture(); // choosing a mode is the gesture that may start the music
+              setScreen(screen);
+            }}>
             <span className="mode-card-name">{text.name}</span>
             <span className="mode-card-title">{text.title}</span>
             <span className="mode-card-body">{text.body}</span>

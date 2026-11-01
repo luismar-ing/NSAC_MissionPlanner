@@ -23,6 +23,11 @@ export const STRINGS = {
     title: "No camera flights or animated transitions: the 3D view cuts between fixed framings (also follows the system setting)",
   },
   dataBadge: (status: string, version: string) => `${status} data · ${version}`,
+  sound: {
+    on: "Sound on",
+    off: "Sound off",
+    title: "Ambient music, generated in your browser (no recordings)",
+  },
   home: "Home",
   homeTitle: "Back to the start page (your pinned plans are kept)",
   landing: {

@@ -2542,3 +2542,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** texto de TR.1.b corregido (luz decorativa). La medida `shell-ready` va ahora desde el clic en Mission Planner y, aparte, se mide `landing-ready`.
 - **Problemas abiertos:** `docs/performance.md` se actualiza completo en TR.5.a.
 - **Siguiente tarea:** TR.1.c.
+
+## 2026-11-01 · TR.1.c · Música ambiental generada (Web Audio)
+
+- **Tarea:** TR.1.c ([x]; la escucha del humano queda en la lista de T5.2.e).
+- **Qué se hizo:** `lib/ambient.ts`: pad cálido sintetizado (acorde abierto de Re: D2, A2, F#3, E4 y A4, cada voz doble con ±6 cents). Cada voz «respira» con un LFO lento propio; filtro paso bajo con el corte modulado a 0.03 Hz y eco largo realimentado. Sin archivos de audio. Fundido de entrada de 4 s y de salida de 1.2 s; tras silenciarse, el contexto se suspende. La preferencia se guarda en `localStorage` (`poleplanner.sound`, con `try/catch`). `components/SoundToggle.tsx`: botón con `aria-pressed`, en la portada y en la cabecera de los modos. Al elegir un modo arranca la música, salvo que el visitante la haya apagado. Créditos y README: «generated live in the browser with the Web Audio API (no recordings)».
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/ambient.test.ts → 3 passed (sin contexto antes del gesto; fundido a LEVEL; apagar → rampa a 0, suspend y "off" recordado; sin Web Audio no lanza)
+  $ npm --prefix web test → Test Files 33 passed · Tests 221 passed · typecheck → exit 0
+  ```
+  En el navegador: antes del clic no hay ningún `AudioContext`; tras clicar «Plan the landing» hay 1, en estado `running`, y el botón dice «Sound on».
+- **Decisiones tomadas:** sonido activado por defecto (lo pidió el humano), pero solo empieza con un gesto, como exigen los navegadores.
+- **Desviaciones de la spec / cambios en la guía:** la escucha del humano pasa a T5.2.e.
+- **Problemas abiertos:** el volumen y el carácter del pad necesitan el oído del humano.
+- **Siguiente tarea:** TR.2.a.

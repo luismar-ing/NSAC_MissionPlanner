@@ -812,11 +812,11 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.1.a · **Spec:** 8.7, 9 · **Decisiones:** D13 · **Est.:** 2.5 h
 - **Aceptación:** `npm --prefix web run fps` informa de 1 contexto WebGL en portada → planner → sitio y ≥ 60 fps en la portada; carga del shell < 3 s (`perf`).
 
-##### [ ] TR.1.c — Música ambiental generada (Web Audio)
+##### [x] TR.1.c — Música ambiental generada (Web Audio)
 - **Qué:** pad cálido sintetizado (osciladores y filtros, sin archivos). Empieza al elegir un modo, con fundido de entrada, y tiene botón de silencio en todas las pantallas. La preferencia se guarda en `localStorage`, con `try/catch`. Se acredita en Credits como «procedural, no external audio».
 - **Archivos:** `web/src/lib/ambient.ts`, `web/src/components/SoundToggle.tsx`, `web/src/lib/credits.ts`, `web/tests/ambient.test.ts`
 - **Depende de:** TR.1.a · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
-- **Aceptación:** prueba con un `AudioContext` simulado: no suena antes de un gesto, se silencia y recuerda la preferencia; revisión auditiva del humano.
+- **Aceptación:** prueba con un `AudioContext` simulado: no suena antes de un gesto, se silencia y recuerda la preferencia; revisión auditiva del humano (pasa a la lista de T5.2.e).
 
 ### TR.2 Mission Planner (A2 → B2 → B3 con estilo A3)
 
