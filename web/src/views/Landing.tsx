@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { SpotlightCard } from "../components/SpotlightCard";
+import { MoonBackdrop } from "../scene3d/MoonBackdrop";
 import { STRINGS } from "../lib/strings";
 import { useApp, type Screen } from "../store/appStore";
 
@@ -10,16 +11,22 @@ const MODES: { screen: Exclude<Screen, "landing">; text: { name: string; title: 
 
 /**
  * Landing page (decision A7, design A1): the Moon turning behind a short headline and two mode cards.
- * Needs no mission data, so it shows at once. `backdrop` is the live Moon (TR.1.b); until it is ready, or
- * without WebGL, the static Moon image stands in. `tools` holds the header controls (sound, motion).
+ * Needs no mission data, so it shows at once. The live Moon (TR.1.b) replaces the static image once its
+ * texture is on the sphere; without WebGL the static image stays. `tools` holds the header controls.
  */
-export function Landing({ backdrop, tools, onCredits }: { backdrop?: ReactNode; tools?: ReactNode; onCredits(): void }) {
+export function Landing({ tools, onCredits }: { tools?: ReactNode; onCredits(): void }) {
   const setScreen = useApp((s) => s.setScreen);
+  const [moonReady, setMoonReady] = useState(false);
+  const ready = useCallback(() => setMoonReady(true), []);
+  // the landing page is the first thing a visitor sees: its time is measured by scripts/perf.mjs (spec 8.7)
+  useEffect(() => {
+    if (!performance.getEntriesByName("landing-ready").length) performance.mark("landing-ready");
+  }, []);
   return (
     <main className="landing" data-testid="landing">
-      <div className="landing-backdrop" aria-hidden="true">
+      <div className="landing-backdrop" aria-hidden="true" data-moon={moonReady ? "live" : "static"}>
         <div className="landing-moon-static" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}textures/moon_2k.jpg)` }} />
-        {backdrop}
+        <MoonBackdrop onReady={ready} />
         <div className="landing-shade" />
       </div>
       <header className="landing-bar">

@@ -5,7 +5,8 @@
  *   node web/scripts/perf.mjs [url]                               (default http://localhost:4173/)
  *
  * Headless Chrome (puppeteer-core with the installed browser, CHROME_PATH overrides), cold cache every run.
- * Measures the initial load of the 2D shell (until the first calendar draw, the app's "shell-ready" mark) on an
+ * Measures the initial load of the landing page (its "landing-ready" mark, TR.1.b) and of the 2D shell (from the
+ * click on Mission Planner to the first calendar draw, the app's "shell-ready" mark) on an
  * unthrottled and on a "normal connection" profile, the bytes it downloads, and the update times the app itself
  * records (constraint change → calendar redraw, tray scrubber → all panels). Frame rate and the WebGL context
  * count need a real GPU and a visible window: they are measured in the browser (docs/performance.md).
@@ -40,10 +41,17 @@ async function load(profile) {
   cdp.on("Network.loadingFinished", (e) => (bytes += e.encodedDataLength));
   const t0 = Date.now();
   await page.goto(URL_, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => performance.getEntriesByName("landing-ready").length > 0, { timeout: 60_000 });
+  const landingMs = await page.evaluate(() => performance.getEntriesByName("landing-ready")[0].startTime);
+  const clickAt = await page.evaluate(() => {
+    document.querySelector('.mode-card[data-mode="planner"]').click();
+    return performance.now();
+  });
   await page.waitForFunction(() => performance.getEntriesByName("shell-ready").length > 0, { timeout: 60_000 });
+  // the 2D shell: everything the planner needs after the click (the core data may already be loading)
   const shellMs = await page.evaluate(() => performance.getEntriesByName("shell-ready")[0].startTime);
   const wall = Date.now() - t0;
-  return { page, ctx, shellMs, wall, bytes };
+  return { page, ctx, landingMs, shellMs, plannerAfterClickMs: shellMs - clickAt, wall, bytes };
 }
 
 const result = {};
@@ -54,7 +62,13 @@ for (const [name, profile] of Object.entries(PROFILES)) {
     runs.push(r);
     if (i < 2 || name !== "unthrottled") await r.ctx.close();
   }
-  result[name] = { shellReadyMs: runs.map((r) => Math.round(r.shellMs)), medianMs: Math.round(median(runs.map((r) => r.shellMs))), downloadedKB: Math.round(median(runs.map((r) => r.bytes)) / 1024) };
+  result[name] = {
+    landingReadyMs: runs.map((r) => Math.round(r.landingMs)),
+    shellReadyMs: runs.map((r) => Math.round(r.shellMs)),
+    plannerAfterClickMs: runs.map((r) => Math.round(r.plannerAfterClickMs)),
+    medianMs: Math.round(median(runs.map((r) => r.shellMs))),
+    downloadedKB: Math.round(median(runs.map((r) => r.bytes)) / 1024),
+  };
   if (name === "unthrottled") result._page = runs[2];
 }
 

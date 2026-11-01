@@ -806,8 +806,8 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.0.b · **Spec:** 9 · **Decisiones:** A7 · **Est.:** 2 h
 - **Aceptación:** prueba: Tab + Enter en cada tarjeta abre su modo; revisión visual contra A1 a 1920×1080.
 
-##### [ ] TR.1.b — Luna girando con el único contexto WebGL
-- **Qué:** escena de fondo con la Luna (`moon_2k.jpg`), girando despacio e iluminada por la dirección real del Sol de `scene/ephemeris`. Usa el `rendererManager` existente, así que es el mismo contexto que luego usa el viaje. Con movimiento reducido no gira; sin WebGL se muestra una imagen fija.
+##### [x] TR.1.b — Luna girando con el único contexto WebGL
+- **Qué:** escena de fondo con la Luna (`moon_2k.jpg`), girando despacio, con el polo sur inclinado hacia el espectador y luz decorativa (la portada no muestra fecha, así que no afirma una fase real; cambio anotado en `PROGRESS.md`). Usa el `rendererManager` existente, así que es el mismo contexto que luego usa el viaje. Con movimiento reducido no gira; sin WebGL se muestra una imagen fija.
 - **Archivos:** `web/src/scene3d/backdrop.ts`, `web/src/views/Landing.tsx`
 - **Depende de:** TR.1.a · **Spec:** 8.7, 9 · **Decisiones:** D13 · **Est.:** 2.5 h
 - **Aceptación:** `npm --prefix web run fps` informa de 1 contexto WebGL en portada → planner → sitio y ≥ 60 fps en la portada; carga del shell < 3 s (`perf`).

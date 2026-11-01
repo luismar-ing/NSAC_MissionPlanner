@@ -56,6 +56,10 @@ const out = await page.evaluate(async () => {
     const d = ts.slice(1).map((t, i) => t - ts[i]).sort((a, b) => a - b);
     return { fps: +(d.length / ((ts.at(-1) - ts[0]) / 1000)).toFixed(1), p50ms: +d[Math.floor(d.length / 2)].toFixed(1), p95ms: +d[Math.floor(d.length * 0.95)].toFixed(1), maxMs: +d.at(-1).toFixed(1), frames: d.length };
   };
+  // landing page (TR.1.b): the turning Moon on the shared WebGL renderer, then into the Mission Planner
+  await until(() => document.querySelector(".landing-backdrop")?.dataset.moon === "live");
+  const landing = await frames(3000);
+  document.querySelector('.mode-card[data-mode="planner"]').click();
   await until(() => document.querySelector('[data-testid="calendar-canvas"]')?.style.height);
   const idle = await frames(2000); // reference: the compare view, no WebGL
   const canvas = document.querySelector('[data-testid="calendar-canvas"]');
@@ -95,14 +99,21 @@ const out = await page.evaluate(async () => {
   }
   window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
   await wait(500);
+  const canvasesInCompare = [...document.querySelectorAll("canvas")].filter((cv) => [...window.__ctxs].some((x) => x.canvas === cv)).length;
+  // back to the landing page: the Moon reuses the same context
+  btn("Home").click();
+  await until(() => document.querySelector(".landing-backdrop")?.dataset.moon === "live");
+  const contextsAfterHome = window.__ctxs.size;
   const c = [...window.__ctxs][0];
   const ext = c?.getExtension("WEBGL_debug_renderer_info");
   return {
     gpu: ext ? c.getParameter(ext.UNMASKED_RENDERER_WEBGL) : "n/a",
     viewport: `${innerWidth}×${innerHeight}`,
+    landing,
     steps,
+    webglContextsAfterHome: contextsAfterHome,
     webglContextsAfter10RoundTrips: window.__ctxs.size,
-    webglCanvasesInDomInCompare: [...document.querySelectorAll("canvas")].filter((cv) => [...window.__ctxs].some((x) => x.canvas === cv)).length,
+    webglCanvasesInDomInCompare: canvasesInCompare,
   };
 });
 await browser.close();

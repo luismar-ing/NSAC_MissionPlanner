@@ -2523,3 +2523,22 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** la Luna estática se ve plana; la sustituye la esfera iluminada de TR.1.b.
 - **Siguiente tarea:** TR.1.b.
+
+## 2026-11-01 · TR.1.b · Luna girando con el único contexto WebGL
+
+- **Tarea:** TR.1.b ([x]).
+- **Qué se hizo:** `scene3d/backdrop.ts`: esfera con la textura LRO LROC (`moon_2k.jpg`), una vuelta cada 150 s e inclinada −0.45 rad para mostrar el polo sur. Dibuja sobre el `rendererManager` existente, el mismo contexto que el viaje. `scene3d/MoonBackdrop.tsx` la carga con un `import()` dinámico (three.js sigue fuera del shell 2D). La imagen estática se desvanece cuando la textura está en la esfera y se queda si no hay WebGL. Con movimiento reducido, la Luna se detiene donde está. Marca `landing-ready` en la portada. Los scripts `fps.mjs` y `perf.mjs` empiezan ahora en la portada y entran en Mission Planner con un clic.
+- **Cómo se verificó:**
+  ```
+  $ node web/scripts/fps.mjs http://localhost:5173/   (Intel Iris Xe, 1920×1080)
+  landing: 60 fps (p95 16.9 ms) · transit 59.8 · approach 59.8 · site 56.7
+  webglContextsAfterHome: 1 · webglContextsAfter10RoundTrips: 1 · webglCanvasesInDomInCompare: 1
+  $ node web/scripts/perf.mjs   (build de producción)
+  normal: shell (calendario) mediana 757 ms · sin compresión: landing 434–457 ms, shell 1877–1903 ms (< 3 s)
+  constraintToDrawMs mediana 4.3 · scrubberAllPanelsMs mediana 1.5 (< 100 ms)
+  $ npm --prefix web test → 218 passed · build → backdrop 1.15 kB en su propio chunk
+  ```
+- **Decisiones tomadas:** luz decorativa, fija desde arriba a la izquierda. La guía pedía la dirección real del Sol, pero la portada no muestra ninguna fecha y las efemérides de escena cubren 2027 (D4): una «fase real» sin fecha sería engañosa (regla 1). La textura sí es real y está acreditada en el pie.
+- **Desviaciones de la spec / cambios en la guía:** texto de TR.1.b corregido (luz decorativa). La medida `shell-ready` va ahora desde el clic en Mission Planner y, aparte, se mide `landing-ready`.
+- **Problemas abiertos:** `docs/performance.md` se actualiza completo en TR.5.a.
+- **Siguiente tarea:** TR.1.c.
