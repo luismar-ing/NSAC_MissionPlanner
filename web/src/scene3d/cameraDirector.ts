@@ -58,6 +58,24 @@ function pose(position: Vec3, target: Vec3, preferredUp: Vec3): Pose {
   return { position, target, up: orthoUp(unit(sub(target, position)), preferredUp) };
 }
 
+/** Planning distance from the Earth's centre, in Earth radii: the whole globe fills about 2/3 of the height. */
+export const PLANNING_DISTANCE_R = 4.2;
+/** Sideways shift of the globe in Earth radii (A2: the sidebar covers the left of the screen). */
+export const PLANNING_SHIFT_R = 0.9;
+
+/**
+ * Planning (Mission Planner, design A2): before launch, the whole Earth seen from straight above the launch
+ * pad, celestial north up, set right of the screen centre. It is outside the mission timeline: the renderer
+ * shows it while the plan is being chosen, and "Launch" hops to the launch framing in real time (hopPose).
+ */
+export function planningPose(i: DirectorInput): Pose {
+  const up = i.padUpAtLaunch;
+  const fwd = mul(up, -1);
+  const right = unit(cross(fwd, Math.abs(up[2]) < 0.95 ? [0, 0, 1] : [0, 1, 0]));
+  const target = mul(right, -i.earthRadius * PLANNING_SHIFT_R); // looking left of the centre puts the globe right
+  return pose(add(target, mul(up, i.earthRadius * PLANNING_DISTANCE_R)), target, [0, 0, 1]);
+}
+
 /** Launch: fixed view of the Earth from above the pad, a little to the side (the rocket climbs and orbits in view). */
 export function launchPose(i: DirectorInput): Pose {
   const up = i.padUpAtLaunch;

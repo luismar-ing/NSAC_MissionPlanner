@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 import type { Plan, SceneEphemeris, Trajectory } from "../src/lib/contract";
 import { parseInstant } from "../src/lib/contract";
 import { timelineOf, type MissionTimeline } from "../src/lib/mission";
-import { CameraController, directorPose, reducedMotionPose, sitePose, type DirectorInput, type Pose } from "../src/scene3d/cameraDirector";
+import { CameraController, directorPose, hopPose, planningPose, reducedMotionPose, SWITCH_MS, sitePose, switchEase, type DirectorInput, type Pose } from "../src/scene3d/cameraDirector";
 import { indexEphemeris, rotate, sceneStateAt } from "../src/scene3d/ephemeris";
 import { padUp } from "../src/scene3d/launch";
 import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, pointToScene, toScene, type Vec3 } from "../src/scene3d/scale";
@@ -157,5 +157,50 @@ describe("user take-over (cancel) and guided camera", () => {
     c.resume();
     expect(c.mode).toBe("director");
     expect(c.manualPose([0, 0, 0], i.moon)).toBeNull();
+  });
+});
+
+describe("planning globe (TR.2.a, design A2)", () => {
+  const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const unitV = (a: Vec3): Vec3 => a.map((c) => c / len(a)) as Vec3;
+
+  it("shows the whole Earth, the launch pad facing the camera, right of centre and north up", () => {
+    for (const id of ["haworth_20270309_7d", "malapert_massif_20271015_14d"]) {
+      const { tl, input } = setup(id);
+      const i = input(tl.startMs);
+      const p = planningPose(i);
+      const fwd = unitV(view(p));
+      const toEarth = sub([0, 0, 0], p.position);
+      const R = i.earthRadius;
+      // the globe fits: vertically inside the 45° field of view (22.5° half-angle; the shift is sideways only),
+      // horizontally inside the 16:9 field (36.4° half-angle), with margin
+      const radiusDeg = (Math.asin(R / len(toEarth)) * 180) / Math.PI;
+      expect(Math.abs(dot(unitV(toEarth), unitV(p.up)))).toBeLessThan(1e-9);
+      expect(radiusDeg).toBeLessThan(21);
+      expect(angle(fwd, toEarth) + radiusDeg).toBeLessThan(34);
+      // the camera sits above the pad, so the pad is the point of the globe nearest to it
+      expect(dot(unitV(p.position), i.padUpAtLaunch)).toBeGreaterThan(0.95);
+      // the Earth is drawn right of the screen centre (the sidebar covers the left)
+      const right = cross(fwd, p.up);
+      expect(dot(unitV(toEarth), right)).toBeGreaterThan(0.1);
+      expect(p.up[2]).toBeGreaterThan(0); // celestial north up
+    }
+  });
+
+  it("'Launch' hops from the globe to the launch framing without a jump (60 fps over SWITCH_MS)", () => {
+    const { tl, input } = setup("haworth_20270309_7d");
+    const i = input(tl.startMs);
+    const from = planningPose(i);
+    const to = directorPose(tl, i);
+    let prev = from;
+    let worst = 0;
+    for (let ms = 1000 / 60; ms <= SWITCH_MS + 1; ms += 1000 / 60) {
+      const p = hopPose(from, to, switchEase(ms), i.earthRadius);
+      worst = Math.max(worst, angle(view(prev), view(p)));
+      prev = p;
+    }
+    expect(len(sub(prev.position, to.position))).toBeLessThan(1e-9);
+    expect(worst).toBeLessThan(6);
   });
 });

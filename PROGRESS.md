@@ -2557,3 +2557,19 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** la escucha del humano pasa a T5.2.e.
 - **Problemas abiertos:** el volumen y el carácter del pad necesitan el oído del humano.
 - **Siguiente tarea:** TR.2.a.
+
+## 2026-11-01 · TR.2.a · Globo terrestre interactivo antes del lanzamiento
+
+- **Tarea:** TR.2.a ([x]; la revisión visual del arrastre se hace con la barra lateral, en TR.2.b).
+- **Qué se hizo:** `planningPose` en `scene3d/cameraDirector.ts`: la Tierra entera vista desde la vertical de la plataforma de lanzamiento, a 4.2 radios, con el norte celeste arriba y desplazada 0.9 radios a la derecha (la barra lateral de A2 tapa la izquierda). `renderer.ts` tiene una opción `planning()` que se lee en cada fotograma. Mientras es verdadera, la cámara usa ese encuadre y arrastrar orbita la Tierra con el `CameraController` existente. Al pasar a falsa («Launch»), la cámara salta en tiempo real al encuadre de la misión con el mismo `hopPose` del cambio de plan (en el marco de la Tierra) y devuelve la cámara al director. Con movimiento reducido es un corte. `SceneHost` acepta la prop `planning`.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/camera.test.ts → 9 passed
+    planning globe: globo entero en el campo (radio angular < 21° en vertical, borde < 34° en horizontal a 16:9), plataforma frente a la cámara (> 0.95), Tierra a la derecha del centro, norte arriba
+    'Launch': salto a 60 fps durante SWITCH_MS con cambio de vista < 6° por fotograma; termina exactamente en el encuadre de despegue
+  $ npm --prefix web test → todos pasan · typecheck → exit 0
+  ```
+- **Decisiones tomadas:** la planificación queda fuera de la línea de tiempo de la misión. La cuenta atrás dura 5 min de misión, y mezclar el globo con el tiempo de misión rompería la continuidad a 6 h/s que comprueban las pruebas del director. Por eso el paso al despegue es un salto en tiempo real, como el cambio de plan (T4.4.b).
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.2.b.

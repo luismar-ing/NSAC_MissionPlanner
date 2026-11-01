@@ -820,7 +820,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 
 ### TR.2 Mission Planner (A2 → B2 → B3 con estilo A3)
 
-##### [ ] TR.2.a — Globo terrestre interactivo antes del lanzamiento
+##### [x] TR.2.a — Globo terrestre interactivo antes del lanzamiento
 - **Qué:** la escena abre en «planificación», antes de `launch_utc`: cámara sobre la Tierra que el usuario gira arrastrando (como nullschool), con marcador del sitio de lanzamiento y fondo de estrellas. El plan elegido en la barra lateral se aplica con el `setPlan` existente.
 - **Archivos:** `web/src/scene3d/renderer.ts`, `web/src/scene3d/cameraDirector.ts`, `web/tests/cameraDirector.test.ts`
 - **Depende de:** TR.1.b · **Spec:** 8.2, 8.3 · **Decisiones:** D8 · **Est.:** 3 h

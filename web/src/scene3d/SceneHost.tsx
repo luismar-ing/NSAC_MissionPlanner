@@ -12,7 +12,7 @@ import { describeError } from "../lib/errors";
  * live view opens; later openings reuse the cached module and the same WebGL context (renderer.ts).
  * While the user drives the camera (drag, wheel, arrow keys), a button gives it back to the director.
  */
-export function SceneHost() {
+export function SceneHost({ planning }: { planning?: () => boolean } = {}) {
   const ref = useRef<HTMLDivElement>(null);
   const control = useRef<{ unmount(): void; resumeCamera(): void; setPlan(p: PlanSpec): void } | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -40,6 +40,7 @@ export function SceneHost() {
           siteId: plan?.site_id,
           loadTerrain: (siteId, lod) => st.data.terrain(siteId, lod),
           reducedMotion: () => appStore.getState().reducedMotion,
+          planning,
         });
         sceneBridge.setPlan = (p) => control.current?.setPlan(p); // plan switch from the thumbnails (T4.4.b)
         setStatus("ready");

@@ -13,7 +13,7 @@ import { phaseAt, type MissionTimeline } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
 import { COLORS } from "../styles/tokens";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
-import { CameraController, directorPose, fromFrame, hopPose, localBlend, reducedMotionPose, switchEase, toFrame, transitPose, type BodyFrame, type DirectorInput, type Pose } from "./cameraDirector";
+import { CameraController, directorPose, fromFrame, hopPose, localBlend, planningPose, reducedMotionPose, switchEase, toFrame, transitPose, type BodyFrame, type DirectorInput, type Pose } from "./cameraDirector";
 import { indexEphemeris, rotate, sceneStateAt } from "./ephemeris";
 import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity } from "./launch";
 import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
@@ -129,6 +129,12 @@ export interface MountOptions {
   loadTerrain?(siteId: string, lod: number): Promise<TerrainData>;
   /** Reduced motion (the app setting, which starts from prefers-reduced-motion): fixed framings, no flights. */
   reducedMotion?(): boolean;
+  /**
+   * Read every frame. While true (Mission Planner before launch, A2) the camera frames the whole Earth
+   * (planningPose) and dragging turns the globe; when it turns false ("Launch") the camera hops to the
+   * mission's framing in real time, like a change of plan.
+   */
+  planning?(): boolean;
 }
 
 /** Real size of the rocket at the site, drawn at real local scale (λ = 1): ~100 m, a generic launcher. */
@@ -282,6 +288,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
   // body frames of the last drawn instant, to carry the camera across a change of plan (T4.4.b)
   let lastFrames: { earth: BodyFrame; moon: BodyFrame } | null = null;
   let switching: { from: { earth: Pose; moon: Pose }; startMs: number } | null = null;
+  let wasPlanning = opts.planning?.() ?? false;
   const canvas = renderer.domElement;
   canvas.tabIndex = 0;
   canvas.setAttribute("aria-label", STRINGS.live.cameraHelp);
@@ -415,9 +422,19 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
     const earthK = 1 - (1 - 1 / SPACE_SCALE.bodyExaggeration) * lambda;
     bodies.earth.scale.set(earthK, earthK * (EARTH_RADII_KM.polar / EARTH_RADII_KM.equatorial), earthK);
 
+    const planning = opts.planning?.() ?? false;
+    if (wasPlanning && !planning) {
+      // "Launch": leave the globe (or the user's own view of it) and hop to the mission's framing
+      if (lastPose && lastFrames && !reduced?.matches) switching = { from: { earth: toFrame(lastPose, lastFrames.earth), moon: toFrame(lastPose, lastFrames.moon) }, startMs: performance.now() };
+      if (controller.mode === "manual") {
+        controller.resume();
+        opts.onCameraModeChange?.("director");
+      }
+    }
+    wasPlanning = planning;
     let pose =
       (controller.mode === "manual" ? controller.manualPose(earthW, moonW) : null) ??
-      (tl ? (reduced?.matches ? reducedMotionPose(tl, input) : directorPose(tl, input)) : transitPose(input));
+      (planning ? planningPose(input) : tl ? (reduced?.matches ? reducedMotionPose(tl, input) : directorPose(tl, input)) : transitPose(input));
     const frames: { earth: BodyFrame; moon: BodyFrame } = {
       earth: { centre: earthW, quat: null, radius: earthR * earthK },
       moon: { centre: moonW, quat: state.moonQuat, radius: moonDrawnR },
@@ -428,7 +445,7 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       const w = switchEase(performance.now() - switching.startMs);
       if (w >= 1) switching = null;
       else {
-        const kind = tl && phaseAt(tl, t) === "launch" ? "earth" : "moon";
+        const kind = planning || (tl && phaseAt(tl, t) === "launch") ? "earth" : "moon";
         const f = frames[kind];
         pose = fromFrame(hopPose(switching.from[kind], toFrame(pose, f), w, f.radius), f);
       }
