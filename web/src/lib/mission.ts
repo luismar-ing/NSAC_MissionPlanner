@@ -78,11 +78,18 @@ export function missionClock(tl: MissionTimeline, t: number): { elapsed: string;
  */
 export const LAUNCH_SLOW_RATE = 300; // 5 minutes of mission per second: the 5-minute countdown takes 1 s
 export const LAUNCH_RAMP_MS = 30 * 60_000;
+/** Detailed launch (T6.3.a): 2 minutes of mission per second during the ascent, so the staging can be seen. */
+export const ASCENT_SLOW_RATE = 120;
 
-export function playbackRate(tl: MissionTimeline, t: number, hoursPerSecond: number): number {
+export function playbackRate(tl: MissionTimeline, t: number, hoursPerSecond: number, holdMs = 0): number {
   const full = hoursPerSecond * 3600;
   if (full <= LAUNCH_SLOW_RATE) return full;
   if (t < tl.launchMs) return LAUNCH_SLOW_RATE;
-  const u = (t - tl.launchMs) / LAUNCH_RAMP_MS;
-  return u >= 1 ? full : LAUNCH_SLOW_RATE * (full / LAUNCH_SLOW_RATE) ** u;
+  // `holdMs` (the detailed launch's staging, T6.3.a): the ascent plays slower still for that long after launch,
+  // and the ramp to full speed starts from there
+  const base = holdMs > 0 ? ASCENT_SLOW_RATE : LAUNCH_SLOW_RATE;
+  const from = tl.launchMs + holdMs;
+  if (t < from) return base;
+  const u = (t - from) / LAUNCH_RAMP_MS;
+  return u >= 1 ? full : base * (full / base) ** u;
 }

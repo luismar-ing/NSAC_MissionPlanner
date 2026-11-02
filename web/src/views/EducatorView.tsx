@@ -11,6 +11,7 @@ import { useSiteData } from "./useSiteData";
 import { STRINGS } from "../lib/strings";
 import { fmtMetric, round } from "../lib/why";
 import { sceneBridge } from "../scene3d/bridge";
+import { ASCENT_MS } from "../scene3d/launch";
 import { SceneHost } from "../scene3d/SceneHost";
 import { appStore, useApp } from "../store/appStore";
 
@@ -109,7 +110,8 @@ export function EducatorView({ tools }: { tools: ReactNode }) {
     const tick = (now: number) => {
       if (last !== null) {
         const cur = appStore.getState().missionTime ?? timeline.startMs;
-        const t = cur + (now - last) * playbackRate(timeline, cur, play.hoursPerSecond);
+        const hold = appStore.getState().detailedLaunch ? ASCENT_MS : 0; // staging stays watchable (T6.3.a)
+        const t = cur + (now - last) * playbackRate(timeline, cur, play.hoursPerSecond, hold);
         if (t >= play.to) {
           go(play.to);
           setPlay(null);

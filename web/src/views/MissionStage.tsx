@@ -25,6 +25,8 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
   const sceneScale = useApp((s) => s.sceneScale);
   const pinned = useApp((s) => s.comparePlans.length);
   const polarMap = useApp((s) => s.polarMap);
+  const detailedLaunch = useApp((s) => s.detailedLaunch);
+  const setDetailedLaunch = useApp((s) => s.setDetailedLaunch);
   const setPolarMap = useApp((s) => s.setPolarMap);
   const polarMapShown = useApp((s) => s.polarMapShown);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
@@ -86,6 +88,9 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
               <span className="visually-hidden">{STRINGS.polarMap.legendTitle}</span>
             </p>
           )}
+          <button type="button" className="scene-chip" aria-pressed={detailedLaunch} title={STRINGS.detailedLaunch.title} onClick={() => setDetailedLaunch(!detailedLaunch)}>
+            <span aria-hidden="true">{detailedLaunch ? "■" : "□"}</span> {STRINGS.detailedLaunch.toggle}
+          </button>
           <button type="button" className="scene-chip" aria-pressed={polarMap} title={STRINGS.polarMap.toggleTitle} onClick={() => setPolarMap(!polarMap)}>
             <span aria-hidden="true">{polarMap ? "■" : "□"}</span> {STRINGS.polarMap.toggle}
           </button>

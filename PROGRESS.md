@@ -2885,3 +2885,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna (8.3: paso intermedio opcional).
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.3.a.
+
+## 2026-11-02 · T6.3.a · Despegue detallado: etapas y separación (ILLUSTRATIVE)
+
+- **Tarea:** T6.3.a ([x]).
+- **Qué se hizo:** el cohete procedural se divide en partes: primera etapa (con su banda y sus 4 aletas), segunda etapa, carga útil y dos mitades de cofia. La silueta, de 1 unidad, es la misma de antes. `launch.ts`: `STAGING` (separación a T+3 min y cofia a T+4,5 min, cada parte tarda 90 s en salir de la vista) y `stagingAt`. `rocket.ts`: `setStaging` deja caer la etapa gastada hacia atrás, girando y desvaneciéndose; abre las mitades de la cofia hacia fuera; y pasa la llama, más pequeña, a la tobera de la segunda etapa. La trayectoria no cambia. Con el extra activo, el ascenso se reproduce a 120× (`ASCENT_SLOW_RATE`: unos 5 s en pantalla), para que la separación se vea, y la rampa a la velocidad elegida arranca desde ahí. Interruptor «Staging» (`detailedLaunch` en el store, activo por defecto); la etiqueta ILLUSTRATIVE sigue visible durante el viaje. No es la cronología de ningún cohete real.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/staging.test.ts → 3 passed (cronología dentro del ascenso; poses de las partes; apagado = cohete entero y ritmo del MVP; con el extra, la separación dura > 1,4 s en pantalla y el ascenso < 6 s)
+  $ npm --prefix web test → 245 passed (la continuidad plataforma → trayectoria de T4.2.b y la rampa de T5.2.a siguen pasando) · typecheck → exit 0
+  ```
+  Recortes headless del cohete: a T+2 min, entero; a T+3,75 min, la primera etapa cayendo y medio desvanecida, con la llama en la segunda; a T+5 min, las mitades de la cofia abiertas a ambos lados.
+- **Decisiones tomadas:** la cámara lenta del ascenso forma parte del extra. Con el interruptor apagado, el reproductor usa exactamente la rampa de T5.2.a. La prueba del cohete cuenta ahora las aletas en todo el modelo, no solo como hijas directas (misma intención).
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.4.a.

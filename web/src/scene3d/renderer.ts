@@ -15,8 +15,8 @@ import { COLORS } from "../styles/tokens";
 import { createBodies, loadTextures, updateBodies } from "./bodies";
 import { approachPose, CameraController, directorPose, fromFrame, hopPose, localBlend, planningPose, reducedMotionPose, switchEase, toFrame, transitPose, type BodyFrame, type DirectorInput, type Pose } from "./cameraDirector";
 import { indexEphemeris, rotate, sceneStateAt } from "./ephemeris";
-import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity } from "./launch";
-import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume } from "./rocket";
+import { launchPositionKm, launchStage, padPositionKm, padUp, plumeIntensity, stagingAt } from "./launch";
+import { apparentLength, createPlume, createRocket, ROCKET_SCREEN_FRACTION, setPlume, setStaging } from "./rocket";
 import { bodyRadius, EARTH_RADII_KM, MOON_RADIUS_KM, earthOffset, pointToScene, RelativeOrigin, SPACE_SCALE, toScene, type Vec3 } from "./scale";
 import { siteBodyFixedKm, sitePositionKm, trailSamples, trailStyle } from "./trajectory";
 import { TerrainManager, type TerrainData } from "./terrain";
@@ -146,6 +146,8 @@ export interface MountOptions {
   levelB?(): boolean;
   /** Read every frame: stand on the site (first-person sky view at h_obs, TR.3.a). Needs Level B and the site. */
   surface?(): boolean;
+  /** Read every frame: detailed launch (T6.3.a): staging. Off or absent = the MVP rocket. */
+  detailedLaunch?(): boolean;
   /** Read every frame: the lit polar map as a step of the zoom (T6.2.b). Off or absent = the MVP zoom. */
   polarMap?(): boolean;
   /** Called when the polar map appears or goes (the UI shows its legend meanwhile). */
@@ -599,6 +601,8 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
       // enlarged in space (constant apparent size), real size (~100 m) at real local scale
       rocket.scale.setScalar(apparentLength(dist, camera.fov, ROCKET_SCREEN_FRACTION) * (1 - lambda) + ROCKET_REAL_LENGTH_UNITS * lambda);
       setPlume(plume, plumeIntensity(traj, t));
+      // detailed launch (T6.3.a): stage separation and fairing; off = the MVP rocket, all in one piece
+      setStaging(rocket, plume, opts.detailedLaunch?.() ? stagingAt(traj, t) : null);
       // the trail belongs to the flight: hidden once landed (its end stays in space while the Moon moves on)
       flown.visible = ahead.visible = t < landingMs && lambda < 1;
       (flown.material as THREE.LineBasicMaterial).opacity = (ahead.material as THREE.LineBasicMaterial).opacity = 0.9 * (1 - lambda);

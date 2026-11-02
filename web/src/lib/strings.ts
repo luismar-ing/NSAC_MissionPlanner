@@ -96,6 +96,10 @@ export const STRINGS = {
       },
     },
   },
+  detailedLaunch: {
+    toggle: "Staging",
+    title: "Detailed launch (ILLUSTRATIVE): the first stage separates and the fairing opens during the ascent, shown in slow motion. Not the timeline of any real rocket.",
+  },
   polarMap: {
     toggle: "Sunlight map",
     toggleTitle: "Show the average sunlight of the south polar region on the Moon during the landing (an optional step of the zoom)",

@@ -13,7 +13,9 @@ describe("rocket model", () => {
     const width = Math.max(box.max.x - box.min.x, box.max.z - box.min.z);
     expect(width).toBeGreaterThan(0.1);
     expect(width).toBeLessThan(0.3); // slender: about 1:4 or thinner including fins
-    expect(r.children.filter((c) => (c as THREE.Mesh).geometry instanceof THREE.ExtrudeGeometry)).toHaveLength(4);
+    const fins: THREE.Object3D[] = [];
+    r.traverse((c) => (c as THREE.Mesh).geometry instanceof THREE.ExtrudeGeometry && fins.push(c));
+    expect(fins).toHaveLength(4); // on the first stage (T6.3.a: the parts can separate)
   });
 
   it("apparent length keeps a constant fraction of the view height at any distance", () => {

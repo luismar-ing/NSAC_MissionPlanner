@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { clampMission, missionClock, phaseAt, phaseStart, playbackRate, PLAY_PHASES, type MissionTimeline } from "../lib/mission";
 import { STRINGS } from "../lib/strings";
+import { ASCENT_MS } from "./launch";
 import { appStore, useApp } from "../store/appStore";
 
 const SPEEDS = [1, 6, 24] as const; // hours of mission per second
@@ -17,6 +18,7 @@ const STEP_MIN = 10; // scrubber resolution
 export function MissionControls({ timeline, planId, autoPlay = false }: { timeline: MissionTimeline; planId?: string; autoPlay?: boolean }) {
   const missionTime = useApp((s) => s.missionTime);
   const missionPhase = useApp((s) => s.missionPhase);
+  const detailedLaunch = useApp((s) => s.detailedLaunch);
   const setMissionTime = useApp((s) => s.setMissionTime);
   const setMissionPhase = useApp((s) => s.setMissionPhase);
   const [playing, setPlaying] = useState(autoPlay); // "Launch" in the Mission Planner starts playing at once
@@ -52,7 +54,8 @@ export function MissionControls({ timeline, planId, autoPlay = false }: { timeli
         return;
       }
       const cur = appStore.getState().missionTime ?? timeline.startMs;
-      const t = cur + (now - last) * playbackRate(timeline, cur, speed); // slow motion around launch (T5.2.a)
+      const hold = appStore.getState().detailedLaunch ? ASCENT_MS : 0; // staging stays watchable (T6.3.a)
+      const t = cur + (now - last) * playbackRate(timeline, cur, speed, hold); // slow motion around launch (T5.2.a)
       last = now;
       if (t >= timeline.endMs) {
         go(timeline.endMs);
@@ -79,7 +82,7 @@ export function MissionControls({ timeline, planId, autoPlay = false }: { timeli
         </span>
         <span className="mono">{clock.elapsed}</span>
         <span className="mono muted">{clock.utc}</span>
-        {playing && playbackRate(timeline, t, speed) < speed * 3600 && (
+        {playing && playbackRate(timeline, t, speed, detailedLaunch ? ASCENT_MS : 0) < speed * 3600 && (
           <span className="mission-slow" data-testid="slow-motion">
             {STRINGS.mission.slow}
           </span>

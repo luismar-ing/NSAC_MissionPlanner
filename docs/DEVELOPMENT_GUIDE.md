@@ -929,7 +929,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T6.2.a · **Spec:** 8.3 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** recorrido continuo con el paso añadido; con el interruptor apagado, el MVP queda intacto.
 
-##### [ ] T6.3.a — Despegue detallado (etapas y separación)
+##### [x] T6.3.a — Despegue detallado (etapas y separación)
 - **Qué:** animación ILLUSTRATIVE de etapas y separación.
 - **Archivos:** `web/src/scene3d/launch.ts`
 - **Depende de:** T5.1.c · **Spec:** 4.2, 5.8 · **Decisiones:** D8 · **Est.:** 2.5 h

@@ -46,6 +46,27 @@ export function launchStage(traj: Trajectory, tMs: number): LaunchStage {
   return "flight";
 }
 
+/**
+ * Detailed launch (T6.3.a, extra; ILLUSTRATIVE, not any real vehicle's timeline): the first stage separates and
+ * drops away during the ascent, then the fairing opens. Times from launch_utc; FALL_MS = how long each part takes
+ * to drop out of view. The ascent itself (the trajectory) is unchanged.
+ */
+export const STAGING = { separationMs: 3 * 60_000, fairingMs: 4.5 * 60_000, fallMs: 90_000 } as const;
+
+export interface Staging {
+  /** -1 = attached; 0..1 = progress of the spent stage's fall (1 = gone). */
+  firstStage: number;
+  /** -1 = closed; 0..1 = progress of the halves opening away (1 = gone). */
+  fairing: number;
+  plumeAt: "first" | "second";
+}
+
+export function stagingAt(traj: Trajectory, tMs: number): Staging {
+  const dt = tMs - parseInstant(traj.phases.launch_utc);
+  const prog = (at: number) => (dt < at ? -1 : Math.min(1, (dt - at) / STAGING.fallMs));
+  return { firstStage: prog(STAGING.separationMs), fairing: prog(STAGING.fairingMs), plumeAt: dt < STAGING.separationMs ? "first" : "second" };
+}
+
 /** Exhaust plume intensity 0–1: on during the ascent, ignition ramp in the last seconds of the countdown. */
 export function plumeIntensity(traj: Trajectory, tMs: number): number {
   const launch = parseInstant(traj.phases.launch_utc);
