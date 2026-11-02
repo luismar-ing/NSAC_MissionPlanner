@@ -2955,3 +2955,28 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** cierre de la Fase 6.
+
+## 2026-11-02 · HITO · Fase 6 cerrada (extras)
+
+- **Estado:** todas las subtareas de la Fase 6 están en [x]: T6.2.a/b (mapa polar iluminado en el zoom), T6.3.a (despegue detallado) y T6.4.a/b (batería supuesta). También T6.5.a/b (restricciones en inglés). T6.1 se cerró en la Fase R y T6.3.b queda cubierta por el modo Educator. La Fase 5 sigue abierta solo por T5.2.e (la revisión del humano).
+- **Aceptación general (cada extra se apaga sin romper el MVP):**
+  ```
+  $ npm --prefix web test con levelB, polarMap, detailedLaunch, energyModel y nlConstraints en false (cambio temporal, revertido) → 265 passed
+  $ npm --prefix web test con los valores por defecto (todos activos) → 265 passed
+  $ .venv/Scripts/python -m pytest → 279 passed (regenera docs/validation.md: mismas cifras, nueva fecha)
+  $ npm --prefix web run build → OK
+  ```
+  Dos pruebas daban por hecho que el Nivel B empieza activo; ahora lo fijan ellas mismas (commit aparte).
+- **Interruptores, en la interfaz:**
+  - «3D terrain shadows» y «Stand on the site» (tarjeta del sitio).
+  - «Sunlight map» y «Staging» (chips del viaje).
+  - «Battery (assumed)» (cabecera de la bandeja).
+  - «Type constraints» (panel de restricciones).
+- **Cómo probar el hito:**
+  1. `npm --prefix web run dev` y entrar en Mission Planner.
+  2. Escribir una frase en «Describe your constraints» y ver el calendario.
+  3. Anclar planes y mirar la franja de batería (Haworth se queda sin energía).
+  4. «Launch» con «Staging»: separación a T+3 min y cofia a T+4,5 min.
+  5. Durante el aterrizaje, el mapa de Sol medio sobre el polo, con su leyenda.
+  6. Apagar cada interruptor y comprobar que vuelve la vista del MVP.
+- **Siguiente:** T5.2.e (revisión del humano) y la Fase 7 (entrega; manda desde el 2026-11-10). D11 sigue pendiente y bloquea T7.1.a, T7.3.a y T7.4.a.
