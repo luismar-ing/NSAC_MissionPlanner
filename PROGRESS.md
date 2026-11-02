@@ -2900,3 +2900,16 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.4.a.
+
+## 2026-11-02 · T6.4.a · Modelo de energía (estado de carga)
+
+- **Tarea:** T6.4.a ([x]).
+- **Qué se hizo:** `web/src/lib/energy.ts`, un balance de energía sobre la serie de visibilidad del Sol del propio sitio (`sun_vis`, spec 5.3). Con Sol, la batería se carga a (solar − consumo) hasta su capacidad; sin Sol, se descarga al ritmo del consumo hasta vaciarse. Devuelve el estado de carga por muestra, el mínimo, cuándo ocurre y cuántas muestras pasa vacía. Los parámetros, `ASSUMED_BATTERY` (5000 Wh, 250 W de consumo, 750 W de paneles, empieza llena), son **supuestos ilustrativos**, no datos de ninguna misión, y la interfaz los mostrará como tales (T6.4.b). Sin orientación de paneles, temperatura ni pérdidas.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/energy.test.ts → 4 passed (con Sol continuo no baja; en oscuridad baja 5 % por muestra de 30 min con 100 W sobre 1000 Wh y luego queda vacía; recarga a solar − consumo hasta la capacidad; la batería supuesta dura 20 h de oscuridad)
+  ```
+- **Decisiones tomadas:** con 20 h de reserva, la diferencia entre sitios se lee en la racha de oscuridad más larga, no en el % de Sol: por ejemplo, Malapert (14 h de oscuridad en su ventana de enero) aguanta y Haworth (34 h) se queda sin energía.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.4.b.

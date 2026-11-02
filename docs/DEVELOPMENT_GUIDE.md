@@ -941,7 +941,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T6.3.a · **Spec:** 4.2, 9 · **Decisiones:** — · **Est.:** 2.5 h
 - **Aceptación:** revisión visual del recorrido completo; se puede salir en cualquier momento.
 
-##### [ ] T6.4.a — Modelo de energía (estado de carga)
+##### [x] T6.4.a — Modelo de energía (estado de carga)
 - **Qué:** modelo de batería con parámetros explícitos, marcados como supuestos en la interfaz.
 - **Archivos:** `web/src/lib/energy.ts`, `web/tests/energy.test.ts`
 - **Depende de:** T5.1.c · **Spec:** 4.2 · **Decisiones:** — · **Est.:** 2 h
