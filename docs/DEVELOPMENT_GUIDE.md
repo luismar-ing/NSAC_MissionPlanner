@@ -947,7 +947,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T5.1.c · **Spec:** 4.2 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** pruebas: con Sol continuo la carga no baja; con oscuridad continua baja al ritmo del parámetro.
 
-##### [ ] T6.4.b — Visualización del estado de carga
+##### [x] T6.4.b — Visualización del estado de carga
 - **Qué:** curva de carga en el panel y la cinta de tiempo.
 - **Archivos:** `web/src/panels2d/TimeRibbon.tsx`
 - **Depende de:** T6.4.a · **Spec:** 4.2, 8.1 · **Decisiones:** — · **Est.:** 1.5 h

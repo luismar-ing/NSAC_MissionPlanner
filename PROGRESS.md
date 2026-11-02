@@ -2913,3 +2913,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.4.b.
+
+## 2026-11-02 · T6.4.b · Visualización del estado de carga
+
+- **Tarea:** T6.4.b ([x]).
+- **Qué se hizo:** `TimeRibbon` dibuja una tercera franja bajo Sol y Tierra con la curva del estado de carga (modelo de T6.4.a, área en el verde de «ambos») y una línea propia: «Battery (assumed): never below N%» o «Battery (assumed): empty for N h». El tooltip lleva los supuestos (5000 Wh, 250 W, 750 W, llena al llegar; «Illustrative, not data about any mission»). Aparece en todos los paneles de la bandeja y en la consola del sitio, con el mismo formato en todos (spec 8.1); las miniaturas conservan sus dos franjas. Interruptor «Battery (assumed)» en la cabecera de la bandeja (`energyModel` en el store, activo por defecto). La fila de la cinta del panel pasa a altura automática.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/energyRibbon.test.tsx → 1 passed (9 h de Sol y 15 h de oscuridad: mínimo 25 %; título con ASSUMED; apagado = HTML idéntico a la cinta del MVP)
+  $ npm --prefix web test → 250 passed · typecheck → exit 0
+  ```
+  Panel de búsqueda en headless (1920×1080 y 1366×768): sin solapes y sin paneles desbordados. En la bandeja, Haworth (34 h de oscuridad) «empty for 14.5 h»; Connecting Ridge y Nobile Rim 1, «never below 100%».
+- **Decisiones tomadas:** la batería va en su propia línea, porque en una sola fila los tres textos se solapaban en paneles estrechos.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.5.a.

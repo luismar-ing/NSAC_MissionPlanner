@@ -13,6 +13,8 @@ import { SiteSection } from "./SiteSection";
 export function CompareView() {
   const manifest = useApp((s) => s.manifest);
   const nSites = useApp((s) => s.sites.length);
+  const energyModel = useApp((s) => s.energyModel);
+  const setEnergyModel = useApp((s) => s.setEnergyModel);
   if (!manifest) return null;
   const nDays = (Date.parse(manifest.date_range.arrival_end) - Date.parse(manifest.date_range.arrival_start)) / 86_400_000 + 1;
 
@@ -40,6 +42,10 @@ export function CompareView() {
           <h2 id="tray-title" className="panel-title">
             {STRINGS.trayTitle}
           </h2>
+          {/* T6.4.b: the illustrative battery lane under every time ribbon, on or off */}
+          <button type="button" className="btn ghost" aria-pressed={energyModel} title={STRINGS.energy.title} onClick={() => setEnergyModel(!energyModel)}>
+            <span aria-hidden="true">{energyModel ? "■" : "□"}</span> {STRINGS.energy.toggle}
+          </button>
         </div>
         <Tray />
       </section>

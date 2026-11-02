@@ -55,6 +55,9 @@ export interface AppState {
   /** Level B at the site (T6.1): terrain shadows and the first-person sky view. Off = the MVP scene. */
   levelB: boolean;
   setLevelB(on: boolean): void;
+  /** Battery state of charge under the time ribbons (T6.4, extra, ASSUMED parameters). Off = MVP panels. */
+  energyModel: boolean;
+  setEnergyModel(on: boolean): void;
   /** Detailed launch (T6.3.a, extra): staging, with the slow motion held through the ascent. Off = MVP launch. */
   detailedLaunch: boolean;
   setDetailedLaunch(on: boolean): void;
@@ -140,6 +143,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     levelB: true,
     setLevelB(on) {
       set({ levelB: on });
+    },
+    energyModel: true,
+    setEnergyModel(on) {
+      set({ energyModel: on });
     },
     detailedLaunch: true,
     setDetailedLaunch(on) {

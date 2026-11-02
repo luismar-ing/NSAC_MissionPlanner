@@ -96,6 +96,10 @@ export const STRINGS = {
       },
     },
   },
+  energy: {
+    toggle: "Battery (assumed)",
+    title: "Show an illustrative battery state of charge under each time ribbon: an ASSUMED lander (5000 Wh, 250 W load, 750 W panels) running on the site's own sunlight. Not data about any mission.",
+  },
   detailedLaunch: {
     toggle: "Staging",
     title: "Detailed launch (ILLUSTRATIVE): the first stage separates and the fairing opens during the ascent, shown in slow motion. Not the timeline of any real rocket.",
@@ -208,6 +212,12 @@ export const STRINGS = {
     aria: (h: number, at: string) =>
       `Time ribbon: Sun on the top lane, Earth on the bottom lane. Longest dark stretch ${round(h, 1)} h, starting ${at}.`,
     ariaNoDark: "Time ribbon: Sun on the top lane, Earth on the bottom lane. The Sun is never lost in this window.",
+    battery: (min: number, emptyH: number) =>
+      emptyH > 0 ? `Battery (assumed): empty for ${round(emptyH, 1)} h` : `Battery (assumed): never below ${Math.round(min * 100)}%`,
+    batteryAria: (min: number, emptyH: number) =>
+      emptyH > 0 ? `Assumed battery runs empty for ${round(emptyH, 1)} h.` : `Assumed battery never below ${Math.round(min * 100)}%.`,
+    batteryTitle: (p: { capacityWh: number; loadW: number; solarW: number }) =>
+      `Battery state of charge, ASSUMED lander: ${p.capacityWh} Wh battery, ${p.loadW} W load, ${p.solarW} W of panels in sunlight, full at arrival. Illustrative, not data about any mission.`,
   },
   scrubber: {
     label: "Time since arrival (all panels)",

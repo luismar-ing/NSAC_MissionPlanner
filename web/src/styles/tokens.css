@@ -417,7 +417,7 @@ button {
 .plan-panel {
   counter-increment: plan;
   display: grid;
-  grid-template-rows: auto 220px 56px auto;
+  grid-template-rows: auto 220px auto auto; /* the ribbon's own height: 2 lanes, or 3 with the battery (T6.4.b) */
   gap: var(--space-sm);
   min-width: 0;
   background: transparent;
@@ -1326,6 +1326,11 @@ button.thumb:focus-visible {
 
 .thumb .ribbon {
   overflow: hidden;
+}
+
+/* the battery lane (T6.4.b) stays in the full panels: thumbnails keep their two lanes */
+.thumb .rib-battery {
+  display: none;
 }
 
 .mission-slow {
