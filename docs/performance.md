@@ -1,6 +1,6 @@
 # PolePlanner · Auditoría de rendimiento (spec 8.7)
 
-T5.2.c, 2026-10-22. Medidas sobre el **build de producción** (`npm --prefix web run build`, servido con `npm --prefix web run preview`, puerto 4173), datos REAL `2c2f11dad7`.
+T5.2.c (2026-10-22), **repetida en TR.5.a (2026-11-02) tras el rediseño de la Fase R** (portada con la Luna 3D, globo, sombras y vista en superficie). Medidas sobre el **build de producción** (`npm --prefix web run build`, servido con `npm --prefix web run preview`, puerto 4173), datos REAL `2c2f11dad7`.
 
 Máquina: portátil con Windows 11 y GPU integrada Intel Iris Xe (ANGLE / Direct3D 11); Chrome headless a 1920×1080.
 
@@ -8,12 +8,12 @@ Máquina: portátil con Windows 11 y GPU integrada Intel Iris Xe (ANGLE / Direct
 
 | Presupuesto (spec 8.7, D13) | Medida | Resultado |
 |---|---|---|
-| Carga inicial del shell 2D < 3 s en una conexión normal | **0,69 s** a 20 Mbit/s y 40 ms (mediana de 3, caché fría); 1,58 s sin compresión; 0,31 s sin limitar | ✓ |
+| Carga inicial < 3 s en una conexión normal | portada **0,44 s** (mediana); shell 2D (portada → Mission Planner → «Search and compare» → calendario) **1,21 s** a 20 Mbit/s y 40 ms; 2,25 s sin compresión; 1,07 s sin limitar | ✓ |
 | Series y ventanas < 15 MB | **2,96 MB** (timeseries 2,15 + windows 0,82) | ✓ |
-| Total de recursos < 50 MB, con carga progresiva | **20,88 MB** en `dist/`; la carga inicial descarga 334 KB comprimidos (2,1 MB sin comprimir) | ✓ |
-| Actualización del calendario y de los paneles 2D < 100 ms | restricción → calendario redibujado **6,8 ms** (máx. 9,7; siguiente fotograma 11,7); scrubber → 5 paneles **1,9 ms** (máx. 3,5) | ✓ |
-| 60 fps en la reproducción 3D y en el zoom, en un portátil | tránsito **59,8 fps**, aproximación y zoom **60 fps**, sitio a escala real con terreno **60 fps** (p95 16,9 ms) | ✓ |
-| Un solo contexto WebGL | **1** tras 10 idas y vueltas comparar ↔ vivir; 0 canvas WebGL en el DOM en modo comparar | ✓ |
+| Total de recursos < 50 MB, con carga progresiva | **21,1 MB** en `dist/`; hasta el calendario se descargan 972 KB comprimidos (3,2 MB sin comprimir: ahora incluye three.js y la textura de la Luna de la portada) | ✓ |
+| Actualización del calendario y de los paneles 2D < 100 ms | restricción → calendario redibujado **8,4 ms** (máx. 11,5; siguiente fotograma 12,3); scrubber → 5 paneles **7,1 ms** (máx. 8,1), con el globo 3D dibujándose detrás | ✓ |
+| 60 fps en la reproducción 3D y en el zoom, en un portátil | portada **59,7 fps**; tránsito **60**; aproximación y zoom **59,9**; sitio con sombras del terreno y vista en primera persona **60 fps** (p95 17 ms) | ✓ |
+| Un solo contexto WebGL | **1** desde la portada, tras 10 idas y vueltas planificar ↔ viaje y al volver a la portada; 1 canvas WebGL (la escena detrás del panel de búsqueda) | ✓ |
 
 ## Cómo se mide (reproducible)
 
@@ -57,26 +57,33 @@ Ambos scripts (`web/scripts/perf.mjs` y `web/scripts/fps.mjs`) usan `puppeteer-c
 | texturas | 3,74 MB | al abrir la vista 3D |
 | **Total** | **20,88 MB** | |
 
-### Carga inicial (ms hasta `shell-ready`, 3 cargas en frío)
+### Carga inicial (3 cargas en frío, TR.5.a)
 
-| Perfil | Cargas | Mediana | Descargado |
-|---|---|---|---|
-| Sin limitar | 390 · 310 · 288 | **310** | 334 KB |
-| Normal (20 Mbit/s, 40 ms) | 688 · 683 · 696 | **688** | 334 KB |
-| Normal sin compresión | 1583 · 1577 · 1577 | **1577** | 2132 KB |
+`landing-ready`: la portada montada. `shell-ready`: primer dibujado del calendario, tras el clic en Mission Planner y en «Search and compare» (el script hace los dos clics en cuanto puede).
+
+| Perfil | `landing-ready` | `shell-ready` | Mediana del shell | Descargado |
+|---|---|---|---|---|
+| Sin limitar | 276 · 298 · 185 | 1755 · 1073 · 658 | **1073** | 1327 KB |
+| Normal (20 Mbit/s, 40 ms) | 359 · 488 · 440 | 1018 · 1252 · 1214 | **1214** | 972 KB |
+| Normal sin compresión | 583 · 566 · 573 | 2185 · 2249 · 2282 | **2249** | 3204 KB |
+
+Antes del rediseño (T5.2.c), el shell abría directamente en el calendario: 0,69 s en conexión normal y 334 KB.
 
 ### Frecuencia de fotogramas (1920×1080, Intel Iris Xe)
 
 | Fase | fps | p50 | p95 | máx. | Fotogramas |
 |---|---|---|---|---|---|
-| Comparar, sin WebGL (referencia) | 60,0 | 16,7 ms | 16,9 ms | 17,0 ms | 121 |
-| Tránsito, 6 h/s | 59,8 | 16,7 ms | 16,9 ms | 33,8 ms (1 fotograma) | 299 |
-| Aproximación final y zoom, 1 h/s | 60,0 | 16,7 ms | 16,8 ms | 17,1 ms | 540 |
-| Sitio a escala real con terreno | 60,0 | 16,7 ms | 16,9 ms | 17,1 ms | 180 |
+| Portada (Luna girando) | 59,7 | 16,7 ms | 16,9 ms | 19,9 ms | 178 |
+| Panel de búsqueda sobre el globo | 60,0 | 16,7 ms | 16,9 ms | 16,9 ms | 120 |
+| Tránsito, 6 h/s | 60,0 | 16,7 ms | 17,1 ms | 17,7 ms | 300 |
+| Aproximación final y zoom, 1 h/s | 59,9 | 16,7 ms | 17,0 ms | 33,4 ms (1 fotograma) | 538 |
+| Sitio: sombras del terreno y primera persona | 60,0 | 16,7 ms | 17,0 ms | 17,3 ms | 180 |
 
 **Nota sobre el panel del navegador de la app de escritorio:** medido allí, el frame rate sale fijo en 30 fps, o en 1 fps en la vista sin WebGL, en cuanto la ventana no está en primer plano. Es la limitación del navegador para ventanas en segundo plano, no el coste de la escena, así que esas cifras no valen como medida. Por eso se mide con Chrome headless sobre la misma GPU. El ensayo cronometrado de T5.1.c, con el panel visible, dio 59 fps.
 
 ## Observaciones
+
+- Fase R: la carga hasta el calendario sube de 0,69 s a 1,21 s (sigue < 3 s). La portada carga three.js y la textura de la Luna para el fondo, y el calendario está ahora a dos clics. La portada es interactiva en < 0,6 s en todos los perfiles.
 
 - El chunk `renderer` (598 KB, 153 KB comprimido) supera el aviso de 500 KB de Vite. Es three.js más la escena y se carga solo al abrir la vista 3D, así que no afecta a la carga inicial.
 - `trajectory/` es la carpeta más pesada (8,6 MB, 1825 archivos), pero cada plan usa uno solo de ~5 KB.

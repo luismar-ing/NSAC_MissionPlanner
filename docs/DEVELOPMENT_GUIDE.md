@@ -898,7 +898,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 
 ### TR.5 Cierre
 
-##### [ ] TR.5.a — Móvil, accesibilidad, rendimiento y capturas
+##### [x] TR.5.a — Móvil, accesibilidad, rendimiento y capturas
 - **Qué:** 375 px sin scroll horizontal (barra lateral y paneles como hojas inferiores); recorrido completo con teclado; contraste; movimiento reducido en todas las pantallas; repetir `perf` y `fps`; regenerar `screens` con las pantallas nuevas.
 - **Archivos:** `web/src/styles/tokens.css`, `web/scripts/screens.mjs`, `docs/performance.md`
 - **Depende de:** TR.2.e, TR.4.c · **Spec:** 8.7, 9 · **Decisiones:** — · **Est.:** 3 h

@@ -2326,3 +2326,89 @@ input[type="range"] {
 .edu-caption-text { margin: 0 auto; max-width: 48rem; font-family: var(--font-serif); font-size: clamp(22px, 2.4vw, 34px); line-height: 1.3; }
 .edu-actions { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
 .edu-hint { margin: 12px 0 0; color: var(--color-text-muted); font-size: var(--font-sm); }
+
+/* ------------------------------------------------------------------ phone (TR.5.a): 375 px, no horizontal page scroll */
+@media (max-width: 720px) {
+  /* one row of tools that scrolls sideways instead of wrapping over the content */
+  .planner-top {
+    left: 8px;
+    right: 8px;
+    top: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .planner-top .landing-tools {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    width: max-content;
+  }
+  .planner-top .btn {
+    padding: 6px 12px;
+    font-size: var(--font-sm);
+    white-space: nowrap;
+  }
+  /* the journey: the scene keeps the top of the screen; everything else is a sheet that scrolls below it */
+  .mission-stage,
+  .mission-stage.at-site {
+    top: 42vh;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    pointer-events: auto;
+    background: var(--glass-panel-strong);
+    border-top: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .mission-stage > *,
+  .mission-stage .site-layout > * {
+    flex: none;
+  }
+  .mission-head { order: 1; }
+  .mission-notes { order: 2; align-self: stretch; }
+  .mission-dock { order: 3; }
+  .site-card { order: 4; }
+  .site-console { order: 5; }
+  .mission-thumbs { order: 6; }
+  .mission-dock,
+  .mission-stage.at-site .mission-dock,
+  .site-card,
+  .site-console {
+    max-height: none;
+  }
+  .site-console {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mission-thumbs {
+    max-height: none;
+  }
+  /* Educator: the heading below the tools, progress above it */
+  .edu-progress {
+    top: 60px;
+    left: 16px;
+    right: auto;
+  }
+  .edu-head {
+    left: 16px;
+    right: 16px;
+    top: 76px;
+    max-width: none;
+  }
+  .edu-dock {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+  .edu-tabs {
+    gap: 4px 16px;
+  }
+  .edu-caption {
+    bottom: 16px;
+  }
+  .edu-actions {
+    flex-wrap: wrap;
+  }
+  .edu-actions .btn.pill {
+    padding: 10px 16px;
+  }
+}

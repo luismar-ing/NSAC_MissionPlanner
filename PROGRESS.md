@@ -2778,3 +2778,23 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.5.a.
+
+## 2026-11-02 · TR.5.a · Móvil, accesibilidad, rendimiento y capturas
+
+- **Tarea:** TR.5.a ([x]).
+- **Qué se hizo:**
+  - **Móvil (≤ 720 px):** la barra de herramientas es una sola fila desplazable en lugar de envolver sobre el contenido. El viaje y el sitio pasan a una hoja inferior desplazable (columna flex en orden: telemetría, avisos, dock, métricas, consola, miniaturas), con la escena 3D en el 42 % superior. En Educator, progreso y titular bajo las herramientas, y botones que envuelven.
+  - **Capturas:** `web/scripts/screens.mjs` reescrito para el flujo A7. Guarda 9 pantallas a 1920×1080 (`desk-*`) y las mismas a 375×812 (`phone-*`), mide el ancho de página en cada una y borra las capturas antiguas.
+  - **Rendimiento:** `perf.mjs` abre el panel «Search and compare» para medir el calendario; `fps.mjs` espera a que el panel termine de abrirse antes de la referencia. Resultados en `docs/performance.md`.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web run screens → 18 capturas · "no horizontal scroll on any screen" · "console: no errors"
+  $ node web/scripts/perf.mjs (build) → portada 0,44 s; shell hasta el calendario 1,21 s en conexión normal (2,25 s sin compresión); restricción → calendario 8,4 ms; scrubber 5 paneles 7,1 ms
+  $ node web/scripts/fps.mjs (Iris Xe) → portada 59,7 · panel 60 · tránsito 60 · aproximación 59,9 · sitio con sombras y primera persona 60 fps; 1 contexto WebGL
+  $ npm --prefix web test → 238 passed · typecheck → exit 0
+  ```
+  Accesibilidad, ya cubierta por las pruebas de esta fase: todas las acciones son `<button>` con nombre accesible; el foco queda atrapado en los diálogos (Esc los cierra y devuelve el foco); Esc sale del viaje y del Educator; el contraste de los tokens es ≥ 4.5:1, también sobre el vidrio. Movimiento reducido: la Luna de la portada se detiene, el panel aparece sin animación, el salto a primera persona y el del globo al despegue se vuelven cortes, y el director usa encuadres fijos.
+- **Decisiones tomadas:** en el teléfono, la escena 3D no se arrastra bajo la hoja; se ve y se arrastra en la parte superior.
+- **Desviaciones de la spec / cambios en la guía:** la carga hasta el calendario pasa de 0,69 s a 1,21 s (presupuesto < 3 s), porque la portada ya trae three.js y la Luna. Fila de `screens` actualizada en `CLAUDE.md`.
+- **Problemas abiertos:** falta la revisión del humano (T5.2.e) en pantalla o proyector, que incluye escuchar la música.
+- **Siguiente tarea:** cierre de la Fase R → T5.2.e (Humano).

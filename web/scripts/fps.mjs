@@ -64,7 +64,8 @@ const out = await page.evaluate(async () => {
   await until(() => btn("Search and compare"));
   btn("Search and compare").click();
   await until(() => document.querySelector('[data-testid="calendar-canvas"]')?.style.height);
-  const idle = await frames(2000); // reference: the compare view, no WebGL
+  await wait(1000); // let the search panel finish opening and the calendar its first draw
+  const idle = await frames(2000); // reference: the search panel over the globe
   const canvas = document.querySelector('[data-testid="calendar-canvas"]');
   const r = canvas.getBoundingClientRect();
   const labelW = Math.min(220, Math.max(130, r.width * 0.14));
@@ -76,7 +77,7 @@ const out = await page.evaluate(async () => {
   document.querySelector('[data-testid="plan-panel"] .live-btn').click();
   await until(() => document.querySelector('[data-testid="scene-host"]')?.dataset.status === "ready");
   await wait(3000); // textures
-  const steps = [{ step: "compare view (no WebGL, reference)", ...idle }];
+  const steps = [{ step: "search panel over the globe", ...idle }];
   btn("Transit").click();
   await wait(300);
   btn("Play the mission").click();

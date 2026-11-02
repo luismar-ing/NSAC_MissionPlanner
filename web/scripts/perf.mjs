@@ -6,7 +6,7 @@
  *
  * Headless Chrome (puppeteer-core with the installed browser, CHROME_PATH overrides), cold cache every run.
  * Measures the initial load of the landing page (its "landing-ready" mark, TR.1.b) and of the 2D shell (from the
- * click on Mission Planner to the first calendar draw, the app's "shell-ready" mark) on an
+ * click on Mission Planner, then "Search and compare", to the first calendar draw, the app's "shell-ready" mark) on an
  * unthrottled and on a "normal connection" profile, the bytes it downloads, and the update times the app itself
  * records (constraint change → calendar redraw, tray scrubber → all panels). Frame rate and the WebGL context
  * count need a real GPU and a visible window: they are measured in the browser (docs/performance.md).
@@ -47,6 +47,9 @@ async function load(profile) {
     document.querySelector('.mode-card[data-mode="planner"]').click();
     return performance.now();
   });
+  // the calendar lives in the Mission Planner's search panel (TR.2.c): open it as soon as the sidebar is there
+  await page.waitForFunction(() => [...document.querySelectorAll(".mission-sidebar button")].some((b) => b.textContent.startsWith("Search and compare")), { timeout: 60_000 });
+  await page.evaluate(() => [...document.querySelectorAll(".mission-sidebar button")].find((b) => b.textContent.startsWith("Search and compare")).click());
   await page.waitForFunction(() => performance.getEntriesByName("shell-ready").length > 0, { timeout: 60_000 });
   // the 2D shell: everything the planner needs after the click (the core data may already be loading)
   const shellMs = await page.evaluate(() => performance.getEntriesByName("shell-ready")[0].startTime);
