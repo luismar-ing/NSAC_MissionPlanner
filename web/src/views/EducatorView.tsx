@@ -2,7 +2,12 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fmtDay } from "../components/MissionSidebar";
 import { CHAPTERS, stepChapter } from "../lib/chapters";
 import { lookup } from "../lib/constraints";
-import { phaseAt, timelineOf, type MissionTimeline } from "../lib/mission";
+import { phaseAt, playbackRate, timelineOf, type MissionTimeline } from "../lib/mission";
+import { Drawer } from "../components/Drawer";
+import { ErrorMessage } from "../components/ErrorMessage";
+import { describeError } from "../lib/errors";
+import { Panorama } from "./Panorama";
+import { useSiteData } from "./useSiteData";
 import { STRINGS } from "../lib/strings";
 import { fmtMetric, round } from "../lib/why";
 import { sceneBridge } from "../scene3d/bridge";
@@ -82,13 +87,63 @@ export function EducatorView({ tools }: { tools: ReactNode }) {
     };
   }, [plan]);
 
-  // each chapter opens at its own moment of the mission
+  // each chapter opens at its own moment of the mission; the journey and the landing then play by themselves
+  const [play, setPlay] = useState<{ to: number; hoursPerSecond: number } | null>(null);
   useEffect(() => {
     if (!timeline) return;
     const t = c.start(timeline);
     appStore.getState().setMissionTime(t);
     appStore.getState().setMissionPhase(c.planning ? "overview" : phaseAt(timeline, t));
+    setPlay(c.hoursPerSecond > 0 ? { to: c.end(timeline), hoursPerSecond: c.hoursPerSecond } : null);
   }, [chapter, timeline]);
+
+  // playback towards play.to, with the mission's slow motion around launch (lib/mission playbackRate)
+  useEffect(() => {
+    if (!play || !timeline) return;
+    let raf = 0;
+    let last: number | null = null;
+    const go = (t: number) => {
+      appStore.getState().setMissionTime(t);
+      appStore.getState().setMissionPhase(phaseAt(timeline, t));
+    };
+    const tick = (now: number) => {
+      if (last !== null) {
+        const cur = appStore.getState().missionTime ?? timeline.startMs;
+        const t = cur + (now - last) * playbackRate(timeline, cur, play.hoursPerSecond);
+        if (t >= play.to) {
+          go(play.to);
+          setPlay(null);
+          return;
+        }
+        go(t);
+      }
+      last = now;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [play, timeline]);
+
+  const skip = () => {
+    if (!play || !timeline) return;
+    appStore.getState().setMissionTime(play.to);
+    appStore.getState().setMissionPhase(phaseAt(timeline, play.to));
+    setPlay(null);
+  };
+  const fullDay = () => {
+    if (!timeline) return;
+    const now = appStore.getState().missionTime ?? timeline.landingMs;
+    const from = now >= timeline.endMs - 3_600_000 ? timeline.landingMs : now; // at the end of the stay: start again
+    appStore.getState().setMissionTime(from);
+    setPlay({ to: Math.min(timeline.endMs, from + 86_400_000), hoursPerSecond: 1 });
+  };
+  const levelB = useApp((s) => s.levelB);
+  const [panorama, setPanorama] = useState(false);
+  const lookAround = () => {
+    // Level B: stand on the site and drag the sky; without it, the 2D 360° panorama (level A)
+    if (levelB) appStore.getState().setSurfaceView(true);
+    else setPanorama(true);
+  };
 
   // Esc leaves the story for the start page (no dialog of this view handles it first)
   useEffect(() => {
@@ -158,10 +213,26 @@ export function EducatorView({ tools }: { tools: ReactNode }) {
           <p className="edu-caption-text" aria-live="polite">
             {caption}
           </p>
+          {c.id === "surface" && levelB && <p className="edu-hint">{STRINGS.educator.lookHint}</p>}
           <div className="edu-actions">
             <button type="button" className="btn pill" onClick={() => setChapter(stepChapter(chapter, -1))}>
               {STRINGS.educator.back}
             </button>
+            {play && (
+              <button type="button" className="btn pill" onClick={skip}>
+                {STRINGS.educator.skip}
+              </button>
+            )}
+            {c.id === "surface" && (
+              <>
+                <button type="button" className="btn pill primary" onClick={fullDay} disabled={play !== null}>
+                  {STRINGS.educator.fullDay}
+                </button>
+                <button type="button" className="btn pill" onClick={lookAround}>
+                  {STRINGS.educator.lookAround}
+                </button>
+              </>
+            )}
             {chapter < CHAPTERS.length - 1 && (
               <button type="button" className="btn pill primary" onClick={() => setChapter(stepChapter(chapter, 1))}>
                 {STRINGS.educator.next}
@@ -170,7 +241,21 @@ export function EducatorView({ tools }: { tools: ReactNode }) {
           </div>
         </div>
       )}
+      {panorama && <PanoramaDrawer onClose={() => setPanorama(false)} />}
     </div>
+  );
+}
+
+/** "Look around 360°" without Level B: the 2D horizon panorama (spec 8.4, level A) on the mission clock. */
+function PanoramaDrawer({ onClose }: { onClose(): void }) {
+  const missionTime = useApp((s) => s.missionTime);
+  const { plan, error, retry } = useSiteData();
+  return (
+    <Drawer title={STRINGS.educator.lookAround} closeLabel={STRINGS.planner.closeSearch} onClose={onClose} testId="edu-panorama">
+      {error !== null && <ErrorMessage what={STRINGS.errors.site} info={describeError(error)} onRetry={retry} />}
+      {error === null && (!plan || missionTime === null) && <p className="placeholder">{STRINGS.loading}</p>}
+      {plan && missionTime !== null && <Panorama data={plan} timeMs={missionTime} />}
+    </Drawer>
   );
 }
 

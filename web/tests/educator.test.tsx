@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "../src/App";
+import { timelineOf } from "../src/lib/mission";
 import { appStore } from "../src/store/appStore";
 
 vi.mock("../src/scene3d/SceneHost", () => ({ SceneHost: () => <div data-testid="scene-host" /> }));
@@ -77,5 +78,37 @@ describe("Educator chapter 1 (C2)", () => {
     fireEvent.keyDown(window, { key: "Escape" });
     expect(appStore.getState().screen).toBe("landing");
     expect(screen.getByTestId("landing")).toBeTruthy();
+  });
+
+  it("TR.4.c: the journey plays by itself and 'Skip ahead' jumps to lunar arrival; chapter 4: a full day, and looking around", async () => {
+    render(<App />);
+    act(() => appStore.getState().setScreen("educator"));
+    await waitFor(() => expect(appStore.getState().selectedPlanId).not.toBeNull());
+    fireEvent.click(await screen.findByRole("button", { name: "Begin the journey" }));
+    const st = appStore.getState();
+    const plan = st.plansById.get(st.selectedPlanId!)!;
+    const tl = timelineOf(plan, await st.data.trajectory(plan.trajectory_id));
+    await waitFor(() => expect(appStore.getState().missionTime!).toBeGreaterThan(tl.startMs)); // playing
+    fireEvent.click(screen.getByRole("button", { name: "Skip ahead" }));
+    expect(appStore.getState().missionTime).toBe(tl.lunarArrivalMs);
+    expect(screen.queryByRole("button", { name: "Skip ahead" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Next chapter" })); // landing
+    fireEvent.click(screen.getByRole("button", { name: "Next chapter" })); // surface
+    expect(screen.getByRole("heading", { name: "On the surface" })).toBeTruthy();
+    expect(appStore.getState().missionPhase).toBe("site");
+    expect(screen.getByText(/gets sunlight [\d.]+% of the time/)).toBeTruthy(); // figures from the window data
+    fireEvent.click(screen.getByRole("button", { name: "Watch a full day" }));
+    await waitFor(() => expect(appStore.getState().missionTime!).toBeGreaterThan(tl.landingMs));
+    fireEvent.click(screen.getByRole("button", { name: "Skip ahead" }));
+    expect(appStore.getState().missionTime).toBe(tl.landingMs + 86_400_000);
+
+    act(() => appStore.getState().setSurfaceView(false));
+    fireEvent.click(screen.getByRole("button", { name: "Look around 360°" }));
+    expect(appStore.getState().surfaceView).toBe(true); // Level B: stand on the site
+    act(() => appStore.getState().setLevelB(false));
+    fireEvent.click(screen.getByRole("button", { name: "Look around 360°" }));
+    expect(await screen.findByTestId("panorama", {}, { timeout: 5000 })).toBeTruthy(); // level A instead
+    act(() => appStore.getState().setLevelB(true));
   });
 });

@@ -70,6 +70,7 @@ export const STRINGS = {
     fullDay: "Watch a full day",
     lookAround: "Look around 360°",
     lookHint: "Drag the sky to look around. Scroll to zoom.",
+    skip: "Skip ahead",
     exit: "Exit to start",
     siteTabs: "Landing site",
     dayBars: "Arrival days around the chosen one, taller = higher score for this site (heights relative to the days shown)",

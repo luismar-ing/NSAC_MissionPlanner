@@ -890,7 +890,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.4.a, TR.2.a · **Spec:** 8.5 · **Decisiones:** A7 · **Est.:** 2.5 h
 - **Aceptación:** prueba: elegir pestaña y día fija el plan; revisión visual contra C2.
 
-##### [ ] TR.4.c — Capítulos 2 a 4 y superficie (C3)
+##### [x] TR.4.c — Capítulos 2 a 4 y superficie (C3)
 - **Qué:** subtítulos del tránsito y del aterrizaje. En la superficie: subtítulo central, «Watch a full day» (reproduce 24 h) y «Look around 360°» (vista TR.3.a, o panorama Nivel A si el Nivel B está apagado). Al cerrar, T6.3.b pasa a `[x]`.
 - **Archivos:** `web/src/views/EducatorView.tsx`, `web/src/lib/strings.ts`
 - **Depende de:** TR.4.b, TR.3.a · **Spec:** 8.2, 8.4 · **Decisiones:** — · **Est.:** 2.5 h
@@ -935,7 +935,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T5.1.c · **Spec:** 4.2, 5.8 · **Decisiones:** D8 · **Est.:** 2.5 h
 - **Aceptación:** etiqueta ILLUSTRATIVE visible; continuidad con la trayectoria (prueba de T4.2.b sigue pasando).
 
-##### [ ] T6.3.b — Modo educativo narrado
+##### [x] T6.3.b — Modo educativo narrado
 - **Qué:** recorrido guiado con subtítulos cortos en inglés.
 - **Archivos:** `web/src/views/GuidedMode.tsx`, `web/src/lib/strings.ts`
 - **Depende de:** T6.3.a · **Spec:** 4.2, 9 · **Decisiones:** — · **Est.:** 2.5 h

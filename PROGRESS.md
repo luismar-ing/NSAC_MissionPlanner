@@ -2763,3 +2763,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** TR.4.c.
+
+## 2026-11-02 · TR.4.c · Capítulos 2 a 4 y superficie (C3)
+
+- **Tarea:** TR.4.c ([x]). T6.3.b (modo educativo narrado) pasa a [x], cubierta por el modo Educator.
+- **Qué se hizo:** `EducatorView.tsx`: el viaje (6 h/s, con la cámara lenta del despegue de `playbackRate`) y el aterrizaje (1 h/s) se reproducen solos hasta el final de su capítulo; «Skip ahead» salta a ese final. En el capítulo 4, la cámara en primera persona (TR.3.a) y el subtítulo con las cifras de la ventana. «Watch a full day» reproduce 24 h a 1 h/s y, si la estancia ya terminó, vuelve a empezar desde el aterrizaje. «Look around 360°» activa la vista en superficie y muestra la pista «Drag the sky…»; con el Nivel B apagado abre el panorama 2D (Nivel A) en un `Drawer`. Se puede salir en cualquier momento (Home o Esc).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/educator.test.tsx → 3 passed (el viaje avanza solo; Skip → lunar arrival; capítulo 4 en fase site con «gets sunlight N% of the time»; un día completo avanza y Skip → aterrizaje + 24 h; Look around → surfaceView, o el panorama si levelB = false)
+  $ npm --prefix web test → 238 passed · typecheck → exit 0
+  ```
+  Capturas headless 1920×1080: capítulo 2 con el cohete camino de la Luna creciente y la estela discontinua ILLUSTRATIVE; capítulo 4 como C3, con horizonte en primera persona, la Tierra rotulada, subtítulo serif y los tres botones. Sin errores en consola.
+- **Decisiones tomadas:** la reproducción del tiempo no se desactiva con movimiento reducido: no es un vuelo de cámara, y el director ya corta entre encuadres fijos en ese modo.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.5.a.
