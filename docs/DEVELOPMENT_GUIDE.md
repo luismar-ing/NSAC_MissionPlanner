@@ -923,7 +923,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T5.1.c · **Spec:** 4.2, 6 · **Decisiones:** — · **Est.:** 2.5 h
 - **Aceptación:** fuente registrada con licencia, o mapa calculado con su método documentado; figura revisada.
 
-##### [ ] T6.2.b — Mapa polar como paso del zoom
+##### [x] T6.2.b — Mapa polar como paso del zoom
 - **Qué:** integrar el mapa como paso intermedio del zoom, con interruptor.
 - **Archivos:** `web/src/scene3d/cameraDirector.ts`, `web/src/scene3d/polarMap.ts`
 - **Depende de:** T6.2.a · **Spec:** 8.3 · **Decisiones:** — · **Est.:** 2 h

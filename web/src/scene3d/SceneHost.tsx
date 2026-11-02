@@ -42,6 +42,8 @@ export function SceneHost({ planning }: { planning?: () => boolean } = {}) {
           reducedMotion: () => appStore.getState().reducedMotion,
           planning,
           levelB: () => appStore.getState().levelB,
+          polarMap: () => appStore.getState().polarMap,
+          onPolarMapVisible: (v) => appStore.setState({ polarMapShown: v }),
           // standing on the site: only once arrived (the store's phase), and only if the visitor wants it
           surface: () => appStore.getState().surfaceView && appStore.getState().missionPhase === "site",
         });

@@ -2558,3 +2558,17 @@ input[type="range"] {
   min-width: 40px;
   min-height: 34px;
 }
+
+/* legend of the lit polar map (T6.2.b): the same ramp the map is drawn with, dark to Sun orange */
+.polar-ramp {
+  display: inline-block;
+  width: 64px;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-bg), var(--color-sun));
+}
+
+button.scene-chip {
+  font: inherit;
+  font-size: 12px;
+}

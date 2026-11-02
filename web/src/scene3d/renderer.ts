@@ -22,6 +22,7 @@ import { siteBodyFixedKm, sitePositionKm, trailSamples, trailStyle } from "./tra
 import { TerrainManager, type TerrainData } from "./terrain";
 import type { PlanSpec } from "./bridge";
 import { createSkyOverlay, dirOf, type Enu } from "./skyOverlay";
+import { createPolarMap, polarMapOpacity } from "./polarMap";
 import { H_OBS_M, skyAzEl } from "./terrainLevelB";
 import { enuBasis } from "./terrain";
 
@@ -145,6 +146,10 @@ export interface MountOptions {
   levelB?(): boolean;
   /** Read every frame: stand on the site (first-person sky view at h_obs, TR.3.a). Needs Level B and the site. */
   surface?(): boolean;
+  /** Read every frame: the lit polar map as a step of the zoom (T6.2.b). Off or absent = the MVP zoom. */
+  polarMap?(): boolean;
+  /** Called when the polar map appears or goes (the UI shows its legend meanwhile). */
+  onPolarMapVisible?(visible: boolean): void;
 }
 
 /** Surface view (TR.3.a): field of view limits (deg) and the initial gaze, a little below the horizon so the
@@ -215,6 +220,10 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
 
   const earthR = bodyRadius(EARTH_RADII_KM.equatorial);
   const moonR = bodyRadius(MOON_RADIUS_KM);
+  // lit polar map (T6.2.b): a child of the Moon mesh, so it follows the Moon's place, turn and scale
+  const polarMap = createPolarMap(opts.baseUrl, moonR);
+  bodies.moon.add(polarMap);
+  let polarMapShown = false;
 
   /**
    * Everything that depends on the plan: its trajectory, timeline, trail, site and terrain. Built at mount and
@@ -542,6 +551,14 @@ export function mountScene(container: HTMLElement, opts: MountOptions): SceneCon
         const r = surfaceHop.rel;
         pose = approachPose({ position: add3(r.position, input.site), target: add3(r.target, input.site), up: r.up }, pose, input.site, w);
       }
+    }
+    const mapOpacity = tl && opts.polarMap?.() ? polarMapOpacity(tl, t, lambda) : 0;
+    const mapMat = polarMap.material as THREE.MeshBasicMaterial;
+    mapMat.opacity = mapOpacity;
+    polarMap.visible = mapOpacity > 0.01 && mapMat.map !== null;
+    if (polarMap.visible !== polarMapShown) {
+      polarMapShown = polarMap.visible;
+      opts.onPolarMapVisible?.(polarMapShown);
     }
     const fov = surfaceOn ? look.fov : 45;
     if (camera.fov !== fov) {

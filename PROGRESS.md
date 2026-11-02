@@ -2870,3 +2870,18 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.2.b.
+
+## 2026-11-02 · T6.2.b · Mapa polar como paso del zoom
+
+- **Tarea:** T6.2.b ([x]).
+- **Qué se hizo:** `scene3d/polarMap.ts`: un disco de 85°S a 90°S sobre el polo sur de la Luna, hijo de la malla de la Luna (sigue su posición, giro y escala), 0,2 % por encima de la esfera. Sin iluminación y de doble cara, con el mapa de T6.2.a teñido del naranja del Sol: oscuro = casi nunca iluminado, naranja = iluminado casi siempre. Aparece en la primera hora tras la llegada a la Luna, se mantiene durante la aproximación final (cuando la cámara mira el polo desde arriba) y se desvanece justo antes del cambio a escala real, cuando entra el terreno. Interruptor «Sunlight map» (`polarMap` en el store, activo por defecto) y una leyenda «Average sunlight, 18.6 years», con la rampa y la cita en el tooltip, mientras está en pantalla.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/polarMap.test.ts → 2 passed (centro = polo sur, borde = 85°S, centro de la imagen = polo; opacidad 0 en tránsito y en el sitio; continua a 1 h/s, salto < 0,05 por fotograma)
+  $ npm --prefix web test → 242 passed · typecheck → exit 0
+  ```
+  Headless (Malapert, llegada 2027-01-06), con la llegada a la Luna 12 h antes del aterrizaje: a +6 h el disco se ve sobre el polo, con bordes claros y cráteres oscuros; a +9 h cubre la región polar en la aproximación, con la Tierra en el horizonte; a +10 h ya no está. Con el interruptor apagado: sin disco ni leyenda, la misma vista del MVP. Sin errores en consola.
+- **Decisiones tomadas:** dos correcciones encontradas al verificar. La textura se lee como datos lineales (`LinearSRGBColorSpace`), porque como sRGB el valor medio 0,21 se veía casi negro. El material es de doble cara, porque el orden de los triángulos los dejaba de espaldas a la cámara. Además, la opacidad baja a 0,75 para que se vea algo del relieve debajo.
+- **Desviaciones de la spec / cambios en la guía:** ninguna (8.3: paso intermedio opcional).
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.3.a.

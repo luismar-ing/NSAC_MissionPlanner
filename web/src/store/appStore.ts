@@ -55,6 +55,10 @@ export interface AppState {
   /** Level B at the site (T6.1): terrain shadows and the first-person sky view. Off = the MVP scene. */
   levelB: boolean;
   setLevelB(on: boolean): void;
+  /** Lit polar map as a step of the zoom (T6.2.b, extra); polarMapShown = on screen now (for its legend). */
+  polarMap: boolean;
+  setPolarMap(on: boolean): void;
+  polarMapShown: boolean;
   /** At the site with Level B: first-person sky view at h_obs (TR.3.a) instead of the aerial framing. */
   surfaceView: boolean;
   setSurfaceView(on: boolean): void;
@@ -134,6 +138,11 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     setLevelB(on) {
       set({ levelB: on });
     },
+    polarMap: true,
+    setPolarMap(on) {
+      set({ polarMap: on });
+    },
+    polarMapShown: false,
     surfaceView: true,
     setSurfaceView(on) {
       set({ surfaceView: on });

@@ -24,6 +24,9 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
   const missionPhase = useApp((s) => s.missionPhase);
   const sceneScale = useApp((s) => s.sceneScale);
   const pinned = useApp((s) => s.comparePlans.length);
+  const polarMap = useApp((s) => s.polarMap);
+  const setPolarMap = useApp((s) => s.setPolarMap);
+  const polarMapShown = useApp((s) => s.polarMapShown);
   const trajectoryMode = useApp((s) => s.manifest?.params.trajectory_mode ?? "ILLUSTRATIVE");
   const [timeline, setTimeline] = useState<{ planId: string; tl: MissionTimeline } | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -75,6 +78,17 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
             </p>
           )}
           <ScaleIndicator mode={scale} compact />
+          {/* T6.2.b: the lit polar map, its switch, and its legend while it is on screen */}
+          {polarMapShown && (
+            <p className="scene-chip" data-testid="polar-map-legend" title={STRINGS.polarMap.legendTitle}>
+              <span>{STRINGS.polarMap.legend}</span>
+              <span className="polar-ramp" aria-hidden="true" />
+              <span className="visually-hidden">{STRINGS.polarMap.legendTitle}</span>
+            </p>
+          )}
+          <button type="button" className="scene-chip" aria-pressed={polarMap} title={STRINGS.polarMap.toggleTitle} onClick={() => setPolarMap(!polarMap)}>
+            <span aria-hidden="true">{polarMap ? "■" : "□"}</span> {STRINGS.polarMap.toggle}
+          </button>
         </div>
       )}
 

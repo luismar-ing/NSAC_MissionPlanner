@@ -96,6 +96,14 @@ export const STRINGS = {
       },
     },
   },
+  polarMap: {
+    toggle: "Sunlight map",
+    toggleTitle: "Show the average sunlight of the south polar region on the Moon during the landing (an optional step of the zoom)",
+    legend: "Average sunlight, 18.6 years",
+    legendTitle: "LOLA average solar illumination, 85°S–90°S (NASA GSFC PGDA; Mazarico et al. 2011). Dark: almost never sunlit; orange: sunlit most of the time. Context only: the site figures come from PolePlanner's own one-year series.",
+    never: "never",
+    always: "always",
+  },
   sky: {
     sun: "Sun",
     earth: "Earth",
