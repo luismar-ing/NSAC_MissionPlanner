@@ -2798,3 +2798,14 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** la carga hasta el calendario pasa de 0,69 s a 1,21 s (presupuesto < 3 s), porque la portada ya trae three.js y la Luna. Fila de `screens` actualizada en `CLAUDE.md`.
 - **Problemas abiertos:** falta la revisión del humano (T5.2.e) en pantalla o proyector, que incluye escuchar la música.
 - **Siguiente tarea:** cierre de la Fase R → T5.2.e (Humano).
+
+## 2026-11-02 · HITO · Fase R cerrada (rediseño de la interfaz)
+
+- **Estado:** las 15 subtareas de la Fase R están en [x] (TR.0.a a TR.5.a, más T6.1.a–c). T6.3.b quedó cubierta por el modo Educator.
+- **Cómo probar el hito:** `npm --prefix web run build`, luego `npm --prefix web run preview` y abrir http://localhost:4173/.
+  1. Portada: la Luna gira; pasar el cursor y tabular por las dos tarjetas; el botón de sonido.
+  2. Mission Planner: globo (arrastrarlo), cambiar día, estancia y sitio en la barra lateral, «Search and compare» (calendario y bandeja; Esc cierra), «Launch»; viaje con telemetría y dock; «At the site»: llegada en primera persona (arrastrar el cielo, rueda para el zoom), «Aerial view», «3D terrain shadows», «Site details and sources».
+  3. Educator: elegir sitio y día en el capítulo 1, «Begin the journey», «Skip ahead», «Next chapter» hasta la superficie, «Watch a full day», «Look around 360°»; Esc en cualquier momento.
+  4. Repetir con «Reduce motion» activo, y a 375 px de ancho.
+- **Lista para la revisión humana (T5.2.e):** legibilidad en el proyector (subtítulos serif, telemetría monoespaciada, etiquetas del cielo); escuchar el pad de música (volumen y carácter); si la consola del sitio deja suficiente cielo a la vista; las alturas relativas de las barras de días del Educator; si el plan preseleccionado del Educator (el mejor score del año) es buena historia. Capturas de referencia en `docs/figures/screens/`.
+- **Siguiente tarea:** T5.2.e (Humano). Después, Fase 6 (extras restantes) o Fase 7 (entrega; manda desde el 2026-11-10).
