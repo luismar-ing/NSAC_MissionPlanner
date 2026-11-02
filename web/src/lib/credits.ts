@@ -23,6 +23,14 @@ export const DATA_CREDITS: CreditSource[] = [
     license: "NASA data; cite Barker et al. 2023 (PGDA data usage policy)",
   },
   {
+    what: "Lit polar map in the zoom (average sunlight over ~18.6 years; context only, not a site metric)",
+    source: "NASA GSFC Planetary Geodynamics Data Archive (PGDA), Lunar Polar Illumination (E. Mazarico), from LRO LOLA topography",
+    citation: "Mazarico, E., et al. 2011, Icarus 211, 1066–1081, doi:10.1016/j.icarus.2010.10.030",
+    items: ["AVGVISIB_85S_060M_201608.TIF (60 m/pixel, 85°S–90°S)"],
+    urls: ["https://pgda.gsfc.nasa.gov/products/69", "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF"],
+    license: "NASA data; cite Mazarico et al. 2011",
+  },
+  {
     what: "Sun, Earth and Moon positions, lunar orientation, time scales",
     source: "NAIF / SPICE, NASA Jet Propulsion Laboratory (generic kernels)",
     items: ["de440s.bsp (DE440 planetary ephemeris)", "naif0012.tls (leap seconds)", "pck00011.tpc (constants)", "moon_pa_de440_200625.bpc (lunar orientation)", "moon_de440_250416.tf (lunar frames MOON_ME / MOON_PA)"],

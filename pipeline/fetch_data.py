@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 SOURCES = Path(__file__).with_name("data_sources.json")
-GROUPS = ("kernels", "dem", "textures", "regions")
+GROUPS = ("kernels", "dem", "textures", "regions", "illumination")
 CHUNK = 1 << 20
 
 

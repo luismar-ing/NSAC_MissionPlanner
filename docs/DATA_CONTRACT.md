@@ -266,6 +266,21 @@ Los nodos van fila a fila (row-major), de norte a sur y, en cada fila, de oeste 
 
 **ENU_SITE (T2.3.d):** el nodo (x, y) es el punto de la superficie a distancia geodésica hypot(x, y) y azimut atan2(x, y) del sitio (proyección azimutal equidistante), y su altura es la coordenada **Arriba** del ENU del sitio respecto a `origin.elevation_m`. Por eso incluye la caída por curvatura (≈ d²/2R: ~115 m a 20 km): el front end dibuja el terreno tal cual, sin añadir curvatura. Número impar de nodos por lado, con el nodo central exactamente en el sitio. Niveles del MVP (D9): lod0 ±20 km cada 400 m, lod1 ±10 km cada 80 m y lod2 ±3 km cada 40 m (la resolución del DEM). Alturas en int16 × 0.25 m.
 
+## 13 bis. `illumination/south_avg.png` + `south_avg.json` (extra, T6.2.a)
+
+Mapa de iluminación media publicado (PGDA, Mazarico et al. 2011; ver `data/README.md`), reducido para la web por `python -m pipeline.illumination_map`. Opcional: la app funciona sin él (extra de la Fase 6).
+
+| Campo de `south_avg.json` | Tipo | Significado |
+|---|---|---|
+| `product` | string | Producto de origen (`AVGVISIB_85S_060M_201608`). |
+| `value` | string | Codificación: píxel = fracción del tiempo con Sol visible × 255. |
+| `period` | string | Periodo del promedio (~18,6 años, pasos horarios). |
+| `projection` | string | CRS polar estereográfico (R = 1 737 400 m). |
+| `extent_m` | `{left, right, bottom, top}` | Extensión en metros de la proyección (±151 740 m). |
+| `size_px` | int | Lado del PNG cuadrado, en gris de 8 bits; fila 0 = norte de la proyección (y máxima). |
+| `source_url`, `citation` | string | Fuente y cita obligatoria. |
+| `png_sha256` | string | SHA-256 del PNG. |
+
 ## 14. Comprobaciones entre archivos
 
 `python -m pipeline.validate <dir>` y el cargador del front end aplican:

@@ -94,6 +94,15 @@
       "md5": null,
       "sha256": "6f8b6bf9da77745acd938b5439a15771c17107bd3af6b1654f0bb2420aca07a6",
       "doi": "https://doi.org/10.5066/P13FD9ZD"
+    },
+    {
+      "id": "lola_avg_illumination_85s",
+      "group": "illumination",
+      "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF",
+      "path": "illumination/AVGVISIB_85S_060M_201608.TIF",
+      "bytes": 33994464,
+      "md5": null,
+      "sha256": "ccf67d4f39e0a970c111196da7d6551ffcf50d075470b93067fb3904c0b05806"
     }
   ]
 }

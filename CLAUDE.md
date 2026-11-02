@@ -26,12 +26,13 @@ Principio: **2D para comparar, 3D para comprender.** Un solo contexto WebGL; los
 |---|---|---|
 | Crear venv | `python -m venv .venv` | disponible |
 | Instalar pipeline | `.venv/Scripts/python -m pip install -r pipeline/requirements.txt` (Git Bash/Linux: `.venv/bin/python` fuera de Windows) | disponible |
-| Descargar datos | `.venv/Scripts/python -m pipeline.fetch_data` (`--kernels`, `--dem`, `--textures`) | disponible |
+| Descargar datos | `.venv/Scripts/python -m pipeline.fetch_data` (`--kernels`, `--dem`, `--textures`, `--regions`, `--illumination`) | disponible |
 | Validar datos | `.venv/Scripts/python -m pipeline.validate <dir>` o `--file <archivo>` | disponible |
 | Efemérides de los sitios (1 año) / de escena | `.venv/Scripts/python -m pipeline.ephemeris` / `... --scene` (→ `pipeline/out/`) | disponible |
 | Trayectorias ILLUSTRATIVE | `.venv/Scripts/python -m pipeline.trajectory [--plot]` (→ `pipeline/out/trajectory/`) | disponible |
 | Características de los sitios | `.venv/Scripts/python -m pipeline.site_features` (`--fetch-gazetteer` para reconsultar el nomenclátor) | disponible |
 | Texturas web (Tierra y Luna) | `.venv/Scripts/python -m pipeline.textures` (data/textures/ → `web/public/textures/`) | disponible |
+| Mapa polar iluminado (extra, T6.2) | `.venv/Scripts/python -m pipeline.illumination_map` (tras `fetch_data --illumination`; → `web/public/data/illumination/` y `docs/figures/illumination_85s.png`) | disponible |
 | Terreno en LOD | `.venv/Scripts/python -m pipeline.terrain_lod` (→ `pipeline/out/terrain/`) | disponible |
 | Datos SYNTHETIC | — | omitido (A4): el front end usa los datos reales |
 | Correr el pipeline | `.venv/Scripts/python -m pipeline.build_all` (`--assemble` solo reensambla) → `web/public/data/` | disponible |

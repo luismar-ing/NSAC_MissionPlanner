@@ -39,6 +39,18 @@ Notas de la selección:
 - **Marco:** MOON_ME de DE421. El marco `MOON_ME` de nuestros kernels es `MOON_ME_DE440_ME421`, alineado con el ME de DE421 (FK `moon_de440_250416.tf`). Por eso conviene usar MOON_ME en T1.1.b.
 - **Uso:** la página no declara una licencia; pide citar Barker et al. 2023 («Data Usage Policy»). Se cita en el README y en la interfaz (regla 12).
 
+## Iluminación media del polo sur (T6.2.a)
+
+Fuente: NASA GSFC Planetary Geodesy Data Archive, «Lunar Polar Illumination» (E. Mazarico), https://pgda.gsfc.nasa.gov/products/69. Verificado el 2026-11-02 (HTTP 200; tamaño por `Content-Length`). Descargado con `python -m pipeline.fetch_data --illumination` tras la aprobación del humano.
+
+| Archivo | URL | Contenido | Proyección | Valores | Tamaño (bytes) | SHA-256 | Fecha | Cita |
+|---|---|---|---|---|---|---|---|---|
+| `AVGVISIB_85S_060M_201608.TIF` (GeoTIFF, int16, 5058 × 5058, nodata −32768) | https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_85S_060M_201608.TIF | Fracción media del tiempo con el Sol visible, en pasos horarios durante un ciclo de nutación lunar completo (~18,6 años), a partir de la topografía LOLA (datos de 2009-07-13 a 2013-07-18, según las etiquetas del archivo); 60 m/píxel, 85°S–90°S (x, y en ±151 740 m) | `+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +R=1737400 +units=m` | entero × 4·10⁻⁵ = fracción 0–1 (máximo leído: 0,763) | 33 994 464 | `ccf67d4f39e0a970c111196da7d6551ffcf50d075470b93067fb3904c0b05806` | 2026-11-02 | Mazarico, E., et al. (2011), *Icarus* 211, 1066–1081, doi:10.1016/j.icarus.2010.10.030 |
+
+- **Uso:** la página no declara licencia; pide citar Mazarico et al. (2011). Es un producto de NASA GSFC. Se cita en el README y en la interfaz (regla 12).
+- **Qué es y qué no:** media de 18,6 años sobre áreas de 60 m y al nivel del suelo; no es la métrica de los sitios (un año, el punto más alto de cada región, 3 m de altura). En la app es solo contexto en el paso del zoom (T6.2.b). La altura de observación del producto no aparece en la página.
+- **Alternativas del mismo producto:** `AVGVISIB_75S_120M_201608.TIF` (83 052 039 bytes) y `AVGVISIB_65S_240M_201608.TIF` (60 394 652 bytes), con más área y menos resolución; 85°S–90°S ya cubre los cinco sitios.
+
 ## Texturas (T0.2.f)
 
 Fuente: NASA Scientific Visualization Studio (SVS). Verificado el 2026-10-21 (URLs HTTP 200). Política de uso de SVS (https://svs.gsfc.nasa.gov/help/): «All of our content is in the public domain (unless otherwise noted)»; las páginas de estas texturas no indican otra cosa.

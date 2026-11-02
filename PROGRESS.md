@@ -2844,3 +2844,29 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   - **Panel «Site details and sources»:** se abría dentro del área del viaje, una capa por debajo de la barra superior, así que los botones tapaban el título y «Close». Ahora se monta con un portal en la raíz de Mission Planner, y los paneles (también «Search and compare») empiezan bajo la barra (`top: 72px`): Home, sonido y créditos quedan visibles.
   - **Arrastre tras aterrizar:** en pantallas de menos de 860 px de alto (portátiles), el ajuste anterior daba `pointer-events: auto` a toda el área del viaje para que hiciera scroll, y eso bloqueaba el canvas 3D. Se quita: el área sigue haciendo scroll con la rueda sobre los paneles, y el cielo vacío vuelve a recibir los arrastres. «Guided camera» (aparece tras mover la cámara) quedaba escondido bajo la barra superior; pasa arriba al centro.
 - **Cómo se verificó:** script headless a 1920×1080 y 1366×768: arrastrar sobre el cielo mueve la cámara en primera persona y en vista aérea (antes, a 1366×768, el puntero caía en `SECTION.mission-stage` y no se movía); la rueda sobre la consola desplaza el área 300 px a 1366×768; el panel de detalles empieza en y = 72 (barra hasta y = 61) con «Close» visible y clicable. `npm --prefix web run screens` → sin scroll horizontal ni errores. `npm --prefix web test` → 240 passed · typecheck → exit 0.
+
+## 2026-11-02 · T6.2.a · Mapa polar iluminado: fuente publicada (Fase 6)
+
+- **Tarea:** T6.2.a ([x]). La Fase 6 se empieza por petición expresa del humano aunque la Fase 5 sigue abierta (solo falta T5.2.e, su revisión).
+- **Qué se hizo:**
+  - **Verificación de la fuente:** existe un mapa publicado, el de PGDA «Lunar Polar Illumination» (E. Mazarico, https://pgda.gsfc.nasa.gov/products/69): iluminación media del Sol a partir de la topografía LOLA, en pasos horarios durante un ciclo de nutación completo (~18,6 años). La página no declara licencia (producto de NASA GSFC) y pide citar Mazarico et al. (2011). Ni las unidades ni la altura de observación aparecen en la página; las unidades se leen del propio archivo.
+  - **Aprobación del humano** para descargar `AVGVISIB_85S_060M_201608.TIF` (34,0 MB). Se registra en `pipeline/data_sources.json` (grupo `illumination`, con SHA-256) y en `data/README.md`.
+  - **Contenido real del archivo:** int16 × 4·10⁻⁵ = fracción 0–1 (máximo 0,763), 5058² píxeles de 60 m, polar estereográfica con R = 1 737 400 m, ±151,74 km; datos LOLA del 2009-07-13 al 2013-07-18.
+  - **`pipeline/illumination_map.py`:** reduce el mapa a un PNG gris de 1024 px (`web/public/data/illumination/south_avg.png`, 541 KB, valor = fracción × 255) con su cabecera `south_avg.json` (extensión, CRS, codificación, cita y SHA-256), y genera la figura `docs/figures/illumination_85s.png` con los cinco sitios. Contrato: sección 13 bis de `docs/DATA_CONTRACT.md`. Créditos de la interfaz y README actualizados (regla 12).
+- **Cómo se verificó:**
+  ```
+  $ .venv/Scripts/python -m pipeline.illumination_map
+  site                   map 18.6 y  our 2027
+  connecting_ridge            58.9%     95.1%
+  haworth                     55.5%     78.6%
+  nobile_rim_1                52.9%     71.1%
+  malapert_massif             59.5%     76.5%
+  de_gerlache_rim_2           60.2%     87.8%
+  $ .venv/Scripts/python -m pytest pipeline/tests/test_illumination_map.py pipeline/tests/test_fetch_data.py → 5 passed (fracciones 0–1, rejilla documentada, fondo de Shackleton < 2 %, cinco sitios > 40 %, cabecera = PNG)
+  $ npm --prefix web test → 240 passed (créditos: cada URL de data/README.md está en la interfaz y en el README)
+  ```
+  Figura revisada: los sitios caen sobre bordes y crestas claras; el cráter oscuro junto a Connecting Ridge coincide con la posición de Shackleton (x ≈ 7,7 km, y ≈ −6,4 km).
+- **Decisiones tomadas:** se usa el producto publicado, en lugar de calcular uno propio, por decisión del humano. Sus valores son menores que los de nuestras series y el orden de los sitios solo coincide en parte (Spearman ≈ 0,5; Nobile, el último en ambos): son 18,6 años frente a un año, la media de un área de unos 180 m frente al punto más alto de cada región, y el suelo frente a 3 m de altura. Por eso el mapa es solo contexto en el zoom, nunca una métrica de los sitios; la interfaz lo dirá.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.2.b.

@@ -917,7 +917,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 
 **T6.1 (terreno 3D, Nivel B) se trasladó a la Fase R** (TR.3) por decisión del humano (2026-11-01): la vista 3D del terreno y del cielo en el sitio forma parte del rediseño. **T6.3.b (modo educativo narrado)** queda cubierta por el modo Educator (TR.4); se marca `[x]` al cerrar TR.4.c.
 
-##### [ ] T6.2.a — Mapa polar iluminado: fuente o cálculo (verificación)
+##### [x] T6.2.a — Mapa polar iluminado: fuente o cálculo (verificación)
 - **Qué:** verificar si existe un mapa de iluminación LOLA publicado con licencia utilizable; si no, calcular la fracción de iluminación en una rejilla gruesa con el pipeline y marcar el método.
 - **Archivos:** `data/README.md` o `pipeline/illumination_map.py`
 - **Depende de:** T5.1.c · **Spec:** 4.2, 6 · **Decisiones:** — · **Est.:** 2.5 h
