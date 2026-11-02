@@ -197,6 +197,12 @@ function ChooseDock({
   };
   const startMs = Math.min(Math.max(first, Date.parse(arrival) - Math.floor(STRIP_DAYS / 2) * DAY_MS), last - (STRIP_DAYS - 1) * DAY_MS);
   const days = Array.from({ length: STRIP_DAYS }, (_, i) => ymd(startMs + i * DAY_MS));
+  // heights relative to the days shown, so differences read at a glance; each bar's label keeps the real score
+  const scores = days.map((d) => (index ? (lookup(index, plan.site_id, d)?.score ?? null) : null));
+  const known = scores.filter((x): x is number => x !== null);
+  const lo = Math.min(...known);
+  const span = Math.max(...known) - lo;
+  const height = (x: number | null) => (x === null ? 15 : span < 1e-3 ? 100 : 15 + (85 * (x - lo)) / span);
   return (
     <div className="edu-dock">
       <div className="edu-tabs" role="group" aria-label={STRINGS.educator.siteTabs}>
@@ -209,12 +215,11 @@ function ChooseDock({
       <div className="edu-choose">
         <div className="edu-days">
           <div className="edu-bars" role="group" aria-label={STRINGS.educator.dayBars}>
-            {days.map((day) => {
-              const m = index ? lookup(index, plan.site_id, day) : null;
-              const label = STRINGS.planner.dayCell(fmtDay(day), m ? round(m.score, 2) : null);
+            {days.map((day, i) => {
+              const label = STRINGS.planner.dayCell(fmtDay(day), scores[i] === null ? null : round(scores[i]!, 2));
               return (
                 <button key={day} type="button" className="edu-bar" aria-pressed={day === arrival} aria-label={label} title={label} onClick={() => pick(plan.site_id, day)}>
-                  <span style={{ height: `${Math.round(20 + 80 * (m?.score ?? 0))}%` }} />
+                  <span style={{ height: `${Math.round(height(scores[i]))}%` }} />
                 </button>
               );
             })}

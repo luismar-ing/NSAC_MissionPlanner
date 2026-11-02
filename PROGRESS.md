@@ -2746,3 +2746,20 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Cómo se verificó:** `npm --prefix web test` → 235 passed · typecheck → exit 0. **No verificado:** pruebas propias de EducatorView (pestañas, barras, Begin, Esc) ni revisión en el navegador.
 - **Problemas abiertos:** faltan la prueba de la vista y la revisión visual contra C2; TR.4.c (reproducción de los capítulos, «Watch a full day», «Look around 360°») y TR.5.a siguen pendientes.
 - **Siguiente tarea:** terminar TR.4.b.
+
+## 2026-11-02 · TR.4.b · Capítulo 1 del modo Educator (C2), cierre
+
+- **Tarea:** TR.4.b ([x]).
+- **Qué se hizo:** prueba `tests/educator.test.tsx` y ajuste de las barras de días: la altura va relativa a los 21 días visibles, para que las diferencias se lean de un vistazo (con escala absoluta, en enero todas medían casi lo mismo). La etiqueta de cada barra sigue dando el score real.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/educator.test.tsx → 2 passed
+    preselecciona el plan de 7 d con el score máximo del año; pestaña → mismo día en otro sitio; barra → otro día
+    «Begin the journey» → capítulo 2 en la fase launch; Back vuelve; Esc → portada
+  $ npm --prefix web test → 237 passed · typecheck → exit 0
+  ```
+  Captura headless 1920×1080 contra C2: titular serif, pestañas, barras con el pico en el día elegido (Jan 10, 2027, Connecting Ridge), «Begin the journey» y el globo a la derecha. Sin errores en consola.
+- **Decisiones tomadas:** escala relativa de las barras (el texto accesible lo dice).
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** TR.4.c.

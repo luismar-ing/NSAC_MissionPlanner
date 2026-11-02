@@ -72,7 +72,7 @@ export const STRINGS = {
     lookHint: "Drag the sky to look around. Scroll to zoom.",
     exit: "Exit to start",
     siteTabs: "Landing site",
-    dayBars: "Arrival days, taller = better for this site",
+    dayBars: "Arrival days around the chosen one, taller = higher score for this site (heights relative to the days shown)",
     arrive: (date: string, days: number) => `Arrive ${date} · stay ${days} days`,
     chapters: {
       leaving: {

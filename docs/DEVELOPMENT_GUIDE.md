@@ -884,7 +884,7 @@ Origen: lienzo de propuestas «PolePlanner redesign directions» (A1 a C3). Elec
 - **Depende de:** TR.0.b · **Spec:** 3, 9 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** pruebas: cada capítulo lleva la misión a su fase; Esc vuelve a la portada; los textos no contienen cifras que no salgan de los datos.
 
-##### [~] TR.4.b — Capítulo 1: elegir sitio y fecha (C2)
+##### [x] TR.4.b — Capítulo 1: elegir sitio y fecha (C2)
 - **Qué:** globo (TR.2.a), pestañas de sitio, barras de días por score, «Begin the journey» y un plan bueno preseleccionado. Titulares en Instrument Serif y etiqueta ILLUSTRATIVE.
 - **Archivos:** `web/src/views/EducatorView.tsx`
 - **Depende de:** TR.4.a, TR.2.a · **Spec:** 8.5 · **Decisiones:** A7 · **Est.:** 2.5 h
