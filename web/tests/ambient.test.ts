@@ -49,6 +49,7 @@ describe("ambient sound (A7)", () => {
     const f = fakeContext();
     const s = new AmbientSound(() => f.ctx);
     s.startFromGesture();
+    (f.ctx as unknown as { state: string }).state = "running"; // the browser let it play
     s.toggle();
     expect(s.enabled).toBe(false);
     expect(s.isPlaying).toBe(false);
@@ -68,5 +69,31 @@ describe("ambient sound (A7)", () => {
     const s = new AmbientSound(() => null);
     expect(() => s.startFromGesture()).not.toThrow();
     expect(s.isPlaying).toBe(false);
+  });
+
+  it("first gesture resumes a suspended pad, but a press on the sound button is left to the button", () => {
+    const f = fakeContext();
+    const s = new AmbientSound(() => f.ctx);
+    const listeners: ((e: Event) => void)[] = [];
+    const target = { addEventListener: (_: string, l: (e: Event) => void) => listeners.push(l), removeEventListener: () => {} };
+    s.autoStart(target as unknown as Window);
+    const button = document.createElement("button");
+    button.setAttribute("data-sound-toggle", "");
+    listeners[0]({ target: button } as unknown as Event);
+    expect(f.ctx.resumed).toBe(1); // ignored: the button's click decides
+    listeners[0]({ target: document.body } as unknown as Event);
+    expect(f.ctx.resumed).toBe(2); // any other first gesture resumes it
+  });
+
+  it("the button never mutes a sound the browser has not let play yet: the press starts it instead", () => {
+    const f = fakeContext(); // state stays "suspended"
+    const s = new AmbientSound(() => f.ctx);
+    s.autoStart({ addEventListener() {}, removeEventListener() {} } as unknown as Window);
+    s.toggle();
+    expect(s.enabled).toBe(true);
+    expect(f.ctx.resumed).toBe(2);
+    (f.ctx as unknown as { state: string }).state = "running";
+    s.toggle(); // now audible: the press mutes
+    expect(s.enabled).toBe(false);
   });
 });

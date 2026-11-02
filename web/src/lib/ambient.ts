@@ -64,8 +64,34 @@ export class AmbientSound {
     if (this.wanted) this.play();
   }
 
-  /** The sound button: turns sound on (and starts it, this is a gesture) or off; the choice is remembered. */
+  /**
+   * Page load: sound is on by default. Browsers let audio start without a gesture only on sites the visitor
+   * already interacted with, so this tries now and, failing that, starts on the first click or key press
+   * anywhere on the page (the sound button handles its own click: see toggle).
+   */
+  autoStart(target: Pick<Window, "addEventListener" | "removeEventListener"> = window): void {
+    if (this.wanted) this.play();
+    const events = ["pointerdown", "keydown"] as const;
+    const first = (e: Event) => {
+      if ((e.target as Element | null)?.closest?.("[data-sound-toggle]")) return;
+      for (const ev of events) target.removeEventListener(ev, first, true);
+      this.startFromGesture();
+    };
+    for (const ev of events) target.addEventListener(ev, first, true);
+  }
+
+  /** Playing and actually audible (the browser has let the audio context run). */
+  private get audible(): boolean {
+    return this.playing && this.ctx?.state === "running";
+  }
+
+  /** The sound button: turns sound on (and starts it, this is a gesture) or off; the choice is remembered.
+   *  While sound is on but still held back by the browser, pressing it starts the sound instead of muting. */
   toggle(): void {
+    if (this.wanted && !this.audible) {
+      this.play();
+      return;
+    }
     this.wanted = !this.wanted;
     writePref(this.wanted);
     if (this.wanted) this.play();
@@ -78,7 +104,10 @@ export class AmbientSound {
   }
 
   private play() {
-    if (this.playing) return;
+    if (this.playing) {
+      void this.ctx?.resume(); // started before any gesture: the browser may have kept it suspended
+      return;
+    }
     if (!this.ctx) {
       this.ctx = this.makeContext();
       if (!this.ctx) return; // no Web Audio: stay silent

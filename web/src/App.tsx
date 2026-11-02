@@ -33,7 +33,12 @@ export function App() {
   // the landing page needs no data: it shows at once while the core data loads behind it
   const motionToggle = (
     <button type="button" className="btn ghost motion-toggle" aria-pressed={reducedMotion} title={STRINGS.motion.title} onClick={() => setReducedMotion(!reducedMotion)}>
-      <span aria-hidden="true">{reducedMotion ? "■" : "□"}</span> {STRINGS.motion.reduce}
+      {/* a small switch: knob left and outlined while off, knob right and filled while on */}
+      <svg width="26" height="16" viewBox="0 0 26 16" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="14" rx="7" fill={reducedMotion ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5" />
+        <circle cx={reducedMotion ? 18 : 8} cy="8" r="4" fill={reducedMotion ? "var(--color-bg)" : "currentColor"} />
+      </svg>
+      {STRINGS.motion.reduce}
     </button>
   );
 

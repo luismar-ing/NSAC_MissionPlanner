@@ -28,6 +28,34 @@ h3 {
   letter-spacing: -0.02em;
 }
 
+/* scrollbars in the interface's own colours (thin, dark track) instead of the browser's light default */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
@@ -1618,12 +1646,6 @@ input[type="range"] {
   max-width: 34rem;
 }
 
-.landing-kicker {
-  margin: 0 0 var(--space-md);
-  color: var(--color-text-muted);
-  font-size: var(--font-md);
-}
-
 .landing-title {
   font-family: var(--font-display);
   font-weight: 300;
@@ -1766,6 +1788,17 @@ input[type="range"] {
   inset: 0;
 }
 
+/* full-screen scene: "Guided camera" goes to the top centre, clear of the tool bar and the side panels */
+.planner-scene .scene-camera-btn {
+  top: 76px;
+  right: auto;
+  left: 50%;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
 .planner-scene .scene-host {
   height: 100%;
   min-height: 0;
@@ -1803,6 +1836,11 @@ input[type="range"] {
   flex-direction: column;
   gap: 22px;
   overflow-y: auto;
+}
+
+.mission-sidebar > *,
+.site-card > * {
+  flex: none; /* scroll instead of squeezing the sections */
 }
 
 .sidebar-mode {
@@ -1946,6 +1984,12 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  /* on short screens the sidebar scrolls: Launch stays pinned to its bottom edge, over the list */
+  position: sticky;
+  bottom: -24px;
+  margin-bottom: -24px;
+  padding: 12px 0 24px;
+  background: linear-gradient(to bottom, transparent, var(--color-panel) 14px);
 }
 
 .btn.primary {
@@ -2015,10 +2059,11 @@ input[type="range"] {
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(0, 232px);
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   grid-template-areas:
     "head . thumbs"
-    "notes notes thumbs"
+    ". . thumbs"
+    "notes notes notes"
     "dock dock dock";
   gap: var(--space-md);
   padding: 76px 24px 24px; /* the top row of tools (planner-top) sits above the grid */
@@ -2029,9 +2074,10 @@ input[type="range"] {
 .mission-stage.at-site {
   grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(0, 320px);
   grid-template-rows: auto minmax(0, 1fr) auto auto;
+  /* the card spans the sky's rows, so its height never squeezes the console (the 2D panorama) */
   grid-template-areas:
     "head . card"
-    ". . thumbs"
+    "thumbs . card"
     "console console console"
     "dock dock dock";
 }
@@ -2089,7 +2135,7 @@ input[type="range"] {
 .mission-notes {
   grid-area: notes;
   align-self: end;
-  justify-self: center;
+  justify-self: end; /* at the right, clear of the trajectory in the middle of the view */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2103,10 +2149,31 @@ input[type="range"] {
   pointer-events: auto;
 }
 
-.mission-notes .scene-badge,
-.mission-notes .scale-indicator {
-  position: static;
+.mission-notes {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* compact notes over the journey (ILLUSTRATIVE, scale): small chips, details in the tooltip */
+.scene-chip {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--glass-stroke);
+  border-radius: 999px;
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--glass-blur));
+  font-size: 12px;
+  color: var(--color-text-muted);
+  cursor: help;
+}
+
+.scene-chip .badge {
+  border: 0;
+  padding: 0;
 }
 
 .mission-thumbs {
@@ -2130,14 +2197,57 @@ input[type="range"] {
   display: contents;
 }
 
+/* at the site the dock is one row (clock, play + timeline, jump, speed), so the 2D console keeps its height */
+@media (min-width: 1100px) {
+  .mission-stage.at-site .mission-controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-lg);
+  }
+  .mission-stage.at-site .phase-track {
+    display: none; /* the "Jump to" buttons name the phases; the bar is the scrubber itself */
+  }
+  .mission-stage.at-site .mission-row {
+    display: contents;
+  }
+  .mission-stage.at-site .mission-controls .scrubber {
+    flex: 1 1 360px;
+  }
+  .mission-stage.at-site .mission-controls .segmented,
+  .mission-stage.at-site .mission-clock {
+    flex: none;
+  }
+}
+
+/* at the site the comparison table (same plans, same clock) takes over from the thumbnails, which would
+   only fit clipped next to the console */
+.mission-stage.at-site:has(.site-compare-mini) .mission-thumbs {
+  display: none;
+}
+
+/* the card's actions side by side */
+.site-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.site-card-actions .btn {
+  flex: 1 1 auto;
+  padding: 6px 10px;
+  font-size: var(--font-sm);
+}
+
 .site-card {
   grid-area: card;
   align-self: start;
-  padding: 18px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 46vh;
+  gap: 8px;
+  max-height: 100%;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -2187,6 +2297,20 @@ input[type="range"] {
   }
 }
 
+/* short screens (laptops, 768 px tall): the 2D panorama and the comparison keep their full height and the
+   journey's panels scroll as one page instead of clipping the console */
+@media (max-height: 860px) and (min-width: 721px) {
+  .mission-stage.at-site {
+    grid-template-rows: auto minmax(120px, auto) auto auto;
+    overflow-y: auto; /* wheel over the panels scrolls; the empty sky still lets the canvas take drags */
+  }
+  .mission-stage.at-site .site-console,
+  .mission-stage.at-site .mission-dock {
+    max-height: none;
+    overflow: visible; /* a scrolling grid item may shrink to nothing: let the stage scroll instead */
+  }
+}
+
 .mission-dock .mission-controls {
   margin-top: 0;
 }
@@ -2220,7 +2344,7 @@ input[type="range"] {
 
 .drawer-scrim {
   position: absolute;
-  inset: 0;
+  inset: 72px 0 0; /* below the top bar: Home, sound and credits stay visible and usable */
   z-index: 4;
   background: rgb(0 0 0 / 0.4);
   animation: fade-in var(--motion-mid) ease-out;
@@ -2228,7 +2352,8 @@ input[type="range"] {
 
 .drawer {
   position: absolute;
-  top: 0;
+  top: 72px;
+  border-top-left-radius: var(--radius-lg);
   right: 0;
   bottom: 0;
   z-index: 5;
@@ -2242,6 +2367,12 @@ input[type="range"] {
   background: var(--color-bg);
   border-left: 1px solid var(--glass-stroke);
   animation: drawer-in var(--motion-mid) cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* the panel scrolls; its sections keep their own height (shrinking them pushed the tray's panels under the
+   next section) */
+.drawer > * {
+  flex: none;
 }
 
 .drawer-head {
@@ -2411,4 +2542,19 @@ input[type="range"] {
   .edu-actions .btn.pill {
     padding: 10px 16px;
   }
+}
+
+/* header toggles: icon and label on one centred line (the sound button is icon-only) */
+.motion-toggle,
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+}
+
+.sound-toggle {
+  min-width: 40px;
+  min-height: 34px;
 }

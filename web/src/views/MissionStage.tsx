@@ -67,12 +67,14 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
 
       {!atSite && (
         <div className="mission-notes">
+          {/* small chips over the journey: the full explanation is in the tooltip and read by screen readers */}
           {trajectoryMode === "ILLUSTRATIVE" && (
-            <p className="scene-badge" data-testid="illustrative-label" title={STRINGS.panel.illustrativeTitle}>
-              <span className="badge illustrative">ILLUSTRATIVE</span> {STRINGS.live.illustrative}
+            <p className="scene-chip" data-testid="illustrative-label" title={`${STRINGS.live.illustrative}. ${STRINGS.panel.illustrativeTitle}`}>
+              <span className="badge illustrative">ILLUSTRATIVE</span>
+              <span className="visually-hidden">{STRINGS.live.illustrative}</span>
             </p>
           )}
-          <ScaleIndicator mode={scale} />
+          <ScaleIndicator mode={scale} compact />
         </div>
       )}
 

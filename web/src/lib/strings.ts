@@ -24,6 +24,7 @@ export const STRINGS = {
   },
   dataBadge: (status: string, version: string) => `${status} data · ${version}`,
   sound: {
+    label: "Ambient music",
     on: "Sound on",
     off: "Sound off",
     title: "Ambient music, generated in your browser (no recordings)",
@@ -111,8 +112,7 @@ export const STRINGS = {
   home: "Home",
   homeTitle: "Back to the start page (your pinned plans are kept)",
   landing: {
-    kicker: "Lunar south pole",
-    title: "Where, and when, to land in the light.",
+    title: "Where do we land next?",
     choose: "Choose how to explore",
     educator: {
       name: "Educator",
@@ -276,6 +276,7 @@ export const STRINGS = {
   },
   scale: {
     notToScale: "Not to scale",
+    factor: (f: number) => `bodies ×${f}`,
     realScale: "Real scale",
     exaggerated: (f: number) => `Earth and Moon drawn ${f}× larger, rocket enlarged to stay visible · distances, Sun direction and Moon phase exact`,
     local: "Terrain and distances at their real size",

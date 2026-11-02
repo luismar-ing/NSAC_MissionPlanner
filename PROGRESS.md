@@ -2809,3 +2809,38 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   4. Repetir con «Reduce motion» activo, y a 375 px de ancho.
 - **Lista para la revisión humana (T5.2.e):** legibilidad en el proyector (subtítulos serif, telemetría monoespaciada, etiquetas del cielo); escuchar el pad de música (volumen y carácter); si la consola del sitio deja suficiente cielo a la vista; las alturas relativas de las barras de días del Educator; si el plan preseleccionado del Educator (el mejor score del año) es buena historia. Capturas de referencia en `docs/figures/screens/`.
 - **Siguiente tarea:** T5.2.e (Humano). Después, Fase 6 (extras restantes) o Fase 7 (entrega; manda desde el 2026-11-10).
+
+## 2026-11-02 · AJUSTE · Portada, sonido por defecto y botones de cabecera (petición del humano)
+
+- **Tarea:** ajustes fuera de la guía, pedidos en el chat.
+- **Qué se hizo:**
+  - Portada: el titular pasa a «Where do we land next?» y se quita «Lunar south pole» (también su estilo `.landing-kicker`).
+  - Sonido activo al cargar: `ambient.autoStart()` en `main.tsx` intenta arrancar en la carga y, si el navegador lo retiene (política de autoplay), arranca con el primer clic o tecla en cualquier parte de la página. El botón ya no apaga un sonido que el navegador aún no deja oír: esa pulsación lo arranca. Antes, en la portada no sonaba nada y la primera pulsación del botón lo desactivaba.
+  - Botón de sonido solo con icono (`aria-label` «Ambient music», estado en `aria-pressed` y en el `title`).
+  - «Reduce motion»: icono de interruptor (apagado: contorno con el botón a la izquierda; activo: relleno con el botón a la derecha), alineado con flex.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web test → 240 passed (nuevas: el primer gesto reanuda el audio pero ignora el propio botón; el botón no silencia un audio aún suspendido) · typecheck → exit 0
+  ```
+  Chrome headless: un solo `AudioContext` al cargar; el botón alterna `aria-pressed` true/false; capturas de los dos estados del interruptor alineados. El headless deja sonar sin gesto, así que la ruta «retenido hasta el primer clic» queda cubierta por las pruebas unitarias y no por el navegador.
+- **Problemas abiertos:** ninguno.
+
+## 2026-11-02 · AJUSTE · Vistas de Mission Planner: scroll, bandeja y llegada (petición del humano)
+
+- **Tarea:** correcciones visuales pedidas en el chat.
+- **Qué se hizo:**
+  - **Barras de scroll:** finas y oscuras en toda la app (`scrollbar-color` con `--color-border-strong` sobre fondo transparente; `::-webkit-scrollbar` para Chromium), en lugar de la barra clara del navegador.
+  - **Bandeja tapada por «At the site»:** el panel «Search and compare» es una columna flex de alto fijo y sus secciones se encogían; los paneles 2D de la bandeja se desbordaban bajo la sección siguiente. Ahora las secciones no se encogen (`.drawer > * { flex: none }`) y el panel hace scroll. La misma regla se aplica a la barra lateral y a la tarjeta de métricas.
+  - **Barra lateral en pantallas bajas:** «Search and compare» y «Launch» quedan fijos al pie (`position: sticky`) mientras la lista de sitios hace scroll por debajo.
+  - **Llegada al sitio:** la consola 2D (panorama, lecturas y cinta) se recortaba porque la tarjeta de métricas ocupaba toda la primera fila de la rejilla. Ahora la tarjeta abarca las dos filas del cielo; el dock de misión ocupa una sola fila (reloj, reproducir y línea de tiempo, saltos, velocidad), y la pista de fases se oculta porque «Jump to» ya nombra las fases; los botones de la tarjeta van en fila. En pantallas de menos de 860 px de alto, la consola conserva su altura completa y los paneles del viaje hacen scroll juntos (con al menos 120 px de cielo). En el sitio, si hay otros planes anclados, la tabla «Against your pinned plans» (los mismos planes, en el mismo reloj) sustituye a la franja de miniaturas, que solo cabía recortada.
+- **Cómo se verificó:** script headless a 1920×1080 y 1366×768: en el panel, sin solapes entre secciones y 0 paneles de la bandeja desbordados; en la llegada, la consola sin scroll interno (447/449 px y 538/540 px) y sin solapes entre tarjeta, consola, dock y telemetría; barra lateral con `scrollbar-color: rgb(58, 71, 96) transparent`. `npm --prefix web run screens` → sin scroll horizontal ni errores. `npm --prefix web test` → 240 passed · typecheck → exit 0.
+- **Desviaciones de la spec / cambios en la guía:** spec 8.0 pide miniaturas vivas en el modo vivir. Siguen vivas durante el viaje; en el sitio las sustituye la tabla de comparación, con los mismos planes y el mismo reloj, cuando hay planes anclados.
+- **Problemas abiertos:** el headless usa barras de scroll superpuestas, así que el aspecto final de la barra oscura se confirma en un Chrome normal.
+
+## 2026-11-02 · AJUSTE · Avisos compactos, panel de detalles y arrastre en el sitio (petición del humano)
+
+- **Qué se hizo:**
+  - **ILLUSTRATIVE y «Not to scale»:** en el viaje de Mission Planner pasan a dos chips pequeños (`.scene-chip`): «ILLUSTRATIVE» y «Not to scale · bodies ×6». La frase completa va en el `title` y en texto solo para lectores de pantalla (`ScaleIndicator` gana la prop `compact`). La etiqueta ILLUSTRATIVE sigue visible (regla 2). La `LiveView` antigua no cambia.
+  - **Panel «Site details and sources»:** se abría dentro del área del viaje, una capa por debajo de la barra superior, así que los botones tapaban el título y «Close». Ahora se monta con un portal en la raíz de Mission Planner, y los paneles (también «Search and compare») empiezan bajo la barra (`top: 72px`): Home, sonido y créditos quedan visibles.
+  - **Arrastre tras aterrizar:** en pantallas de menos de 860 px de alto (portátiles), el ajuste anterior daba `pointer-events: auto` a toda el área del viaje para que hiciera scroll, y eso bloqueaba el canvas 3D. Se quita: el área sigue haciendo scroll con la rueda sobre los paneles, y el cielo vacío vuelve a recibir los arrastres. «Guided camera» (aparece tras mover la cámara) quedaba escondido bajo la barra superior; pasa arriba al centro.
+- **Cómo se verificó:** script headless a 1920×1080 y 1366×768: arrastrar sobre el cielo mueve la cámara en primera persona y en vista aérea (antes, a 1366×768, el puntero caía en `SECTION.mission-stage` y no se movía); la rueda sobre la consola desplaza el área 300 px a 1366×768; el panel de detalles empieza en y = 72 (barra hasta y = 61) con «Close» visible y clicable. `npm --prefix web run screens` → sin scroll horizontal ni errores. `npm --prefix web test` → 240 passed · typecheck → exit 0.

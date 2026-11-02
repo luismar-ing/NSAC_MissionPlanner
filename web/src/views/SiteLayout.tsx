@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Drawer } from "../components/Drawer";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { describeError } from "../lib/errors";
@@ -29,37 +30,72 @@ export function SiteLayout() {
   const surfaceView = useApp((s) => s.surfaceView);
   const setSurfaceView = useApp((s) => s.setSurfaceView);
   const others = plan ? pinned.filter((p) => p.plan.id !== plan.plan.id) : [];
-  const best = plan ? bestBadges([plan.metrics, ...others.map((p) => p.metrics)])[0] : new Set<never>();
+  const best = plan
+    ? bestBadges([plan.metrics, ...others.map((p) => p.metrics)])[0]
+    : new Set<never>();
 
   return (
-    <section className="site-layout" data-testid="live-site" aria-labelledby="live-site-title">
+    <section
+      className="site-layout"
+      data-testid="live-site"
+      aria-labelledby="live-site-title"
+    >
       <h3 id="live-site-title" className="visually-hidden">
         {STRINGS.site.title}
       </h3>
       {error !== null && (
         <div className="site-console glass">
-          <ErrorMessage what={STRINGS.errors.site} info={describeError(error)} onRetry={retry} />
+          <ErrorMessage
+            what={STRINGS.errors.site}
+            info={describeError(error)}
+            onRetry={retry}
+          />
         </div>
       )}
-      {error === null && (!plan || !site || missionTime === null) && <p className="site-console glass placeholder">{STRINGS.loading}</p>}
+      {error === null && (!plan || !site || missionTime === null) && (
+        <p className="site-console glass placeholder">{STRINGS.loading}</p>
+      )}
       {plan && site && missionTime !== null && (
         <>
-          <aside className="site-card glass" aria-label={STRINGS.siteLayout.card}>
+          <aside
+            className="site-card glass"
+            aria-label={STRINGS.siteLayout.card}
+          >
             <p className="site-card-label">{STRINGS.siteLayout.card}</p>
             <MetricsBox metrics={plan.metrics} best={best} />
-            <button type="button" className="btn ghost" onClick={() => setDetails(true)}>
-              {STRINGS.siteLayout.details}
-            </button>
-            {/* T6.1.c: Level B can be turned off; the MVP scene and every 2D view stay as they are */}
-            <button type="button" className="btn ghost" aria-pressed={levelB} title={STRINGS.siteLayout.levelBTitle} onClick={() => setLevelB(!levelB)}>
-              <span aria-hidden="true">{levelB ? "■" : "□"}</span> {STRINGS.siteLayout.levelB}
-            </button>
-            {/* TR.3.a: the first-person sky (Level B) or the aerial framing of the site */}
-            {levelB && (
-              <button type="button" className="btn ghost" title={STRINGS.siteLayout.standTitle} onClick={() => setSurfaceView(!surfaceView)}>
-                {surfaceView ? STRINGS.siteLayout.aerial : STRINGS.siteLayout.stand}
+            <div className="site-card-actions">
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setDetails(true)}
+              >
+                {STRINGS.siteLayout.details}
               </button>
-            )}
+              {/* T6.1.c: Level B can be turned off; the MVP scene and every 2D view stay as they are */}
+              <button
+                type="button"
+                className="btn ghost"
+                aria-pressed={levelB}
+                title={STRINGS.siteLayout.levelBTitle}
+                onClick={() => setLevelB(!levelB)}
+              >
+                <span aria-hidden="true">{levelB ? "■" : "□"}</span>{" "}
+                {STRINGS.siteLayout.levelB}
+              </button>
+              {/* TR.3.a: the first-person sky (Level B) or the aerial framing of the site */}
+              {levelB && (
+                <button
+                  type="button"
+                  className="btn ghost"
+                  title={STRINGS.siteLayout.standTitle}
+                  onClick={() => setSurfaceView(!surfaceView)}
+                >
+                  {surfaceView
+                    ? STRINGS.siteLayout.aerial
+                    : STRINGS.siteLayout.stand}
+                </button>
+              )}
+            </div>
           </aside>
           <div className="site-console glass">
             <div className="site-console-main">
@@ -68,11 +104,25 @@ export function SiteLayout() {
             </div>
             {others.length > 0 && <CompareTable plan={plan} others={others} />}
           </div>
-          {details && (
-            <Drawer title={STRINGS.siteLayout.detailsTitle(plan.site.name)} closeLabel={STRINGS.planner.closeSearch} onClose={() => setDetails(false)} testId="site-details">
-              <SitePanel plan={plan} features={site.features} daily={site.daily} pinned={pinned} />
-            </Drawer>
-          )}
+          {/* rendered in the Mission Planner's root layer: above the journey panels (which may scroll) and
+              below the tool bar, like the search panel */}
+          {details &&
+            createPortal(
+              <Drawer
+                title={STRINGS.siteLayout.detailsTitle(plan.site.name)}
+                closeLabel={STRINGS.planner.closeSearch}
+                onClose={() => setDetails(false)}
+                testId="site-details"
+              >
+                <SitePanel
+                  plan={plan}
+                  features={site.features}
+                  daily={site.daily}
+                  pinned={pinned}
+                />
+              </Drawer>,
+              document.querySelector(".planner") ?? document.body,
+            )}
         </>
       )}
     </section>
@@ -80,18 +130,31 @@ export function SiteLayout() {
 }
 
 /** Every metric of this plan against the other pinned ones; ★ marks the best of each row (shape, not colour). */
-function CompareTable({ plan, others }: { plan: PlanData; others: PlanData[] }) {
+function CompareTable({
+  plan,
+  others,
+}: {
+  plan: PlanData;
+  others: PlanData[];
+}) {
   const rows = [plan, ...others];
   const best = bestBadges(rows.map((p) => p.metrics));
   return (
     <div className="site-compare-mini table-scroll">
       <table className="compare-table" data-testid="site-compare-mini">
-        <caption className="site-card-label">{STRINGS.siteLayout.compare}</caption>
+        <caption className="site-card-label">
+          {STRINGS.siteLayout.compare}
+        </caption>
         <thead>
           <tr>
             <th scope="col">{STRINGS.sitePanel.short.metric}</th>
             {rows.map((p, i) => (
-              <th key={p.plan.id} scope="col" className={i === 0 ? "this-plan" : ""} title={`${p.site.name} · ${p.plan.arrival_utc.slice(0, 10)}`}>
+              <th
+                key={p.plan.id}
+                scope="col"
+                className={i === 0 ? "this-plan" : ""}
+                title={`${p.site.name} · ${p.plan.arrival_utc.slice(0, 10)}`}
+              >
                 {i === 0 ? STRINGS.siteLayout.thisPlan : p.site.name}
               </th>
             ))}
@@ -104,7 +167,9 @@ function CompareTable({ plan, others }: { plan: PlanData; others: PlanData[] }) 
               {rows.map((p, i) => (
                 <td key={p.plan.id} data-best={best[i].has(key)}>
                   {fmtMetric(key, p.metrics[key])}
-                  {best[i].has(key) && <span aria-label={STRINGS.panel.best}> ★</span>}
+                  {best[i].has(key) && (
+                    <span aria-label={STRINGS.panel.best}> ★</span>
+                  )}
                 </td>
               ))}
             </tr>

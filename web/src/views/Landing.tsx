@@ -35,7 +35,6 @@ export function Landing({ tools, onCredits }: { tools?: ReactNode; onCredits(): 
         <div className="landing-tools">{tools}</div>
       </header>
       <div className="landing-copy">
-        <p className="landing-kicker">{STRINGS.landing.kicker}</p>
         <h1 className="landing-title">{STRINGS.landing.title}</h1>
       </div>
       <nav className="landing-modes" aria-label={STRINGS.landing.choose}>
