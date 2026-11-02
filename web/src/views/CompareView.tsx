@@ -14,6 +14,8 @@ export function CompareView() {
   const manifest = useApp((s) => s.manifest);
   const nSites = useApp((s) => s.sites.length);
   const energyModel = useApp((s) => s.energyModel);
+  const nlConstraints = useApp((s) => s.nlConstraints);
+  const setNlConstraints = useApp((s) => s.setNlConstraints);
   const setEnergyModel = useApp((s) => s.setEnergyModel);
   if (!manifest) return null;
   const nDays = (Date.parse(manifest.date_range.arrival_end) - Date.parse(manifest.date_range.arrival_start)) / 86_400_000 + 1;
@@ -23,9 +25,15 @@ export function CompareView() {
       <SyntheticBanner manifest={manifest} />
       <section className="search-area" aria-label="Search">
         <div className="panel" aria-labelledby="constraints-title">
-          <h2 id="constraints-title" className="panel-title">
-            {STRINGS.constraintsTitle}
-          </h2>
+          <div className="tray-head">
+            <h2 id="constraints-title" className="panel-title">
+              {STRINGS.constraintsTitle}
+            </h2>
+            {/* T6.5.b: the plain-English field, on or off */}
+            <button type="button" className="btn ghost" aria-pressed={nlConstraints} title={STRINGS.nl.toggleTitle} onClick={() => setNlConstraints(!nlConstraints)}>
+              <span aria-hidden="true">{nlConstraints ? "■" : "□"}</span> {STRINGS.nl.toggle}
+            </button>
+          </div>
           <p className="visually-hidden">{STRINGS.constraintsPlaceholder}</p>
           <ConstraintControls />
         </div>

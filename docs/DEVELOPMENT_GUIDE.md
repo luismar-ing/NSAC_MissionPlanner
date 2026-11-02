@@ -959,7 +959,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T5.1.c · **Spec:** 4.2, 4.3 · **Decisiones:** — · **Est.:** 2 h
 - **Aceptación:** pruebas con 10 frases de ejemplo en inglés y su X, Y, Z esperado.
 
-##### [ ] T6.5.b — Restricciones en lenguaje natural: interfaz
+##### [x] T6.5.b — Restricciones en lenguaje natural: interfaz
 - **Qué:** campo de texto que mueve los deslizadores.
 - **Archivos:** `web/src/components/ConstraintControls.tsx`
 - **Depende de:** T6.5.a · **Spec:** 4.2 · **Decisiones:** — · **Est.:** 1 h

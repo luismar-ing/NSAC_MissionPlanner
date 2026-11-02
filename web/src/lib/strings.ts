@@ -168,6 +168,15 @@ export const STRINGS = {
     earth: (min: string, mean: string) => `Earth ${mean} h/day (min ${min})`,
     score: (v: string) => `Score ${v}`,
   },
+  nl: {
+    label: "Describe your constraints",
+    placeholder: "e.g. at least 80% sunlight, no more than 24 h of darkness, Earth 8 h a day",
+    apply: "Apply",
+    understood: (what: string) => `Applied: ${what}.`,
+    notUnderstood: (what: string) => `Not understood (only sunlight, darkness and Earth contact can be set): “${what}”.`,
+    toggle: "Type constraints",
+    toggleTitle: "Show a text field that sets the constraints from a sentence in English (interpreted in your browser)",
+  },
   constraints: {
     sun: "Minimum sunlight",
     sunHint: "Share of the window with the Sun's upper limb above the terrain.",

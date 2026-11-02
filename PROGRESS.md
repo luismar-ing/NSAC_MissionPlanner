@@ -2942,3 +2942,16 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.5.b.
+
+## 2026-11-02 · T6.5.b · Restricciones en lenguaje natural: interfaz
+
+- **Tarea:** T6.5.b ([x]).
+- **Qué se hizo:** campo «Describe your constraints» sobre los deslizadores (`ConstraintControls`). Con Enter o «Apply», el intérprete de T6.5.a aplica la frase a los mismos tres controles, que se mueven, y el calendario se actualiza con ellos. Una línea de estado dice qué aplicó y qué no pudo expresar. Interruptor «Type constraints» en la cabecera del panel de restricciones (`nlConstraints` en el store, activo por defecto).
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/nlControls.test.tsx → 3 passed (la frase enciende y mueve los deslizadores; lo no expresable se informa y no cambia nada; apagado = sin campo)
+  ```
+  Headless: «at least 90% sunlight, no more than 12 hours of darkness and earth 20 h a day» → deslizadores 90 / 12 / 20; el calendario pasa de «1825 of 1825» a «463 of 1825 7-day plans meet the constraints»; estado «Applied: sunlight ≥ 90%, darkness ≤ 12 h, Earth contact ≥ 20 h/day.». Sin errores en consola.
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** cierre de la Fase 6.

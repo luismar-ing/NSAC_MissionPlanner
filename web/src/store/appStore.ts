@@ -55,6 +55,9 @@ export interface AppState {
   /** Level B at the site (T6.1): terrain shadows and the first-person sky view. Off = the MVP scene. */
   levelB: boolean;
   setLevelB(on: boolean): void;
+  /** Constraints typed in plain English (T6.5, extra): the text field above the sliders. */
+  nlConstraints: boolean;
+  setNlConstraints(on: boolean): void;
   /** Battery state of charge under the time ribbons (T6.4, extra, ASSUMED parameters). Off = MVP panels. */
   energyModel: boolean;
   setEnergyModel(on: boolean): void;
@@ -143,6 +146,10 @@ export function createAppStore(data: DataStore = DataStore.forPage()) {
     levelB: true,
     setLevelB(on) {
       set({ levelB: on });
+    },
+    nlConstraints: true,
+    setNlConstraints(on) {
+      set({ nlConstraints: on });
     },
     energyModel: true,
     setEnergyModel(on) {
