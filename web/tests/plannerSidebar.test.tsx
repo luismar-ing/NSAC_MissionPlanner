@@ -132,6 +132,7 @@ describe("Mission Planner sidebar (A2)", () => {
 
   it("Level B switch (T6.1.c): off keeps the arrival working (panorama, metrics) and the choice in the store", async () => {
     const st = appStore.getState();
+    st.setLevelB(true);
     st.setScreen("planner");
     st.selectPlan("haworth_20270309_7d");
     render(<App />);

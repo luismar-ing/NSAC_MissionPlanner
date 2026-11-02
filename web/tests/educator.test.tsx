@@ -103,7 +103,10 @@ describe("Educator chapter 1 (C2)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Skip ahead" }));
     expect(appStore.getState().missionTime).toBe(tl.landingMs + 86_400_000);
 
-    act(() => appStore.getState().setSurfaceView(false));
+    act(() => {
+      appStore.getState().setLevelB(true); // this part is about the extra switched on
+      appStore.getState().setSurfaceView(false);
+    });
     fireEvent.click(screen.getByRole("button", { name: "Look around 360°" }));
     expect(appStore.getState().surfaceView).toBe(true); // Level B: stand on the site
     act(() => appStore.getState().setLevelB(false));
