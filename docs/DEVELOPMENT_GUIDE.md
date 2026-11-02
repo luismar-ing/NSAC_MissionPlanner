@@ -953,7 +953,7 @@ Aceptación general: cada extra se desactiva con un interruptor sin romper el MV
 - **Depende de:** T6.4.a · **Spec:** 4.2, 8.1 · **Decisiones:** — · **Est.:** 1.5 h
 - **Aceptación:** revisión visual; interruptor apagado → paneles idénticos al MVP.
 
-##### [ ] T6.5.a — Restricciones en lenguaje natural: intérprete local
+##### [x] T6.5.a — Restricciones en lenguaje natural: intérprete local
 - **Qué:** intérprete en el navegador (sin servidor, 4.3) de frases a X, Y, Z.
 - **Archivos:** `web/src/lib/nlConstraints.ts`, `web/tests/nl.test.ts`
 - **Depende de:** T5.1.c · **Spec:** 4.2, 4.3 · **Decisiones:** — · **Est.:** 2 h

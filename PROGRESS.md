@@ -2928,3 +2928,17 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna.
 - **Problemas abiertos:** ninguno.
 - **Siguiente tarea:** T6.5.a.
+
+## 2026-11-02 · T6.5.a · Restricciones en lenguaje natural: intérprete local
+
+- **Tarea:** T6.5.a ([x]).
+- **Qué se hizo:** `web/src/lib/nlConstraints.ts`, un intérprete por reglas que corre en el navegador (sin servidor, spec 4.3). Divide la frase en cláusulas («,», «and», «with», «but»…), reconoce el tema de cada una (Tierra/contacto, oscuridad, Sol/luz), su cifra y su unidad (%, h, días → ×24) y las formas «always / never / 24/7» (Sol 100 %, oscuridad 0 h, Tierra 24 h/día). Ajusta cada valor al rango de su control (oscuridad hasta 24·L h; Tierra en pasos de 0,5). «Clear all constraints» los apaga todos. Lo que no puede expresar con X, Y y Z (un máximo de Sol, «near water ice»…) se devuelve como no reconocido, nunca se adivina.
+- **Cómo se verificó:**
+  ```
+  $ npx vitest run tests/nl.test.ts → 12 passed: las 10 frases de ejemplo con su X, Y, Z esperado, más «lo que no entiende lo dice» y «valores dentro de rango»
+  $ npm --prefix web test → todos pasan · typecheck → exit 0
+  ```
+- **Decisiones tomadas:** reglas y no un modelo de lenguaje: es determinista, verificable con pruebas, sin dependencias ni red. Las formas «always / never» solo cuentan si la cláusula no trae cifra («no more than 24 hours» es un número, no «never»).
+- **Desviaciones de la spec / cambios en la guía:** ninguna.
+- **Problemas abiertos:** ninguno.
+- **Siguiente tarea:** T6.5.b.
