@@ -2980,3 +2980,37 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
   5. Durante el aterrizaje, el mapa de Sol medio sobre el polo, con su leyenda.
   6. Apagar cada interruptor y comprobar que vuelve la vista del MVP.
 - **Siguiente:** T5.2.e (revisión del humano) y la Fase 7 (entrega; manda desde el 2026-11-10). D11 sigue pendiente y bloquea T7.1.a, T7.3.a y T7.4.a.
+
+## 2026-11-02 · AJUSTE · «Back to planning» en la esquina superior izquierda
+
+- **Tarea:** petición del humano (fuera de la guía), commit 01b7d9e.
+- **Qué se hizo:** el botón sale de la cabecera del viaje (`MissionStage.tsx`) y queda fijo arriba a la izquierda (`.mission-back`, pastilla de cristal con flecha); en móvil vuelve al flujo normal.
+- **Cómo se verificó:** captura a 1920×1080 y 1366×768; `npm --prefix web test` → 265 passed en tres pasadas seguidas.
+- **Problemas abiertos:** el commit se hizo en la misma orden que una pasada de tests en la que `modeTransition.test.tsx` falló por tiempo (máquina cargada). Las tres pasadas posteriores dieron 265/265; es una prueba sensible a la carga, no un fallo del cambio.
+- **Siguiente tarea:** definición del terreno 3D (siguiente entrada).
+
+## 2026-11-02 · AJUSTE · Terreno 3D más denso en los sitios
+
+- **Tarea:** petición del humano: el terreno 3D se veía borroso. Eligió solo «mallas más densas» con el DEM de 40 m que ya tenemos (sin mapa de normales ni DEM de 5 m).
+- **Qué se hizo:**
+  - `pipeline/terrain_lod.py`: los tres niveles de cada sitio pasan a 401 × 401 nodos, todos del DEM de 40 m. lod0 ±60 km cada 300 m, lod1 ±20 km cada 100 m y lod2 ±8 km cada 40 m. Antes eran ±20 km / 400 m, ±10 km / 80 m y ±3 km / 40 m, y más allá de 20 km solo quedaba el contexto polar de 2 km. El horizonte que se ve desde el sitio está a decenas de km: ahora lo dibujan celdas de 100–300 m en vez de 400 m–2 km. Cuando la caída por curvatura de ±60 km desborda int16, la escala de alturas pasa a 0,5 m.
+  - `web/src/scene3d/terrain.ts`: el hueco de cada nivel sale de la cabecera del nivel fino (`-grid.x0_m`), no de una constante. Los niveles se piden antes: lod1 a < 60 km y lod2 a < 25 km.
+  - `web/src/scene3d/terrainLevelB.ts`: el paso del rayo del horizonte sigue la malla nueva (20 / 50 / 150 / 1000 m).
+  - `pipeline/illumination_map.py` y `build_all.py`: el mapa polar iluminado se genera en `pipeline/out/illumination/` y `build_all` lo copia, porque `--assemble` borraba `web/public/data/illumination/`.
+  - Pruebas: la de alturas de `test_terrain_lod.py` usa el desarrollo de 2.º orden de la curvatura (tolerancia 1 m en los tres niveles). `terrain.test.ts` usa los huecos nuevos.
+  - Docs: `DATA_CONTRACT.md` §13 y `performance.md`.
+- **Cómo se verificó:**
+  ```
+  $ .venv/Scripts/python -m pipeline.terrain_lod && .venv/Scripts/python -m pipeline.build_all --assemble → contrato: OK (terrain/ 4,9 MB; antes 1,15 MB)
+  $ .venv/Scripts/python -m pytest → 279 passed
+  $ npm --prefix web run typecheck → sin errores · npm --prefix web test → 265 passed
+  Horizonte 3D − máscara 2D (cada 10°, 5 sitios):  antes  media 0,09°, p95 0,33°, máx 0,66°
+                                                   ahora  media 0,04°, p95 0,20°, máx 0,34°
+  Sombras 3D vs sun_vis:  Haworth 98,5 % → 100 %; Malapert 91,7 % y De Gerlache 99,4 % sin cambio
+  fps (fps.mjs, misma sesión, misma máquina):  sitio 50,9 → 47,2; aproximación 48,0 → 45,7; tránsito 45,6 → 46,6
+  ```
+  Los fps de hoy son más bajos que los de `performance.md` (60) también con las mallas viejas: la máquina estaba más cargada. La diferencia que se debe a las mallas (~3 fps en el sitio) está dentro del ruido de la medición. Capturas antes y después (vista aérea de Haworth y Connecting Ridge): más relieve y cráteres lejanos, y desaparece una cuña de color en una costura de Connecting Ridge.
+- **Decisiones tomadas:** usar solo el DEM de 40 m (respeta la geografía real de cada sitio, sin datos nuevos). Quedan como opciones el mapa de normales y el DEM de 5 m de PGDA (producto 78, solo para Connecting Ridge, Haworth y Nobile Rim 1).
+- **Desviaciones de la spec / cambios en la guía:** ninguna. D9 («terreno simplificado») se cumple con más detalle.
+- **Problemas abiertos:** se ven costuras finas entre niveles en algunas vistas aéreas; ya existían. Hay que repetir la medida de fps con la máquina en reposo antes de la entrega (8.7).
+- **Siguiente tarea:** T5.2.e (revisión del humano) y la Fase 7.

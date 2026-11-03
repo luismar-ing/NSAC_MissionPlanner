@@ -1,7 +1,7 @@
 {
  "contract_version": "1.0.0",
- "data_version": "2c2f11dad7",
- "generated_utc": "2026-10-21T17:56:14Z",
+ "data_version": "01b7d9e65f-dirty",
+ "generated_utc": "2026-11-03T01:28:12Z",
  "data_status": "REAL",
  "date_range": {
   "arrival_start": "2027-01-01",
@@ -95,6 +95,14 @@
    "bytes": 2562,
    "sha256": "1a40d0ac6b2903d638cc88787d6c3ba645963762921a209d69f9c417080a5ac9"
   },
+  "illumination/south_avg.json": {
+   "bytes": 743,
+   "sha256": "62a95adcbf052c6093238313a3fd78676927d478913d1d9439396e2647402ffd"
+  },
+  "illumination/south_avg.png": {
+   "bytes": 541203,
+   "sha256": "6e27660e0f6c443829f522225adbeb1f220ef44c222f9c5eb0f79e93350f7188"
+  },
   "plans.json": {
    "bytes": 1149022,
    "sha256": "6026f8a0d70b4c6d37d19ed6a510df50a20909480da5db6173b81c51cdac5c67"
@@ -136,124 +144,124 @@
    "sha256": "aaab14d59ede63d32ab87adcb9b4b1e55b9698ede35b256d9fd2b435ee313042"
   },
   "terrain/connecting_ridge/lod0.bin": {
-   "bytes": 20402,
-   "sha256": "519186c3a8555e00bddbcb5a767c6fccc97f7adef4f77e5119737e024a684fdb"
+   "bytes": 321602,
+   "sha256": "af76afbce92c1360d11c4e5f01944f4caac17f003c4252aba014ebd5eeb18322"
   },
   "terrain/connecting_ridge/lod0.json": {
-   "bytes": 399,
-   "sha256": "846994b14a36daa1956ff78d6f0554e038441157782e79041c0907fc4dd22c78"
+   "bytes": 400,
+   "sha256": "b3f34ce35a4eac1e298c9b41d28b1d49d3605d2a8b81203b21496e75dde61a9d"
   },
   "terrain/connecting_ridge/lod1.bin": {
-   "bytes": 126002,
-   "sha256": "3737d8ab278a2ff968338d3563e3a71513771764d96f9e1d7b7f570dd3df151f"
+   "bytes": 321602,
+   "sha256": "d6a276a5611300ec04427da2f0cd7747afed96cc68eaadafae3fd565d9975808"
   },
   "terrain/connecting_ridge/lod1.json": {
-   "bytes": 399,
-   "sha256": "38ad88f951d9a0ca9fa50bd0fa1a88e63b40e85bf766e94295d166a06b36362a"
+   "bytes": 400,
+   "sha256": "8cddd479b81bdad684b8c0b44b694c650ddc3d96bab3a15e22d6b67310091a97"
   },
   "terrain/connecting_ridge/lod2.bin": {
-   "bytes": 45602,
-   "sha256": "2aa40dde4d9a13a8292f24dc14ba1a62de8b8a7cbedaf271a2b0f7f5b054ead7"
+   "bytes": 321602,
+   "sha256": "46e9f3b5383536a0a49241b82460959e384f70c34af12f943650b73ddc1fb87c"
   },
   "terrain/connecting_ridge/lod2.json": {
-   "bytes": 396,
-   "sha256": "d95ebf610dd53fbde29731a1ef1ba6c65ef2ece244af72d3dbe7ce623dc6ed61"
+   "bytes": 397,
+   "sha256": "8c918d1c728a3b47dc31153c0112199b5cbc93b6b54361432165cc16ce3ae804"
   },
   "terrain/de_gerlache_rim_2/lod0.bin": {
-   "bytes": 20402,
-   "sha256": "c230eae6b13e35135ada9f3a5d23c9a6d71bf21149766ed925ac37dc4662b139"
+   "bytes": 321602,
+   "sha256": "80f1a44ac9c996b04e140a9c8332fde59debe88ba479ea694bde7269787d8f7c"
   },
   "terrain/de_gerlache_rim_2/lod0.json": {
-   "bytes": 398,
-   "sha256": "7dd84fe3d7d7654de5ec00b18bbf02e46b8bad326a12fc55a914c1884cb5cee4"
+   "bytes": 399,
+   "sha256": "2cf3370828d61427375d3ea75c384c01d5efcee3741a74ad88d2d7f4b7427827"
   },
   "terrain/de_gerlache_rim_2/lod1.bin": {
-   "bytes": 126002,
-   "sha256": "c1fc74dca421b53101d4936ca47ce050108921329e369c22a10ffe3476e1d4f7"
+   "bytes": 321602,
+   "sha256": "693154bc3c0400b57cb6970ed5dcdb1a1bd139f05cbbecb4b28a4ddb092ce1fb"
   },
   "terrain/de_gerlache_rim_2/lod1.json": {
-   "bytes": 398,
-   "sha256": "26eed1989facf69d6358da7749d824369ff7e0427ba072c88027820f41e9d72c"
+   "bytes": 399,
+   "sha256": "5af62b9cc2029da632dca8072541c70284b66dc6c723d0257cd9bad4c64ce63b"
   },
   "terrain/de_gerlache_rim_2/lod2.bin": {
-   "bytes": 45602,
-   "sha256": "3e852788af7407c6d644858052cf745bcd1e2137e49da9eb6a400a3e1f579dd9"
+   "bytes": 321602,
+   "sha256": "718a2f64c26ff1a2682d7ae63764b576eb46acd93417a9e58f0102679afd5956"
   },
   "terrain/de_gerlache_rim_2/lod2.json": {
-   "bytes": 395,
-   "sha256": "0e60cc5b7f7b606e4eded174232a158b212457cb93983476ad528bf8beaad5e0"
+   "bytes": 396,
+   "sha256": "bdd12bb4fd65b0653a056554f792d7deb2cc9e6b91a4851e207b949397220a6c"
   },
   "terrain/haworth/lod0.bin": {
-   "bytes": 20402,
-   "sha256": "75d000cd77bbdf601e05acf9b0b1a6a2e3395f6b7170758f50230cc13d565ff7"
+   "bytes": 321602,
+   "sha256": "2a0981f503bb4b3599e1de3034ae498a5b9a0b10e9fcacaad5fd8bb5d348fa5a"
   },
   "terrain/haworth/lod0.json": {
    "bytes": 389,
-   "sha256": "9e4227f036b28f63f6f4d9b8e100d544e7fa75aaf53fc3d5f59ae8da977b9861"
+   "sha256": "086c6aa44d6f700e9a94370262ebaec7f5737ce051ed025a1eea38a466442dd4"
   },
   "terrain/haworth/lod1.bin": {
-   "bytes": 126002,
-   "sha256": "e14402824a8e1e2e8e5a79cccb2397ce2a94ec93e01497e52d6ce564bd1ce39c"
+   "bytes": 321602,
+   "sha256": "d97d264665a550a0edbcc70601053e34d8f6d93c93d8af2698f5fdbffe3812d1"
   },
   "terrain/haworth/lod1.json": {
-   "bytes": 389,
-   "sha256": "cdff2323ee1b9f21e5ea5c546b9bee51ce685e57650a63486ede0ee3a49a066f"
+   "bytes": 390,
+   "sha256": "4dd730101bc6247990d65088d851ad53787513ee8ee411fb0c72a8a71480d8d3"
   },
   "terrain/haworth/lod2.bin": {
-   "bytes": 45602,
-   "sha256": "d965e5738d07d3bd27ce56937daa44a2be2997e41d4ff6a1c8ead16371a811f1"
+   "bytes": 321602,
+   "sha256": "caabd1383fa62c572523fa9408dd075391aea785c5566d6d32b11c34a64925e2"
   },
   "terrain/haworth/lod2.json": {
-   "bytes": 386,
-   "sha256": "d3d36c343922fc6527a7e9fa7d384b765e0a51501de15063ace2d207495677b1"
+   "bytes": 387,
+   "sha256": "f4921307bd27e1a1a1457b8016340e21a6e1d9234a4d2274b9991d79e607ae70"
   },
   "terrain/malapert_massif/lod0.bin": {
-   "bytes": 20402,
-   "sha256": "39a3e04b876677b39d5f98b7d775883161a3c96a335f8104b3043bf02a77a925"
+   "bytes": 321602,
+   "sha256": "2588f4d0b33549ca71d3e591002f98eed3e9d4c5abd6396591edf3050ad87b34"
   },
   "terrain/malapert_massif/lod0.json": {
    "bytes": 395,
-   "sha256": "f38f119ffb1098cc1101c2efab8e9bc21d2d0b2bb8e4e75d6212bf2e86d83146"
+   "sha256": "8c91aa5aa31ed4df303a658b167e418ca9a9012b7b6128dcfc8c2e58c5d41d25"
   },
   "terrain/malapert_massif/lod1.bin": {
-   "bytes": 126002,
-   "sha256": "e9dbc16651927fd4aca1ae0c17ba3f38b755c453baa6df2381f9adad7a7b2371"
+   "bytes": 321602,
+   "sha256": "d4f18164e1a67d87806c23e0a4bd6b212f1725ad4f41ca597724c394be1960fc"
   },
   "terrain/malapert_massif/lod1.json": {
-   "bytes": 395,
-   "sha256": "ec6534fe035254b74ac498cf891883c63c4004355a7a3d89efbef237358e6019"
+   "bytes": 396,
+   "sha256": "26c98e8a74becbbf4feefd2d5ec3fed4e4d2ea4cd355e7e73c38ba81fdd4cee5"
   },
   "terrain/malapert_massif/lod2.bin": {
-   "bytes": 45602,
-   "sha256": "4b68b8914d721efb2b7e162392854da5f3c22c2bdce111a7a516f5cc0f6f210b"
+   "bytes": 321602,
+   "sha256": "884f65531af6070c85d6ee0dde32662c8aa6546cdb3fb8303793e7025ad7f6f5"
   },
   "terrain/malapert_massif/lod2.json": {
-   "bytes": 392,
-   "sha256": "f4e33ff7f6c0caf9cbb7a2c5d8c9fa924a46673ceb68f42baa71d86aec669b1c"
+   "bytes": 393,
+   "sha256": "9a808a8b29cb52ae39b2509ddf6ff69d122768fd333a233034ba1a957420d132"
   },
   "terrain/nobile_rim_1/lod0.bin": {
-   "bytes": 20402,
-   "sha256": "a93b77e6299aa73db660477bc8527a50ec90f5b47dd6356b37ba2ed12abbb794"
+   "bytes": 321602,
+   "sha256": "460e0937ee739bb649f1e36487694b640e4ef9cf09ead60a74f39464c59ad302"
   },
   "terrain/nobile_rim_1/lod0.json": {
    "bytes": 393,
-   "sha256": "31c41875025efda737e7c4da823a819d70746ac86460acf2153ed64af4f464da"
+   "sha256": "0da6f6fb5dc8c61bea4f85c13232da41abe5bcdcd94b41198cf05d6efe505519"
   },
   "terrain/nobile_rim_1/lod1.bin": {
-   "bytes": 126002,
-   "sha256": "64dc1ce99f5316c32566a39c014a20ee4aea15a17c9c71a88fd8e7c49a4eb4c0"
+   "bytes": 321602,
+   "sha256": "02474f8146b044253fd1ba7cc250c80df9294e327eb64c8583ac9be948ae497b"
   },
   "terrain/nobile_rim_1/lod1.json": {
-   "bytes": 393,
-   "sha256": "cf088777ce6610427406407834c73ed92eb65b5ea8171db9ccd446e6a537702f"
+   "bytes": 394,
+   "sha256": "ab24d96c407897c17ba3e8fe5b27c902cbb58c294422d21285ff62b96d642bd8"
   },
   "terrain/nobile_rim_1/lod2.bin": {
-   "bytes": 45602,
-   "sha256": "594d336d64f576b08c6aee2391c9574a833d1c1fc15367bf4d63f5fd98a094f3"
+   "bytes": 321602,
+   "sha256": "b22e603f35eac3ed8da2d6c56106f62dfa9ebc25facf0cb8c82dc214c350c02a"
   },
   "terrain/nobile_rim_1/lod2.json": {
-   "bytes": 390,
-   "sha256": "97cb66aa03a62e88ad83b7148efccba400b334cd462316a7577bd1dc757f7506"
+   "bytes": 391,
+   "sha256": "0afa50f7dfe862631341bf8747a71ad369d110b3048222778c0cab4de63e409a"
   },
   "timeseries/connecting_ridge.json": {
    "bytes": 437735,

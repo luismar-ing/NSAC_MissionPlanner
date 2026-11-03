@@ -35,9 +35,10 @@ def test_shackleton_floor_is_dark_and_the_sites_are_lit():
 
 
 def test_web_header_matches_the_png():
-    head = json.loads((im.OUT / "south_avg.json").read_text(encoding="utf-8"))
+    """The versioned copy the front end loads (web/public/data/illumination/)."""
+    head = json.loads((im.WEB / "south_avg.json").read_text(encoding="utf-8"))
     import hashlib
 
-    assert hashlib.sha256((im.OUT / "south_avg.png").read_bytes()).hexdigest() == head["png_sha256"]
+    assert hashlib.sha256((im.WEB / "south_avg.png").read_bytes()).hexdigest() == head["png_sha256"]
     assert head["size_px"] == im.WEB_PX
     assert "Mazarico" in head["citation"]

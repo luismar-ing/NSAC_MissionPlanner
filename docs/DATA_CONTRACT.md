@@ -264,7 +264,7 @@ El contexto polar de baja resolución (T2.3.e) usa la misma estructura en `terra
 
 Los nodos van fila a fila (row-major), de norte a sur y, en cada fila, de oeste a este.
 
-**ENU_SITE (T2.3.d):** el nodo (x, y) es el punto de la superficie a distancia geodésica hypot(x, y) y azimut atan2(x, y) del sitio (proyección azimutal equidistante), y su altura es la coordenada **Arriba** del ENU del sitio respecto a `origin.elevation_m`. Por eso incluye la caída por curvatura (≈ d²/2R: ~115 m a 20 km): el front end dibuja el terreno tal cual, sin añadir curvatura. Número impar de nodos por lado, con el nodo central exactamente en el sitio. Niveles del MVP (D9): lod0 ±20 km cada 400 m, lod1 ±10 km cada 80 m y lod2 ±3 km cada 40 m (la resolución del DEM). Alturas en int16 × 0.25 m.
+**ENU_SITE (T2.3.d):** el nodo (x, y) es el punto de la superficie a distancia geodésica hypot(x, y) y azimut atan2(x, y) del sitio (proyección azimutal equidistante), y su altura es la coordenada **Arriba** del ENU del sitio respecto a `origin.elevation_m`. Por eso incluye la caída por curvatura (≈ d²/2R: ~115 m a 20 km): el front end dibuja el terreno tal cual, sin añadir curvatura. Número impar de nodos por lado, con el nodo central exactamente en el sitio. Niveles (D9, densificados el 2026-11-02): lod0 ±60 km cada 300 m, lod1 ±20 km cada 100 m y lod2 ±8 km cada 40 m (la resolución del DEM), 401 × 401 nodos cada uno; antes eran ±20 km / 400 m, ±10 km / 80 m y ±3 km / 40 m. Alturas en int16 × `height_scale_m`: 0.25 m, o 0.5 m cuando la caída por curvatura de ±60 km (~1 km) desbordaría int16. El front end toma el tamaño de cada nivel de su cabecera (`grid.x0_m`).
 
 ## 13 bis. `illumination/south_avg.png` + `south_avg.json` (extra, T6.2.a)
 

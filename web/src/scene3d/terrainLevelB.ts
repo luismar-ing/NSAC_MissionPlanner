@@ -1,6 +1,6 @@
 /**
  * Level B terrain (spec 8.4, T6.1): standing on the site at the observer height h_obs, the 3D ground is the
- * terrain the scene already draws (terrain.ts: lod2 ±3 km / 40 m, lod1 ±10 km / 80 m, lod0 ±20 km / 400 m, then
+ * terrain the scene already draws (terrain.ts: lod2 ±8 km / 40 m, lod1 ±20 km / 100 m, lod0 ±60 km / 300 m, then
  * the polar context ±302 km / 2 km). This module holds the pure geometry of that view (no drawing):
  *
  * - `meshHorizonDeg`: the skyline those meshes make, seen from h_obs, by azimuth. Checked against the 2D
@@ -60,7 +60,7 @@ function polarXY(site: SurfaceTerrain["site"], d: number, az: number): [number, 
 }
 
 /** Step along the ray (m): finer near the observer, where the finest levels are. */
-const stepAt = (d: number) => (d < 3_000 ? 20 : d < 10_000 ? 40 : d < 20_000 ? 200 : 1_000);
+const stepAt = (d: number) => (d < 8_000 ? 20 : d < 20_000 ? 50 : d < 60_000 ? 150 : 1_000);
 
 /**
  * Highest elevation angle (deg) of the drawn terrain along azimuth `azDeg` (0 = north, 90 = east), seen from

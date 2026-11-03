@@ -31,7 +31,10 @@ class Lod:
     spacing_m: float
 
 
-SITE_LODS = (Lod(0, 20_000.0, 400.0), Lod(1, 10_000.0, 80.0), Lod(2, 3_000.0, 40.0))
+# 401 × 401 nodes per level, all from the 40 m DEM. The far horizon seen from the site (tens of km) comes from
+# 100–300 m meshes: each cell spans ≤ ~0.3° at the distance where it forms the skyline (2026-11-02; before:
+# ±20 km / 400 m, ±10 km / 80 m, ±3 km / 40 m, and 2 km cells beyond 20 km, which looked blurred).
+SITE_LODS = (Lod(0, 60_000.0, 300.0), Lod(1, 20_000.0, 100.0), Lod(2, 8_000.0, 40.0))
 
 
 def enu_grid(half_m: float, spacing_m: float) -> tuple[np.ndarray, np.ndarray]:
@@ -101,7 +104,10 @@ def build_site(site: dict, out: Path = OUT) -> list[dict]:
     headers = []
     for lod in SITE_LODS:
         x, y = enu_grid(lod.half_m, lod.spacing_m)
-        headers.append(write_lod(site["id"], lod, origin, surface_up_m(site, x, y, window), out=out))
+        z = surface_up_m(site, x, y, window)
+        # ±60 km adds up to ~1 km of curvature drop to the relief: use 0.5 m steps when 0.25 m would overflow int16
+        scale = HEIGHT_SCALE_M if np.abs(z).max() / HEIGHT_SCALE_M <= 32767 else 2 * HEIGHT_SCALE_M
+        headers.append(write_lod(site["id"], lod, origin, z, out=out, scale_m=scale))
     return headers
 
 

@@ -52,7 +52,7 @@ describe("site geometry", () => {
       for (const lod of [0, 1, 2]) {
         const t = readTerrain(s.id, lod);
         const { nx, ny } = t.header.grid;
-        const g = siteLevelGeometry(t, siteBody, lod < 2 ? [10_000, 3_000][lod] : 0);
+        const g = siteLevelGeometry(t, siteBody, lod < 2 ? [20_000, 8_000][lod] : 0);
         const pos = g.getAttribute("position");
         const c = Math.floor(ny / 2) * nx + Math.floor(nx / 2); // centre node = the site (contract §13)
         expect(Math.hypot(pos.getX(c), pos.getY(c), pos.getZ(c)) * 1e6).toBeLessThan(0.5); // < 0.5 m from the site

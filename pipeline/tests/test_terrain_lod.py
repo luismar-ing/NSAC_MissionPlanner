@@ -41,8 +41,9 @@ def test_heights_match_dem_at_control_points(site, lod):
     px, py = latlon_to_xy(lat2, lon2)
     sx, sy = latlon_to_xy(site["lat"], site["lon"])
     h = DemWindow.read(sx, sy, lod.half_m * 1.45 + 1000).sample(np.asarray(px), np.asarray(py))
-    approx = h - site["elevation_m"] - d**2 / (2 * R_MOON_M)
-    assert np.max(np.abs(z[i, j] - approx)) < 1.0  # < 1 m (la fórmula aproximada difiere < 0.3 m a 28 km)
+    # desarrollo de 2.º orden de (R + h)·cos θ − (R + h0), con θ = d / R: su propio error es ~R·θ⁴/24 (~0,1 m a 60 km)
+    approx = h - site["elevation_m"] - d**2 * (R_MOON_M + h) / (2 * R_MOON_M**2)
+    assert np.max(np.abs(z[i, j] - approx)) < 1.0
 
 
 def test_polar_context():

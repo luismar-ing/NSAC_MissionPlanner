@@ -2,10 +2,10 @@
  * Site terrain at real local scale (spec 5.9, 8.3; D9: simplified terrain in the MVP; contract §13).
  *
  * - Polar context `terrain/_polar/lod0` (POLAR_STEREO, ±302 km every 2 km) covers everything visible from a
- *   few km above any site (horizon ≈ 100 km away); the site levels lod0 (±20 km / 400 m), lod1 (±10 km /
- *   80 m) and lod2 (±3 km / 40 m) refine the centre.
+ *   few km above any site (horizon ≈ 100 km away); the site levels lod0 (±60 km / 300 m), lod1 (±20 km /
+ *   100 m) and lod2 (±8 km / 40 m, the DEM's own spacing) refine the centre.
  * - Loaded BY DISTANCE (camera → site), never before the landing approach: polar + lod0 within 200 km, lod1
- *   within 30 km, lod2 within 10 km. Each finer patch cuts a hole in the coarser one and carries a skirt on its
+ *   within 60 km, lod2 within 25 km. Each finer patch cuts a hole in the coarser one and carries a skirt on its
  *   edge, so seams never show cracks and surfaces never overlap (no depth fighting).
  * - Geometry is in the Moon-fixed frame, RELATIVE TO THE SITE (km → scene units), so the numbers stay small
  *   near the camera; the group is placed at the site anchor and turned with the Moon (camera-relative render).
@@ -143,8 +143,12 @@ export function polarGeometry(t: TerrainData, siteBodyKm: Vec3, hole: number): T
 }
 
 /** Distances (scene units, camera → site) at which each level is requested. */
-export const LOAD_DISTANCE = { polar: 0.2, lod0: 0.2, lod1: 0.03, lod2: 0.01 } as const;
-const HALF = { lod0: 20_000, lod1: 10_000, lod2: 3_000 } as const; // m, from contract §13 / D9
+// levels of ±60 km / 300 m, ±20 km / 100 m and ±8 km / 40 m (pipeline/terrain_lod.py): each is requested a little
+// before the camera is close enough for it to matter
+export const LOAD_DISTANCE = { polar: 0.2, lod0: 0.2, lod1: 0.06, lod2: 0.025 } as const;
+
+/** Half-size (m) of a loaded site level, read from its own header (x0 = −half), so the holes follow the data. */
+const halfOf = (t: TerrainData) => -t.header.grid.x0_m;
 
 type Level = "polar" | "lod0" | "lod1" | "lod2";
 
@@ -186,9 +190,9 @@ export class TerrainManager {
   private rebuild(): void {
     this.version++;
     const finest = (l: Level): number => {
-      if (l === "polar") return this.data.lod0 ? HALF.lod0 : 0;
-      if (l === "lod0") return this.data.lod1 ? HALF.lod1 : 0;
-      if (l === "lod1") return this.data.lod2 ? HALF.lod2 : 0;
+      if (l === "polar") return this.data.lod0 ? halfOf(this.data.lod0) : 0;
+      if (l === "lod0") return this.data.lod1 ? halfOf(this.data.lod1) : 0;
+      if (l === "lod1") return this.data.lod2 ? halfOf(this.data.lod2) : 0;
       return 0;
     };
     for (const l of ["polar", "lod0", "lod1", "lod2"] as Level[]) {

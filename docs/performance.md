@@ -53,9 +53,9 @@ Ambos scripts (`web/scripts/perf.mjs` y `web/scripts/fps.mjs`) usan `puppeteer-c
 | horizon/, daily/, site_features/ | 0,22 MB | al seleccionar un plan |
 | trajectory/ | 8,62 MB | una trayectoria (~5 KB) al abrir un plan en 3D |
 | scene/ (efemérides de escena) | 1,58 MB | al abrir la vista 3D |
-| terrain/ | 1,15 MB | solo en la aproximación final (T4.3.b) |
+| terrain/ | 4,9 MB (cada sitio ~1 MB: 3 niveles de 401 × 401) | solo en la aproximación final (T4.3.b) |
 | texturas | 3,74 MB | al abrir la vista 3D |
-| **Total** | **20,88 MB** | |
+| **Total** | **24,6 MB** (con el terreno denso del 2026-11-02) | |
 
 ### Carga inicial (3 cargas en frío, TR.5.a)
 
@@ -78,6 +78,8 @@ Antes del rediseño (T5.2.c), el shell abría directamente en el calendario: 0,6
 | Tránsito, 6 h/s | 60,0 | 16,7 ms | 17,1 ms | 17,7 ms | 300 |
 | Aproximación final y zoom, 1 h/s | 59,9 | 16,7 ms | 17,0 ms | 33,4 ms (1 fotograma) | 538 |
 | Sitio: sombras del terreno y primera persona | 60,0 | 16,7 ms | 17,0 ms | 17,3 ms | 180 |
+
+**Terreno denso (2026-11-02):** con las mallas nuevas (3 niveles de 401 × 401 por sitio), la misma sesión dio en el sitio 47,2 fps frente a 50,9 fps con las mallas anteriores. La máquina estaba cargada y ambas cifras quedan por debajo de las de la tabla. Hay que repetir la medida en reposo antes de la entrega.
 
 **Nota sobre el panel del navegador de la app de escritorio:** medido allí, el frame rate sale fijo en 30 fps, o en 1 fps en la vista sin WebGL, en cuanto la ventana no está en primer plano. Es la limitación del navegador para ventanas en segundo plano, no el coste de la escena, así que esas cifras no valen como medida. Por eso se mide con Chrome headless sobre la misma GPU. El ensayo cronometrado de T5.1.c, con el panel visible, dio 59 fps.
 

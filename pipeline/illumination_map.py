@@ -1,6 +1,7 @@
 """Lit polar map for the zoom step (T6.2.a): the published LOLA average illumination of the south pole.
 
-    python -m pipeline.illumination_map      # data/illumination/ -> web/public/data/illumination/ + figure
+    python -m pipeline.illumination_map      # data/illumination/ -> pipeline/out/illumination/ + figure
+                                             # (python -m pipeline.build_all --assemble copies it to web/public/data/)
 
 Source (registered in pipeline/data_sources.json and data/README.md, downloaded by fetch_data --illumination):
 AVGVISIB_85S_060M_201608.TIF, NASA GSFC PGDA "Lunar Polar Illumination" (https://pgda.gsfc.nasa.gov/products/69).
@@ -9,8 +10,9 @@ from LOLA topography; polar stereographic (R = 1737.4 km, true scale at the pole
 Cite Mazarico, E., et al. (2011), Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030.
 
 Outputs:
-- web/public/data/illumination/south_avg.png: 8-bit grey, value = fraction x 255, averaged down to WEB_PX pixels.
-- web/public/data/illumination/south_avg.json: extent, CRS, encoding, source and citation.
+- pipeline/out/illumination/south_avg.png: 8-bit grey, value = fraction x 255, averaged down to WEB_PX pixels.
+- pipeline/out/illumination/south_avg.json: extent, CRS, encoding, source and citation.
+  (Both reach web/public/data/illumination/ through build_all --assemble, like every other front-end file.)
 - docs/figures/illumination_85s.png: check figure with the five sites.
 It also prints the map value at each site (3x3 pixels, ~180 m) next to the site's own sunlit fraction for the demo
 year (our series: the highest DEM pixel of each region, 3 m above the ground). They measure different things
@@ -35,7 +37,8 @@ from pyproj import Transformer
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "data" / "illumination" / "AVGVISIB_85S_060M_201608.TIF"
-OUT = ROOT / "web" / "public" / "data" / "illumination"
+OUT = ROOT / "pipeline" / "out" / "illumination"  # build_all --assemble copies it to web/public/data/illumination/
+WEB = ROOT / "web" / "public" / "data" / "illumination"
 FIG = ROOT / "docs" / "figures" / "illumination_85s.png"
 WEB_PX = 1024  # ~296 m/px over ±151.7 km: enough for a zoom step seen from hundreds of km
 CITATION = "Mazarico, E., et al. (2011), Illumination conditions of the lunar polar regions using LOLA topography, Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030"

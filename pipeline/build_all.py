@@ -34,7 +34,7 @@ DEM_PRODUCT = "LDEM_80S_40MPP_ADJ (LOLA, NASA GSFC PGDA)"
 
 def run_chain() -> None:
     """Ejecuta cada paso del pipeline; cada uno escribe en pipeline/out/ y comprueba lo suyo."""
-    from pipeline import ephemeris, horizon, plans, site_features, terrain_lod, trajectory, visibility, windows
+    from pipeline import ephemeris, horizon, illumination_map, plans, site_features, terrain_lod, trajectory, visibility, windows
 
     steps = [
         ("efemérides de los sitios", lambda: ephemeris.main(["--no-plots"])),
@@ -47,6 +47,8 @@ def run_chain() -> None:
         ("características de los sitios", lambda: site_features.main([])),
         ("terreno en LOD", lambda: terrain_lod.main(["--no-plots"])),
     ]
+    if illumination_map.SRC.exists():  # optional download (fetch_data --illumination)
+        steps.append(("mapa polar iluminado", lambda: illumination_map.main([])))
     for name, fn in steps:
         t0 = time.perf_counter()
         print(f"\n== {name}", flush=True)
@@ -116,6 +118,9 @@ def assemble() -> Path:
     for sub in ("daily", "windows", "trajectory", "site_features", "scene"):
         shutil.copytree(OUT / sub, WEB / sub)
     shutil.copytree(OUT / "terrain", WEB / "terrain")
+    # lit polar map (T6.2, extra): only when it has been built (its source is an optional download)
+    if (OUT / "illumination").exists():
+        shutil.copytree(OUT / "illumination", WEB / "illumination")
 
     load_kernels()
     data_version, generated = git_version()
