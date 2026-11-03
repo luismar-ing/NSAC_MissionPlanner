@@ -2099,13 +2099,26 @@ input[type="range"] {
   gap: 12px;
 }
 
+.mission-back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  background: var(--glass-panel);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
 .telemetry-title {
   font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--font-lg);
 }
 
-.mission-head kbd {
+.mission-head kbd,
+.mission-back kbd {
   margin-left: 6px;
   padding: 0 5px;
   border: 1px solid var(--color-border);
@@ -2616,4 +2629,13 @@ button.scene-chip {
   min-height: 1.2em;
   font-size: var(--font-sm);
   color: var(--color-text-muted);
+}
+
+/* phone: the journey is a bottom sheet; the button heads it instead of floating */
+@media (max-width: 720px) {
+  .mission-back {
+    position: static;
+    align-self: flex-start;
+    order: 0;
+  }
 }

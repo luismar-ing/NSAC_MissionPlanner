@@ -60,13 +60,17 @@ export function MissionStage({ autoPlay }: { autoPlay: boolean }) {
   const scale = sceneScale === "local" ? LOCAL_SCALE : SPACE_SCALE;
   return (
     <section className={`mission-stage${atSite ? " at-site" : ""}`} aria-labelledby="live-title" data-testid="live-view">
+      {/* top-left corner, level with the tool bar on the right */}
+      <button type="button" className="btn ghost mission-back" onClick={closeLive} aria-keyshortcuts="Escape">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path d="M19 12H5M11 6l-6 6 6 6" />
+        </svg>
+        {STRINGS.live.back} <kbd>Esc</kbd>
+      </button>
       <div className="mission-head">
         <h2 id="live-title" className="telemetry-title">
           {STRINGS.live.title(site?.name ?? "")}
         </h2>
-        <button type="button" className="btn ghost" onClick={closeLive} aria-keyshortcuts="Escape">
-          {STRINGS.live.back} <kbd>Esc</kbd>
-        </button>
         <Telemetry plan={plan} phase={missionPhase} scale={sceneScale === "local" ? STRINGS.scale.realScale : STRINGS.scale.notToScale} />
       </div>
 
