@@ -15,6 +15,7 @@ import type { TerrainHeader } from "../lib/contract";
 import { COLORS } from "../styles/tokens";
 import type { Vec3 } from "./scale";
 import { MOON_RADIUS_KM } from "./scale";
+import { addRegolith } from "./regolith";
 
 const M_PER_UNIT = 1e6; // 1 scene unit = 1000 km
 
@@ -172,6 +173,8 @@ export class TerrainManager {
   ) {
     this.group.name = "terrain";
     this.group.visible = false;
+    const { east, north } = enuBasis(siteBodyKm);
+    addRegolith(this.material, east, north); // procedural detail below the DEM's 40 m (visual only)
   }
 
   private request(level: Level): void {

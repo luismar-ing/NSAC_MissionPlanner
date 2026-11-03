@@ -3014,3 +3014,24 @@ Las trayectorias ILLUSTRATIVE, los datos SYNTHETIC y toda desviación de la spec
 - **Desviaciones de la spec / cambios en la guía:** ninguna. D9 («terreno simplificado») se cumple con más detalle.
 - **Problemas abiertos:** se ven costuras finas entre niveles en algunas vistas aéreas; ya existían. Hay que repetir la medida de fps con la máquina en reposo antes de la entrega (8.7).
 - **Siguiente tarea:** T5.2.e (revisión del humano) y la Fase 7.
+
+## 2026-11-02 · AJUSTE · Textura de regolito en el terreno 3D
+
+- **Tarea:** petición del humano: de pie en el sitio el suelo seguía viéndose plano, sin textura.
+- **Qué se hizo:**
+  - `web/src/scene3d/regolith.ts` (nuevo): el material del terreno recibe en el shader de fragmentos detalle por debajo de los 40 m del DEM. Son cráteres pequeños en tres tamaños (celdas de 40, 11 y 3 m; cuenco con borde elevado, la mayoría desgastados) y un grano ondulado en 4 octavas. El patrón se aplica como relieve (perturbación de la normal con gradiente analítico) y como una leve variación de albedo.
+  - El patrón vive en el plano Este/Norte del sitio, en metros, así que queda fijo en el suelo. Cada capa se apaga cuando un píxel la cubre (`fwidth`), para que el suelo lejano no parpadee.
+  - `terrain.ts` lo aplica al material de los niveles.
+  - `credits.ts` (NOT_DATA) dice en la interfaz que ese detalle es procedural.
+- **Por qué es solo visual:** no mueve ningún vértice. El horizonte, las sombras (mapa de profundidad) y todas las métricas siguen saliendo de LOLA. La prueba nueva `tests/regolith.test.ts` comprueba que el shader encuentra sus anclas en three.js y que no toca `transformed`.
+- **Cómo se verificó:**
+  ```
+  $ npm --prefix web run typecheck → sin errores · npm --prefix web test → 266 passed
+  fps.mjs A/B en la misma sesión (portátil en batería al 19 %, GPU limitada): sitio 18,9 sin textura / 18,2–18,5 con textura
+  ```
+  Capturas en primera persona (Malapert, Haworth): cráteres y grano visibles con Sol rasante.
+  - Primera versión: usaba derivadas de pantalla y salían bloques de 2×2 píxeles. Se cambió a gradiente analítico.
+  - Segunda versión: el ruido de valor dejaba una retícula. Se gira cada octava.
+- **Desviaciones de la spec / cambios en la guía:** ninguna. Detalle visual declarado en «About & credits».
+- **Problemas abiertos:** repetir `npm --prefix web run fps` con el portátil enchufado antes de la entrega (8.7).
+- **Siguiente tarea:** T5.2.e (revisión del humano) y la Fase 7.
